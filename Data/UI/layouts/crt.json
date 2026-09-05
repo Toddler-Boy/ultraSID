@@ -1,0 +1,17 @@
+{
+	"constants": [
+		{ "settingsW": "276 + 16" }
+	],
+
+	"components": [
+		{ "id": "crt", "x": "fullscreen", "y": 0, "r": "parW - ( settingsW + bentoGap ) * showSettings - fullscreen", "b": "parH",
+			"components": [
+				{ "id": "open", "r": "parW", "y": 0 },
+				{ "id": "pageControl", "cx": "parW2", "b": "parH - bentoGap * 2" }
+			]
+		},
+
+		// The panel's own tree comes from the shared crt-settings.json
+		{ "id": "settings", "x": "prevR + bentoGap", "y": "prevY", "r": "parW - bentoGap", "b": "parB - bentoGap" }
+	]
+}

@@ -1,0 +1,22 @@
+{
+	"components": [
+		{ "id": "badge", "x": 7, "y": 0, "r": "parW - 7 - 5", "h": 28,
+			"components": [
+				{ "id": "logo", "x": 0, "y": 0, "w": 97, "h": "parH", "properties": { "focusMargin": "2" } },
+				{ "id": "version", "x": "prevR + 10", "cy": "parH2", "h": 22, "properties": { "focusRadius": "badge/corner" } }
+			]
+		},
+		{ "id": "mainMenu", "x": "prevX", "y": "prevB + 15", "r": "parW - 7 - 5", "h": 240,
+			"components": [
+				{ "grid": "search,playlists,crt,export,history,settings", "bounds": "parent", "rows": 6, "rowGap": 5 }
+			]
+		},
+		{ "id": "playlistGrid", "x": 0, "y": "prevB + bentoGap * 6", "r": "prevR + 5", "b": "parH - bentoGap",
+			"components": [
+				{ "id": "header", "x": "bentoGap * 2", "y": 0, "r": "parW - bentoGap * 2 - 12", "h": 20 },
+				{ "id": "addPlaylist", "xd": 0, "w": "prevH", "properties": { "focusRadius": 1000 } }
+			]
+		},
+		{ "id": "rightBorder", "r": "parW", "y": 0, "w": 1, "h": "parH" }
+	]
+}

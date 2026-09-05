@@ -1,0 +1,50 @@
+{
+	"constants": [
+		{ "edMargin": 12 },
+		{ "rowH": 28 },
+		{ "groupSpc": 16 },
+		{ "labelW": 130 }
+	],
+
+	"components": [
+		{ "id": "name-label", "x": "edMargin", "y": 4, "w": "labelW", "h": 20 },
+		{ "id": "name", "x": "prevR", "y": "prevY", "r": "parW - edMargin", "h": "prevH" },
+		{ "id": "folder-label", "yd": "0, name-label" },
+		{ "id": "folder", "yd": "0, name" },
+
+		{ "id": "cap-label", "yd": "groupSpc, folder-label", "h": "rowH" },
+		{ "id": "cap", "x": "prevR", "y": "prevY + 2", "w": 36, "h": "rowH - 4" },
+
+		{ "id": "flt0dac", "x": "edMargin", "y": "prevB", "r": "parW - edMargin", "h": "rowH" },
+		{ "id": "fltgain", "yd": 0 },
+		{ "id": "fltsat", "yd": 0 },
+		{ "id": "resonance", "yd": 0 },
+
+		{ "id": "wavedc", "yd": "groupSpc" },
+		{ "id": "extdc", "yd": 0 },
+		{ "id": "bias", "yd": 0 },
+
+		{ "id": "leakage", "yd": "groupSpc" },
+
+		{ "id": "cws-label", "x": "edMargin", "y": "prevB + groupSpc + 4", "w": "labelW", "h": "rowH" },
+		{ "id": "cws", "x": "prevR", "y": "prevY", "w": 110, "h": "rowH" },
+		{ "id": "cws-ultra-label", "yd": "compGap, cws-label" },
+		{ "id": "cws-ultra", "x": "prevR", "y": "prevY + 2", "w": 36, "h": "rowH - 4" },
+
+		{ "id": "loop-label", "x": "edMargin", "y": "prevB + groupSpc + compGap", "w": "labelW", "h": "rowH" },
+		{ "id": "loop-info", "x": "prevR", "y": "prevY", "w": 76, "h": "rowH" },
+
+		{ "id": "loop-start", "xd": "compGap" },
+		{ "id": "loop-end", "xd": "compGap" },
+		{ "id": "loop-clear", "xd": "compGap" },
+
+		{ "id": "save-factory", "x": "edMargin", "b": "parH - edMargin", "w": 150, "h": 32 },
+		{ "id": "save-user", "xd": "compGap", "r": "getR('loop-clear')" },
+
+		{ "id": "line1", "x": "edMargin", "macro": "centerY(folder, cap-label, 0)", "r": "parW - edMargin", "h": 1 },
+		{ "id": "line2", "x": "edMargin", "macro": "centerY(resonance, wavedc, 0)", "r": "parW - edMargin", "h": 1 },
+		{ "id": "line3", "x": "edMargin", "macro": "centerY(bias, leakage, 0)", "r": "parW - edMargin", "h": 1 },
+		{ "id": "line4", "x": "edMargin", "macro": "centerY(leakage, cws, -4)", "r": "parW - edMargin", "h": 1 },
+		{ "id": "line5", "x": "edMargin", "macro": "centerY(cws-ultra, loop-label, 0)", "r": "parW - edMargin", "h": 1 }
+	]
+}

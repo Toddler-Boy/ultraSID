@@ -1,0 +1,6 @@
+/DEMOS/S-Z/Zamzara_V1_1_intro=unclear
+/GAMES/A-F/A_C_E=ctrl2 stream (no mode yet)|ctrl2 stream (no mode yet)|-|-|ctrl2 stream (no mode yet)|ctrl2 stream (no mode yet)|ctrl2 stream (no mode yet)|ctrl2 stream (no mode yet)|ctrl2 stream (no mode yet)|ctrl2 stream (no mode yet)|ctrl2 stream (no mode yet)|ctrl2 stream (no mode yet)
+/MUSICIANS/0-9/4-Mat/Type_Mismatch=freq3 lo-byte latch (no mode yet)
+/MUSICIANS/R/Red_Duijckaerts_Roger/Batdance-Mix=freq1 lo-byte latch (no mode yet)
+/MUSICIANS/R/Red_Duijckaerts_Roger/Big_Fun=freq1 lo-byte latch (no mode yet)
+/MUSICIANS/T/Taylor_Stuart/Caized_Music=pwLo2 (no mode yet)

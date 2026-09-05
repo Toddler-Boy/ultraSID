@@ -1,0 +1,290 @@
+colors:
+  window: "#00000f"
+  text: "#fcffff"
+  accent: "#ff1493"
+  accent2: "#f0f"
+
+  logo: "#ff0"
+  logo-outline: "#ff1493"
+
+  voice-off: "#5a6673"
+  voice-on: "#3fff90"
+  voice-muted: "#ff2424"
+  filter-on: "#3cffff"
+  digi: "#00ffe1"
+
+  fx-real: "#fefeff"
+  fx-pure: "#00ffff"
+  fx-magic: "#ffed00"
+  fx-epic: "#ff47ff"
+  fx-mythic: "#ff371b"
+
+  status-ok: "#3fff90"
+  status-warning: "#ffed00"
+  status-error: "#ff2424"
+  status-info: "#3f97ff"
+  status-unknown: "#5a6673"
+
+page-title:
+  font: 32 800
+
+alert-banner:
+  font: 13.1 800
+
+tooltip:
+  font: 13.8 500
+  corner: 4
+  line: 1.2
+  padding: 12 14
+
+toast:
+  font: 16 600
+  corner: 12
+  line: 0.5
+  padding: 18 24
+  button-padding: 6 16
+  progress-height: 4
+
+badge:
+  font: 10.5 600
+  corner: 5
+
+drop-down:
+  font: 13 600
+  corner: 5
+
+menu:
+  corner: 8
+  line: 1
+  highlight-corner: 5
+  separator-line: 1
+  column-separator-line: 1.5
+
+text-editor:
+  corner: 5
+  line: 2
+
+slider-bubble:
+  line: 1
+
+main-menu:
+  font: 14 550
+  button-corner: 8
+  badge-line: 1
+
+search-bar:
+  font: 13.8 500
+  corner: 1000
+  line: 2
+
+search-info:
+  font: 11.5 500
+
+tags:
+  liked: "#ff2e5e"
+  pioneers: "#a97dff"
+  gems: "#6bd2ff"
+  winners: "#ffed00"
+
+tag-button:
+  font: 10 600
+  corner: 1000
+  line: 1.5
+  line-on: 0.5
+
+table-header:
+  font: 13 600
+
+browser:
+  text-font: 13 550
+  small-font: 12 500
+  row-corner: 3
+  thumbnail-corner: 3
+
+onboarding:
+  text-font: 13.8 500
+  button-font: 15.4 600
+  progress-font: 12.3 600
+  status-font: 12.3 600
+
+footer:
+  title-font: 14 600
+  author-font: 13 600
+  released-font: 12.5 550
+  thumbnail-corner: 3
+
+transport:
+  font: 10 700
+
+value-bubble:
+  corner: 4
+
+quality-button:
+  font: 15 600
+  corner: 6
+
+quality-selector:
+  corner: 8
+  header-font: 15.4 800
+  help-font: 14 500
+  button-font: 9 800
+  button-corner: 8
+
+settings:
+  section-font: 18 800
+  entry-font: 15.5 700
+  help-font: 13.2 600
+  label-font: 14 700
+  field-font: 14 550
+  location-font: 14 500
+  box-corner: 10
+  box-line: 1
+
+settings-location-button:
+  font: 12.3 600
+  line: 1.5
+
+export:
+  token-author: "#ffa520"
+  token-title: "#25b6f7"
+  token-release: "#cc82d8"
+  token-year: "#ffed54"
+  token-number: "#70c773"
+  token-quality: "#f476a0"
+
+crt:
+  header-font: 15 700
+  label-font: 12 600
+  slider-choice-font: 10 700
+
+chips:
+  labels-font: 10 730
+  text: "#ffffff66"
+  divot: "#00000088"
+  divot-line: 1
+
+chip-states:
+  corner: 3
+  line: 1.75
+  history-padding: 2.5 0
+  control-padding: 2.5 0
+  waveform-padding: 7.5 0
+  filter-mode-padding: 7.5 4
+
+memory-overview:
+  corner: 2
+
+eq:
+  hot: "#ff952c"
+  neutral: "#66ff99"
+  cold: "#3ca5ff"
+  line: 3
+  dot: 9.5
+  halo: 2
+  bars: 51
+  curve-alpha: 1
+  bars-alpha: 1
+  dash-visibility: 3
+  column-visibility: 3
+  label-font: 10.5 700
+
+fft:
+  caption-font: 9 500
+  clip-corner: 2
+  curve-corner: 5
+  curve-line: 1.125
+  voice-frequency-line: 2
+  left-line: "#0410e2"
+  left-fill: "#0410e2"
+  right-line: "#fcffff"
+  right-fill: "#00000000"
+  grid: "#fcffff33"
+  grid-text: "#fcffff66"
+
+stil:
+  toggle-tunes-only: "#ffb90a"
+  toggle-stil: "#04e6d1"
+  toggle-viz: "#d28fff"
+  toggle-font: 10 600
+  toggle-corner: 8
+  toggle-line: 1.5
+  toggle-line-on: 0.5
+
+  list-font: 10.8 500
+  list-icon-padding: 1 4 1 0
+
+stil-box:
+  item-gap: 3
+  corner: 8
+  alpha: 0.2
+
+  marker-line: 3
+  marker-padding: 6
+
+  padding: 10 10 10 0
+
+  author-height: 30
+  author-padding: 8 6 4 0
+  author-font: 22 600
+  portrait-corner: 1000
+
+  comment: "#00f6ff"
+  comment-font: 13.5 550
+  link: "#fd2"
+  link-corner: 4
+  link-padding: 2 4
+
+  quote: "#b9bed2"
+  quote-font: 13.5 550
+
+  title: "#babaff"
+  title-font: 13.5 550
+  title-icon-gap: 1
+  title-icon-padding: 2
+
+  mono: "#ff9000"
+  mono-font: 10.625 670
+
+  bug: "#ff3636"
+  bug-font: 13.5 550
+
+playlist:
+  info-font: 10 700
+  cover-corner: 8
+
+grid:
+  outline-line: 0.75
+  drag-line: 2
+
+grid-big:
+  corner: 12
+  header-font: 32 700
+  title-font: 14 700
+  authors-font: 10.8 500
+
+grid-mini:
+  corner: 12
+  padding: 8 4
+  header-font: 13 700
+  name-font: 13 600
+  info-font: 12 600
+
+xy-pad:
+  line: 1
+
+keycap:
+  font: 11 600
+  corner: 6
+  line: 1
+  padding: 7
+  height: 26
+  gap: 5
+  fill: "#fff1"
+  outline: "#fff4"
+
+shortcuts:
+  title-font: 32 700
+  section-font: 24 700
+  hint-font: 15 500
+  row-height: 34
+  header-height: 60

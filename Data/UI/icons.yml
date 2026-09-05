@@ -1,0 +1,126 @@
+#
+# This is not a full-fledged YAML file.
+# The parser will fail if you go beyond this extremely simple format.
+#
+main-menu:
+  search:     font-awesome/magnifying-glass-solid-full
+  playlists:  font-awesome/list-solid-full
+  crt:        font-awesome/display-solid-full
+  export:     font-awesome/arrow-up-right-from-square-solid-full
+  history:    font-awesome/clock-rotate-left-solid-full
+  settings:   font-awesome/gear-solid-full
+
+# Context menus
+menu:
+  add_to_playlist: font-awesome/plus-solid-full
+  playlist:        font-awesome/list-solid-full
+  delete:          font-awesome/trash-can-regular-full
+  move_to_top:     font-awesome/arrow-up-solid-full
+  move_to_bottom:  font-awesome/arrow-down-solid-full
+  go_to_folder:    font-awesome/folder-open-solid-full
+  export_tune:     font-awesome/arrow-up-right-from-square-solid-full
+  requeue_export:  font-awesome/arrow-down-solid-full
+  clear_older:     font-awesome/clock-rotate-left-solid-full
+
+search:
+  tag:
+    pioneers: tabler/rocket
+    gems:     tabler/diamond
+    winners:  tabler/award
+    liked:    font-awesome/heart-solid-full
+
+search_bar:
+  search: font-awesome/magnifying-glass-solid-full
+  clear:  font-awesome/xmark-solid-full
+
+stil:
+  toggle:
+    tunes_only: tabler/filter-2
+    stil:       tabler/message-2
+    viz:        material/memory_alt
+
+  list:
+    song:     font-awesome/record-vinyl-solid-full
+    stinger:  tabler/sparkles-2
+    fx:       font-awesome/explosion-solid-full
+    speech:   material/record_voice_over
+
+  title:
+    song:   font-awesome/record-vinyl-solid-full
+    artist: font-awesome/user-solid-full
+
+playlist:
+  play: footer/player_play
+  add:  font-awesome/circle-plus-solid-full
+
+about:
+  close: font-awesome/xmark-solid-full
+
+crt:
+  settings_open:  font-awesome/sliders-solid-full
+  settings_close: font-awesome/sliders-solid-full
+
+crt:
+  settings:
+    tv:
+      brightness:  crt/brightness
+      contrast:    crt/contrast
+      saturation:  crt/saturation
+      tint:        crt/tint
+      warmth:      crt/warmth
+      overscan:    crt/overscan
+
+    webcam:
+      brightness:  crt/brightness
+      contrast:    crt/contrast
+      saturation:  crt/saturation
+      zoom:        font-awesome/magnifying-glass-solid-full
+
+footer:
+  volume:
+    mute:    footer/volume_mute
+    low:     footer/volume_low
+    medium:  footer/volume_medium
+    high:    footer/volume_high
+
+  player:
+    play:     footer/player_play
+    pause:    footer/player_pause
+    previous: footer/player_previous
+    next:     footer/player_next
+    repeat:   footer/player_repeat
+    repeat_1: footer/player_repeat_1
+    shuffle:  footer/player_shuffle
+
+history_back: font-awesome/chevron-left-solid-full
+menu_button:  tabler/dots-vertical
+
+# Generic list columns
+list:
+  history_date: font-awesome/clock-rotate-left-solid-full
+
+# Look-and-feel primitives
+laf:
+  combo_arrow:   font-awesome/angle-down-solid-full
+  check:         font-awesome/check-solid-full
+  submenu_arrow: font-awesome/chevron-right-solid-full
+
+# Likes
+liked:        font-awesome/heart-solid-full
+not-liked:    font-awesome/heart-regular-full
+other-liked:  font-awesome/heart-circle-exclamation-solid-full
+
+portrait-unknown: font-awesome/user-solid-full
+theme-user:       font-awesome/user-solid-full
+theme-factory:    font-awesome/dice-d6-solid-full
+crt-user:         font-awesome/user-solid-full
+crt-factory:      font-awesome/dice-d6-solid-full
+
+status:
+  error:  tabler/alert-triangle
+
+version-pill:
+  checking: font-awesome/circle-notch-solid-full
+  current:  font-awesome/circle-check-regular-full
+  outdated: tabler/alert-triangle
+  failed:   font-awesome/circle-xmark-regular-full

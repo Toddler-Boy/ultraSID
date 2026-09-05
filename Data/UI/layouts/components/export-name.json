@@ -1,0 +1,8 @@
+{
+	"components": [
+		{ "id": "label", "x": 0, "y": 0, "r": "parW", "h": 16 },
+		{ "id": "help", "yd": 6, "h": 20 },
+		{ "id": "text", "x": 0, "y": "prevB + 6", "r": "parW", "h": 32 },
+		{ "id": "preview", "x": 0, "y": "prevB + 6", "r": "parW", "h": 48 }
+	]
+}

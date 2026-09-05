@@ -1,0 +1,17 @@
+{
+	"washes": [
+		{ "rect": [ 9, 1, 23, 5 ], "speed": 3,
+		  "colors": [ "blue", "dark_grey", "purple", "light_red", "cyan", "yellow", "white",
+		              "yellow", "cyan", "light_red", "purple", "dark_grey" ] },
+
+		{ "rect": [ 10, 3, 21, 1 ], "speed": 2, "pause": 180,
+		  "colors": [ 1, 15, 12, 11, 12, 15, 1, 15, 12, 11 ] }
+  	],
+
+	"rasterbars": [
+		{ "y": -15, "amplitude": 6, "period": 150, "phase": 0,		"colors": [ "blue", "light_blue", "cyan", "white", "cyan", "light_blue", "blue" ] },
+		{ "y": -15, "amplitude": 6, "period": 150, "phase": 0.5,	"colors": [ "red", "light_red", "white", "light_red", "red" ] },
+		{ "y": 215, "amplitude": 6, "period": 150, "phase": 0.5,	"colors": [ "blue", "light_blue", "cyan", "white", "cyan", "light_blue", "blue" ] },
+		{ "y": 215, "amplitude": 6, "period": 150, "phase": 0,		"colors": [ "red", "light_red", "white", "light_red", "red" ] }
+	]
+}

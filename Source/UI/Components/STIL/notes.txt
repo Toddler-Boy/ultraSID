@@ -1,0 +1,6 @@
+First comment for musician, search for "'s own comments are denoted".
+
+Everything trimmed before is the musicians name
+Everything trimmed after is the placeholder
+
+During STIL rendering (not parsing), replace placeholder with musicians name

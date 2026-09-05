@@ -1,0 +1,32 @@
+# One path per line, prefixed with the root it lives under. Tests/data-roots.txt
+# says where each marker points (machine-specific, keep untracked).
+# Because the files sit at their real paths, the engine's chip/audio profiles
+# and tune overrides apply exactly as in the app. Filter on/off comes from
+# not-filtered.txt (matched on the filename stem).
+$HVSC$/DEMOS/A-F/Desole.sid
+$HVSC$/MUSICIANS/C/C0zmo/50_Shades_of_Gradius.sid
+$HVSC$/MUSICIANS/G/Gray_Fred/Hysteria.sid
+$HVSC$/MUSICIANS/H/Hubbard_Rob/Arcade_Classics.sid
+$HVSC$/MUSICIANS/H/Hubbard_Rob/Commando.sid
+$HVSC$/MUSICIANS/H/Hubbard_Rob/Pandora.sid
+$HVSC$/MUSICIANS/L/Lead/House_Designs.sid
+$HVSC$/MUSICIANS/L/Lead/No_Women_Allowed.sid
+$HVSC$/MUSICIANS/L/Lead/Paradise.sid
+$HVSC$/MUSICIANS/L/Lead/Poing.sid
+$HVSC$/MUSICIANS/L/Lft/Machine_Yearning_2SID.sid
+$HVSC$/MUSICIANS/M/Mahoney/Kapla_Caves.sid
+$HVSC$/MUSICIANS/M/Mahoney/Stereophonik_6581_2SID.sid
+$HVSC$/MUSICIANS/N/Norman_Paul/Bowling_BASIC.sid
+$HVSC$/MUSICIANS/N/Norman_Paul/Forbidden_Forest.sid
+$HVSC$/MUSICIANS/S/Shogoon/Cheezzy_Top_Fixed_3SID.sid
+$HVSC$/MUSICIANS/S/Spino2006/Peek_and_Poke.sid
+$HVSC$/MUSICIANS/T/Tel_Jeroen/Cybernoid.sid
+$HVSC$/MUSICIANS/T/Tel_Jeroen/Cybernoid_II.sid
+$HVSC$/MUSICIANS/T/Tjelta_Geir/Artillery.sid
+$HVSC$/MUSICIANS/T/Tjelta_Geir/Echofied_6581.sid
+$HVSC$/MUSICIANS/T/Toggle/Kicks_Like_a_M_U_L_E.sid
+
+# Shipped with ultraSID, not part of the HVSC; the mirror shadows the HVSC
+# layout so path-matched profiles apply
+$EXOT$/DEMOS/M-R/Nutcracker_10SID.sid
+$EXOT$/MUSICIANS/L/LMan/The_Tuneful_Eight_8SID.sid

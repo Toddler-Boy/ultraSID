@@ -1,0 +1,10 @@
+delay	8	6.29427e-05
+eq_loudness	8	0.000347616
+gain	8	0.00021716
+noise	8	0.000497494
+reverb	8	0.000751898
+splitter_48db	8	0.000651424
+splitter_freq_switch	8	0.000540785
+transformer_hum	8	0.001565
+tv_speaker	8	0.0011066
+wide_mono	8	4.88514e-05

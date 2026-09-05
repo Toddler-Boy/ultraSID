@@ -1,0 +1,37 @@
+{
+  "buildPresets": [
+    {
+      "condition": {
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows",
+        "type": "equals"
+      },
+      "configurePreset": "vs",
+      "displayName": "Build with Visual Studio",
+      "inherits": "base",
+      "name": "vs"
+    }
+  ],
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 2,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "condition": {
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows",
+        "type": "equals"
+      },
+      "displayName": "Build with Visual Studio",
+      "generator": "Visual Studio 18 2026",
+      "inherits": "base",
+      "name": "vs"
+    }
+  ],
+  "include": [
+    "base.json"
+  ],
+  "version": 10
+}

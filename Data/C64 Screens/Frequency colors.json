@@ -1,0 +1,7 @@
+{
+	"frequency": {
+		"on":       { "colors": [ "dark_grey", "brown", "green", "light_grey", "light_green" ] },
+		"filtered": { "colors": [ "dark_grey", "blue", "purple", "light_blue", "cyan" ] },
+		"muted":    { "colors": [ "brown", "red", "orange", "light_red" ] }
+	}
+}

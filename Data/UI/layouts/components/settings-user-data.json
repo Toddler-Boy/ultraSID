@@ -1,0 +1,26 @@
+{
+	"components": [
+		{ "id": "label", "x": 0, "y": 0, "r": "parW - 150", "h": 21 },
+		{ "id": "help", "yd": 0 },
+
+		{ "id": "playlists", "x": 0, "y": "prevB + 10", "w": 22, "h": 22 },
+		{ "id": "playlists-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
+		{ "id": "likes", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
+		{ "id": "likes-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
+		{ "id": "history", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
+		{ "id": "history-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
+		{ "id": "tunes", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
+		{ "id": "tunes-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
+		{ "id": "themes", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
+		{ "id": "themes-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
+		{ "id": "crt", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
+		{ "id": "crt-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
+		{ "id": "preferences", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
+		{ "id": "preferences-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
+
+		{ "id": "status", "x": 0, "y": "prevB + 10", "r": "parW", "h": 16 },
+
+		{ "id": "export", "x": "parW - 139", "y": "getY('playlists') - 3", "r": "parW", "h": 28 },
+		{ "id": "import", "yd": 6 }
+	]
+}

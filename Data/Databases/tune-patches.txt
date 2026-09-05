@@ -1,0 +1,34 @@
+# Byte fixes for broken HVSC rips, applied as a tune loads.
+# A tune line is its collection path; each line below it is "offset old new" in
+# hex, offsets into the .sid file, anything after the third value is a comment.
+# A tune's patches apply only when every old byte matches, otherwise the file
+# loads untouched, so an entry retires itself once HVSC ships the fixed file.
+# Song lengths after the tune path ("/path/Tune.sid 1:32", one time per
+# subtune) replace the HVSC's lengths for the tune; they cannot retire
+# themselves, delete the block by hand once the HVSC carries the fix.
+
+/MUSICIANS/H/Huelsbeck_Chris/Madness.sid
+0077 04 14   PSID flags: PAL + 6581
+3548 80 20   instrument 17 filter cutoff base
+3568 80 20   instrument 18 filter cutoff base
+35E8 70 10   instrument 22 filter cutoff base
+
+/MUSICIANS/A/Astovel/Tengu_Warez_1_menu.sid
+0B22 03 FF   drum pattern $0A: end after 16 rows like all others (two stray rows made voice 1 loop 10 frames late)
+
+/MUSICIANS/S/Svensson_Roger/Walliball.sid
+0987 3E 3D   subtune 5: drop the empty pattern 9 from voice 1's sequence (2 frames drift per loop)
+
+/MUSICIANS/W/Wizard_Oxygen/Night.sid 1:32   loops after 4608 frames, the HVSC's 9:12 was measured on the detuned version
+0C6F 41 C9   voice 2 pattern: stray duration byte after a legato toggle left voice 2 sharp from 1:14 to the end
+
+/DEMOS/UNKNOWN/Misc_Tune_05.sid
+0C59 52 82   voice 3 pattern 7: duration byte, was read as a note 82 semitones up
+0C61 55 85   voice 3 pattern 7: duration byte, was read as a note 85 semitones up
+0C62 FF 39   voice 3 pattern 7: note instead of a premature end, restores the full 192-tick pattern
+
+/DEMOS/UNKNOWN/Wham.sid
+15C3 40 00   voice 2, position $45: play the regular bass pattern $9400 instead of the garbled fill at $9340
+16C3 93 94   (high byte of the same pattern pointer)
+15C7 40 00   voice 2, position $49: same substitution for the second fill bar
+16C7 93 94   (high byte of the same pattern pointer)

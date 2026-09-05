@@ -1,0 +1,121 @@
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+--------------------------------------------------
+
+Third-Party Libraries & Open Source Notices:
+
+1. JUCE Framework ({})
+   https://github.com/juce-framework/JUCE
+   Copyright © 2026, Raw Material Software Limited
+   GNU Affero General Public License v3.0
+
+   This component is bound by the terms of the AGPLv3.
+   A full copy of the license text is available at:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
+
+
+2. Gin
+   https://github.com/FigBug/Gin
+   Copyright © 2018, Roland Rabien
+   BSD 3-Clause License
+
+
+3. libSidplayEZ (the ultraSID player core)
+   https://github.com/Toddler-Boy/libSidplayEZ
+   Based on libsidplayfp,
+   Copyright © Simon White, Antti Lankila, Leandro Nini and contributors
+   Includes reSIDfp, based on reSID by Dag Lem.
+   GNU General Public License v2.0 or later
+
+
+4. PFFFT
+   https://bitbucket.org/jpommier/pffft
+   Copyright © 2013 Julien Pommier
+   Based on FFTPACK, Copyright © 1984-2004 the University Corporation
+   for Atmospheric Research
+
+
+5. Colodore palette
+   https://www.colodore.com
+   Copyright © Philip "pepto" Timmermann
+   The VIC-II color model behind the CRT palette rendering.
+
+
+6. MVerb
+   https://github.com/martineastwood/mverb
+   Copyright © 2010 Martin Eastwood
+   GNU General Public License v3.0 or later
+   Modified for ultraSID (block processing, SIMD kernels).
+
+
+7. {fmt}
+   https://github.com/fmtlib/fmt
+   Copyright © 2012-present, Victor Zverovich and {fmt} contributors
+   MIT License
+
+
+8. Boost.Regex
+   https://github.com/boostorg/regex
+   Copyright © John Maddock and contributors
+   Boost Software License 1.0
+
+
+9. libarchive
+   https://www.libarchive.org
+   Copyright © Tim Kientzle and contributors
+   BSD 2-Clause License
+
+
+10. XZ Utils (liblzma)
+    https://tukaani.org/xz
+    Copyright © Lasse Collin and contributors
+    BSD Zero Clause License (0BSD)
+
+
+11. Melatonin Blur
+    https://github.com/sudara/melatonin_blur
+    Copyright © 2023 Sudara Williams
+    MIT License
+
+
+12. MD5
+    Copyright © 1999 Aladdin Enterprises, L. Peter Deutsch
+    Derived by Michael Schwendt for libsidplayfp
+    zlib-style license
+
+
+13. Fonts
+    Figtree, Copyright © 2022 The Figtree Project Authors
+    https://github.com/erikdkennedy/figtree
+    Noto Sans Mono, Copyright © 2022 The Noto Project Authors
+    https://github.com/notofonts/latin-greek-cyrillic
+    Both under the SIL Open Font License, Version 1.1
+
+
+14. SIDId player signatures
+    https://github.com/cadaver/sidid
+    Written by Lasse Öörni (Cadaver), signatures by Ian Coog, Ice00,
+    Ninja, Yodelking, Wilfred/HVSC, Prof. Chaos and contributors.
+
+
+--------------------------------------------------
+
+Tune metadata and lengths come from the High Voltage SID Collection
+and the SID Tune Information List (STIL).
+https://www.hvsc.c64.org
+
+Nearly all title screens and game screenshots come from Lemon64,
+with their kind permission.
+https://www.lemon64.com
+
+Thank you to everyone keeping the C64 scene alive.

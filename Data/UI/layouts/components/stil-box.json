@@ -1,0 +1,17 @@
+{
+	"w": "itemWidth", "h": "boxHeight",
+
+	"constants": [
+		{ "titleRowHeight": 16 },
+		{ "titleRowGap": 6 },
+		{ "textTop": "hasAuthor * ( authorPadTop + authorHeight + authorPadBottom ) + ( 1 - hasAuthor ) * padTop" },
+		{ "boxHeight": "textTop + textHeight + padBottom" }
+	],
+
+	"components": [
+		{ "id": "marker", "x": "markerLeft", "y": "markerTop", "w": "markerLine", "h": "boxHeight - markerTop - markerBottom" },
+		{ "id": "textArea", "x": "prevR + markerRight + padLeft", "y": "textTop", "r": "itemWidth - padRight", "h": "textHeight" },
+		{ "id": "portrait", "optional": true, "x": "getR('marker') + markerRight + authorPadLeft", "y": "authorPadTop", "w": "authorHeight", "h": "authorHeight" },
+		{ "id": "author", "optional": true, "x": "prevR + authorPadRight", "y": "prevY", "r": "itemWidth - padRight", "h": "prevH" }
+	]
+}

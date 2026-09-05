@@ -1,0 +1,30 @@
+tune (integrated LUFS)                 input    REAL    PURE   MAGIC    EPIC  MYTHIC
+50_Shades_of_Gradius                   -16.1   -20.2   -21.1   -20.0   -18.4   -18.1
+Arcade_Classics                        -19.0   -23.3   -24.0   -22.9   -21.3   -20.9
+Artillery                              -20.1   -24.0   -25.1   -24.4   -22.8   -22.4
+Bowling_BASIC                          -25.9   -29.7   -30.9   -30.2   -28.6   -29.3
+Cheezzy_Top_Fixed_3SID                 -22.0   -26.6   -27.0   -26.5   -25.8   -25.8
+Commando                               -17.0   -20.9   -22.0   -21.3   -19.7   -19.3
+Cybernoid                              -18.1   -22.4   -23.1   -22.1   -20.5   -20.2
+Cybernoid_II                           -21.0   -26.2   -26.0   -24.2   -22.7   -22.3
+Desole                                 -19.4   -24.7   -24.4   -23.1   -21.5   -21.1
+Echofied_6581                          -18.4   -24.0   -23.4   -22.0   -20.4   -20.0
+Forbidden_Forest                       -23.0   -26.9   -28.0   -27.0   -25.4   -25.0
+Hysteria                               -16.9   -22.6   -21.9   -20.0   -18.5   -18.1
+Kapla_Caves                            -20.1   -23.7   -25.1   -23.5   -22.0   -21.7
+Kicks_Like_a_M_U_L_E                   -15.9   -23.7   -20.9   -18.5   -17.0   -16.6
+Machine_Yearning_2SID                  -25.8   -31.0   -30.8   -29.4   -28.4   -28.2
+Nutcracker_10SID                       -20.3   -24.6   -25.3   -25.1   -24.6   -24.8
+Pandora                                -19.2   -23.4   -24.2   -23.0   -21.5   -21.1
+Peek_and_Poke                          -20.4   -26.8   -25.4   -23.3   -21.8   -21.3
+Stereophonik_6581_2SID                 -21.3   -27.7   -26.3   -24.3   -23.1   -22.9
+The_Tuneful_Eight_8SID                 -19.0   -23.3   -24.0   -23.2   -22.5   -22.5
+
+average delta vs MAGIC (positive = measures louder), 20 tunes:
+  REAL   -1.1 dB  (worst tune +5.2 dB)
+  PURE   -1.2 dB  (worst tune +2.4 dB)
+  EPIC   +1.4 dB  (worst tune +1.6 dB)
+  MYTHIC  +1.6 dB  (worst tune +2.0 dB)
+
+note: fxGains is tuned for equal FEEL; use these numbers to spot drift
+after FX/EQ changes, not as a target to equalize against

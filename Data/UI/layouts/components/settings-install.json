@@ -1,0 +1,10 @@
+{
+	"components": [
+		{ "id": "label", "x": 0, "y": 0, "r": "parW - 200", "h": 21 },
+		{ "id": "help", "yd": 0 },
+		{ "id": "status", "yd": 0 },
+
+		{ "id": "shortcut", "x": "parW - 140", "y": 0, "r": "parW", "h": 28 },
+		{ "id": "move", "yd": 6 }
+	]
+}

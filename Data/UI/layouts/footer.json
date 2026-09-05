@@ -1,0 +1,42 @@
+{
+	"constants": [
+		{ "third": "parW / 3" },
+		{ "thumbSize": "parH - 32" }
+	],
+
+	"components": [
+		{ "id": "info", "bounds": "16, 0, third - 16, parH",
+			"components": [
+				{ "id": "thumbnail", "x": 0, "cy": "parH2", "w": "(thumbSize * 15) / 10", "h": "thumbSize" },
+				{ "id": "title", "x": "prevR + 16", "y": "prevY + 2", "r": "parR", "h": 19 },
+				{ "id": "author", "yd": 0 },
+				{ "id": "released", "yd": 0 }
+			]
+		},
+		{ "id": "transport", "cx": "parW2", "y": 4, "w": "third - 32", "b": "parH - 4",
+			"components": [
+				{ "id": "play", "cx": "parW2", "y": 10, "w": 36, "h": 36, "order": 2, "properties": { "focusRadius": 1000 } },
+				{ "id": "next", "x": "prevR + 8", "cy": "prevCY", "w": 32, "h": 32, "order": 3, "properties": { "focusRadius": 1000 } },
+				{ "id": "repeat", "xd": 8, "order": 4, "properties": { "focusRadius": 1000 } },
+				{ "id": "prev", "r": "getX('play') - 8", "cy": "prevCY", "w": 32, "h": 32, "order": 1, "properties": { "focusRadius": 1000 } },
+				{ "id": "shuffle", "xd": -8, "order": 0, "properties": { "focusRadius": 1000 } },
+
+				{ "id": "time", "x": 0, "y": "prevB + 2", "w": 40, "h": 32 },
+				{ "id": "progress", "xd": 0, "w": "parW - prevW * 2" },
+				{ "id": "length", "xd": 0, "w": "getW('time')" }
+			]
+		},
+		{ "id": "volume", "y": 0, "r": "parW - 16", "w": "third - 16", "h": "parH",
+			"components": [
+				{ "id": "volume", "r": "parW", "cy": "parH2", "w": 125, "h": 32 },
+				{ "id": "mute", "r": "prevX", "cy": "parH2", "w": 20, "h": "prevH", "order": 1, "properties": { "focusMargin": "1.3 1.3 1.3 2.4" } },
+				{ "id": "quality", "r": "prevX - 20", "cy": "parH2", "w": 55, "h": 22, "order": 0, "properties": { "focusRadius": "quality-button/corner" } },
+
+				{ "id": "inL", "x": 0, "cy": "parH2", "w": 4, "h": "parH * 0.8" },
+				{ "id": "inR", "xd": 1 },
+				{ "id": "outL", "xd": 1 },
+				{ "id": "outR", "xd": 1 }
+			]
+		}
+	]
+}

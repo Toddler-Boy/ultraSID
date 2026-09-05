@@ -1,0 +1,42 @@
+{
+	"components": [
+		{ "id": "page1", "cx": "parW2", "cy": "parH2", "w": "dialogMargin * 2 + 700", "pH": "maxY + dialogMargin - 20",
+			"components": [
+				{ "id": "header", "cx": "parW2", "y": "dialogMargin - 20", "w": 700, "h": 40 },
+
+				{ "id": "welcome", "x": "prevX", "y": "prevB + 10", "r": "prevR", "h": 150,
+					"components": [
+						{ "id": "label", "x": 20, "y": 20, "r": "parW - 20", "b": "parH - 20" }
+					]
+				},
+
+				{ "id": "label:storage", "x": "prevX + 10", "y": "prevB + 30", "r": "prevR", "h": 30 },
+				{ "id": "storage", "x": "prevX - 10", "y": "prevB", "w": 700, "pH": "maxY + 12",
+					"components": [
+						{ "id": "hvsc", "x": 20, "y": 20, "r": "parW - 20", "pH": "maxY + 4", "macro": "setting-location" },
+						{ "id": "user", "yd": 16, "macro": "setting-location" }
+					]
+				},
+				{ "id": "download", "cx": "parW2", "y": "prevB + 30", "w": 300, "h": 40 }
+			]
+		},
+		{ "id": "page2", "cx": "parW2", "cy": "parH2", "w": "dialogMargin * 2 + 700", "pH": "maxY + dialogMargin - 20",
+			"components": [
+				{ "id": "header", "cx": "parW2", "y": "dialogMargin - 20", "w": 700, "h": 40 },
+
+				{ "id": "installing", "x": "prevX", "y": "prevB + 10", "r": "prevR", "pH": "maxY + 20",
+					"components": [
+						{ "id": "status",  "cx": "parW2", "y": 20, "w": "parW - 40", "h": 50,
+							"components": [
+								{ "id": "label", "x": 2, "y": 0, "w": "parW * 0.6", "h": "parH2" },
+								{ "id": "progressStr", "x": "prevR", "y": "prevY", "r": "parW", "h": "prevH" },
+								{ "id": "progress", "x": 0, "h": 15, "r": "parW", "b": "parH" }
+							]
+						}
+					]
+				},
+				{ "id": "cancel", "cx": "parW2", "y": "prevB + 30", "w": 300, "h": 40 }
+			]
+		}
+	]
+}

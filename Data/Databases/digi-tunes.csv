@@ -1,0 +1,71 @@
+tune,mode,comment
+/DEMOS/A-F/Catalysis.sid,none,
+/DEMOS/A-F/Dragons_Lair_Demo.sid,none,
+/DEMOS/A-F/Fugue_2026.sid,none,
+/DEMOS/A-F/Future_Spy.sid,none,
+/DEMOS/Commodore/SX-64_Demo.sid,none,
+/DEMOS/G-L/HBFS.sid,output,"plays 2 digis (voice1+2 = delayed, voice3 = vocals)"
+/DEMOS/M-R/Party_Songs.sid,none,
+/DEMOS/S-Z/Sledged.sid,none,
+/DEMOS/S-Z/Trumpet_Fiesta.sid,none,
+/GAMES/A-F/Big_Ben.sid,none,pitch-sweep FX
+/GAMES/A-F/Davy-King_of_the_Wild_Frontier.sid,covox,
+/GAMES/M-R/Out_on_a_Limb.sid,covox,speech in all subtunes but the first
+/GAMES/S-Z/Windwalker.sid,none,pitch-sweep FX
+/MUSICIANS/A/Andy/Justinblue_tune_6.sid,output3x,
+/MUSICIANS/B/Beyond_Reproach/Super_Carling_the_Spider_credits.sid,output2x,
+/MUSICIANS/D/Danko_Tomas/Peniz.sid,none,bad rip carrying a digi player that never runs
+/MUSICIANS/D/Danko_Tomas/Randomixx_2.sid,none,bad rip carrying a digi player that never runs
+/MUSICIANS/D/Data/Busty_Cactus.sid,output,
+/MUSICIANS/D/Deetsay/1_2_3_C64.sid,freq3,
+/MUSICIANS/D/Deetsay/Asmlook.sid,freq3,
+/MUSICIANS/D/Deetsay/Raveloop14_xm.sid,freq1,
+/MUSICIANS/D/Deutsch_Matthias/Ice_Guys.sid,voice3Out,digis in the first two subtunes
+/MUSICIANS/E/Encore/Fishing_Furiously.sid,freq3,
+/MUSICIANS/E/Encore/Spread_Eagle_Idaho.sid,freq3,
+/MUSICIANS/J/Jammer/Come_at_Me_Bro.sid,freq3,
+/MUSICIANS/J/Jammer/El_Loco_Challenge_intro.sid,freq3,
+/MUSICIANS/K/Khugiani_Naveed/Journey_into_Space.sid,mahoney,Mahoney school despite the unused Frodigi code
+/MUSICIANS/L/Lft/Platform_Hopping.sid,freq3,
+/MUSICIANS/L/Linus/Night_Finds_You.sid,freq3,
+/MUSICIANS/L/Linus/SYS64738_Days_Vinyl_Tribute.sid,freq3,
+/MUSICIANS/L/Linus/SYS64738_Days.sid,freq3,
+/MUSICIANS/M/Magnar/Comaland_tune_3.sid,output,"hard-sync ctrl streams + PCM, the mix IS the digi"
+/MUSICIANS/M/Magnar/Star_Wars-Imperial_March_Upbeat.sid,none,multi-speed player
+/MUSICIANS/M/Mankeli/Humphrey_Bogart.sid,none,multi-speed player
+/MUSICIANS/M/Mankeli/Your_Love.sid,freq2,
+/MUSICIANS/M/Matt/Allo_Allo.sid,none,"Master Composer, Lope pulse sweep on all voices"
+/MUSICIANS/M/Matt/Fugue_12.sid,none,"Master Composer, Lope pulse sweep on all voices"
+/MUSICIANS/M/Matt/Ghostbusters.sid,none,"Master Composer, Lope pulse sweep on all voices"
+/MUSICIANS/M/Matt/Marche_Militaire.sid,none,"Master Composer, Lope pulse sweep on all voices"
+/MUSICIANS/M/Matt/Tenko.sid,none,"Master Composer, Lope pulse sweep on all voices"
+/MUSICIANS/M/Mixer/Jungle.sid,output2x,
+/MUSICIANS/M/Mixer/Soundcheck.sid,freq3,
+/MUSICIANS/M/Mixer/Synthesis.sid,freq3,
+/MUSICIANS/M/Mixer/Tekno.sid,output2x,
+/MUSICIANS/M/Mixer/Vicious_SID_2-15638Hz.sid,freq1,
+/MUSICIANS/M/Mixer/Vicious_SID_2-Carmina_Burana.sid,carmina,
+/MUSICIANS/M/Morton_Adam/Synthmeld.sid,freq1,
+/MUSICIANS/N/Norman_Paul/Trivia_Monster.sid,none,"fast modulation, 1984"
+/MUSICIANS/R/Red_Kimmel_Jeroen/All_Risks.sid,covox,speech in subtune 4
+/MUSICIANS/R/Rosenbaum_Thorsten_and_Thomas/Bullet_in_the_Head.sid,output4x,"voice 2 + 3 tricks beyond the freq latch, the mix IS the digi"
+/MUSICIANS/R/Rosenbaum_Thorsten_and_Thomas/Flat_Beat_25_Years_Flat_Eric.sid,output4x,"voice 2 + 3 tricks beyond the freq latch, the mix IS the digi"
+/MUSICIANS/S/Sieslack_Joerg/Mission_Egg.sid,none,freq LFO on all three voices
+/MUSICIANS/S/SounDemoN/Vicious_SID_2-1st_loader.sid,escos,same impulse school
+/MUSICIANS/S/SounDemoN/Vicious_SID_2-Cybernoid_2.sid,output,"hard-sync ctrl stream on voice 2, the mix IS the digi"
+/MUSICIANS/S/SounDemoN/Vicious_SID_2-Escos.sid,escos,
+/MUSICIANS/S/Swallow/Spasmolytic_part_2.sid,voice1Pwm,PWM samples on voice 1
+/MUSICIANS/S/Swallow/Wonderland_IX_part_5.sid,voice1Pwm,PWM samples on voices 1+2
+/MUSICIANS/S/Swallow/Wonderland_XI-End.sid,pwLo1,16 kHz Censor school without a signature
+/MUSICIANS/T/Tape/Lootuskukka.sid,freq3,
+/MUSICIANS/T/Thorne_Jeremy/Song_Writer-Follow_Me.sid,none,"Song Writer 1984, PW timbre fuzz"
+/MUSICIANS/T/Thorne_Jeremy/Song_Writer-Life.sid,none,"Song Writer 1984, PW timbre fuzz"
+/MUSICIANS/T/Thorne_Jeremy/Song_Writer-REM10.sid,none,"Song Writer 1984, PW timbre fuzz"
+/MUSICIANS/V/Vincenzo/Semmi.sid,output,
+/MUSICIANS/W/Warp_8/Bassminer.sid,none,Warp 8 players modulate at 8x speed by design
+/MUSICIANS/W/Warp_8/Child_in_Time_Dub_Purple_Remix.sid,none,Warp 8 players modulate at 8x speed by design
+/MUSICIANS/W/Warp_8/Deaf_Apollo.sid,none,Warp 8 players modulate at 8x speed by design
+/MUSICIANS/W/Warp_8/Escalating_Madness.sid,none,Warp 8 players modulate at 8x speed by design
+/MUSICIANS/W/Warp_8/Minimalprinzip.sid,none,Warp 8 players modulate at 8x speed by design
+/MUSICIANS/W/Warp_8/Money_for_Nothing_595_dollars_Remix.sid,none,Warp 8 players modulate at 8x speed by design
+/MUSICIANS/W/Warp_8/Pickup.sid,none,Warp 8 players modulate at 8x speed by design

@@ -1,0 +1,16 @@
+{
+	"constants":[
+		{ "footerHeight": 91 },
+		{ "stilWidth": 454 },
+		{ "bannerHeight": 66 }
+	],
+
+	"components": [
+		{ "id": "footer", "x": 0, "h": "footerHeight * windowed", "b": "parH", "w": "parW", "visible": "windowed", "order": 4 },
+		{ "id": "sidebarLeft", "x": "margin", "y": 0, "w": "234 * windowed + 5", "b": "prevY", "visible": "windowed", "order": 1 },
+		{ "id": "sidebarRight", "r": "parW - margin * sidebarRightAllowed", "y": "getY('sidebarLeft')", "w": "(stilWidth + 1) * windowed * sidebarRightAllowed", "b": "getB('sidebarLeft')", "visible": "windowed * sidebarRightAllowed", "order": 3 },
+		{ "id": "pages", "x": "getR('sidebarLeft')", "y": "getY('sidebarLeft')", "r": "getX('sidebarRight')", "b": "getB('sidebarLeft')", "order": 2 },
+
+		{ "id": "alertBanner", "x": 0, "y": 0, "w": "parW", "h": "bannerHeight", "order": 0 }
+	]
+}

@@ -1,0 +1,43 @@
+{
+	"constants": [
+		{ "stilWidth": 454 },
+		{ "memoryHeight": 20 },
+		{ "chipsHeight": "stilWidth * ( 500 / 900 )" },
+		{ "fftHeight": 64 },
+		{ "freqLinesGlow": 8 },
+		{ "chipsBoxH": "singleChip * chipsHeight + chipHalfRows * chipsHeight / 2" },
+		{ "vizFull": "memoryHeight + 5 + bentoGap * 0.5 * ( 1 - singleChip ) + chipsBoxH + twoChips * bentoGap / 2 + fftHeight" },
+
+		{ "memoryPadCollapsed": 8 },
+		{ "vizNeeded": "keepFull * vizFull + ( 1 - keepFull ) * ( memoryHeight + 5 + memoryPadCollapsed + fftHeight + bentoGap )" }
+	],
+
+	"components": [
+		{ "id": "leftBorder", "x": 0, "y": 0, "w": 1, "h": "parH" },
+		{ "id": "viz", "w": "stilWidth", "r": "parW", "b": "parH", "h": "min( vizNeeded, parH )",
+			"components": [
+				{ "id": "memoryOverview", "x": "bentoGap * 2", "r": "parW - bentoGap * 2 - 3", "y": 0, "h": "memoryHeight" },
+				{ "id": "chips", "visible": "keepFull", "x": 0, "y": "prevB + bentoGap * 0.5 * ( 1 - singleChip )", "w": "parW", "h": "min( chipsBoxH, parH - prevB - fftHeight - bentoGap * 0.5 )" },
+				{ "id": "fftGridLines", "x": "getX('memoryOverview')", "r": "getR('memoryOverview')", "b": "parH - bentoGap", "h": "fftHeight" },
+				{ "id": "fftL", "bounds": "prev" },
+				{ "id": "fftR", "bounds": "prev" },
+				{ "id": "fftGridCaptions", "bounds": "prev" },
+				{ "id": "frequencyLines", "bounds": "prevX, prevY - freqLinesGlow, prevW, prevH + freqLinesGlow - 2" }
+			]
+		},
+		{ "id": "stil", "x": "prevX", "y": 0, "b": "prevY - bentoGap", "w": "prevW",
+			"constants": [
+				{ "contentTop": 28 },
+				{ "sideL": 16 }
+			],
+			"components": [
+				{ "id": "STIL/toggle/tunes_only", "x": 10, "y": 0, "w": 0, "h": 26, "properties": { "focusRadius": "stil/toggle-corner" } },
+				{ "id": "STIL/toggle/stil", "xd": 5, "properties": { "focusRadius": "stil/toggle-corner" } },
+				{ "id": "STIL/toggle/viz", "xd": 5, "properties": { "focusRadius": "stil/toggle-corner" } },
+				{ "id": "stilListView", "x": "sideL", "y": "contentTop + 5", "r": "parW + 3", "h": "showInfo * min( stilListMax, ( parH - contentTop ) / 2 - 11 ) + ( 1 - showInfo ) * ( parH - contentTop - 10 )" },
+				{ "id": "line", "visible": "showInfo", "x": "sideL", "y": "prevB + 5", "r": "parW - 11", "h": 1 },
+				{ "id": "stilTextView", "visible": "showInfo", "x": "sideL", "y": "prevB + 10", "r": "parW + 3", "b": "parH - 5" }
+			]
+		}
+	]
+}

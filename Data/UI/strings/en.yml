@@ -1,0 +1,441 @@
+#
+# This is not a full-fledged YAML file.
+# The parser will fail if you go beyond this extremely simple format.
+#
+main-menu:
+  search:     Search
+  playlists:  Playlists
+  crt:        CRT
+  export:     Export
+  history:    History
+  settings:   Settings
+
+# Chip
+chip:
+  approved: Approved by {}
+  sid6581_profile_tip: Excellent 6581 emulation
+  sid8580_profile_tip: Excellent 8580 emulation
+
+# Memory overview; the tooltip strings are fmt patterns, "{}" and friends
+# get the values filled in
+memory:
+  nothing_loaded_tip: No SID tune loaded
+  load_address: "Load address: ${:04X} - ${:04X} (length {})"
+  init_address: "Init address : ${:04X}"
+  basic_program: Basic Program
+  play_address: "Play address : ${:04X}"
+  playroutine: "Playroutine: {}"
+
+# Footer
+footer:
+  quality:
+    header: Audio Quality
+    real:   Filtered through a tiny 1084 speaker, with distortion, transformer hum and hiss added.
+    pure:   Faithful machine output. Nothing added, only inaudible subsonics removed.
+    magic:  Mild stereo widening, light delay & reverb and a gentle bass shelf. Recommended.
+    epic:   Heavy stereo widening, deep delay & reverb and bold bass. Not for the faint-hearted.
+    mythic: Everything cranked to 11. Maximum width, endless echoes, cavernous reverb.
+
+  volume:
+    mute_tip:   Mute
+    unmute_tip: Unmute
+
+  quality_tip:  Audio quality settings
+
+  play_tip:               Play
+  pause_tip:              Pause
+  previous_tip:           Previous
+  next_tip:               Next
+  enable_repeat_all_tip:  Repeat
+  enable_repeat_one_tip:  Repeat
+  disable_repeat_tip:     Repeat one
+  enable_shuffle_tip:     Shuffle
+  disable_shuffle_tip:    Shuffle
+
+# STIL
+stil:
+  toggle:
+    tunes_only: Tunes only
+    tunes_only_tip: Toggles Stingers / FX
+    stil: Notes
+    stil_tip: Toggles STIL notes
+    viz: Chips
+    viz_tip: Keeps the chip display visible even when the notes need the space
+
+# Color adjustments
+color-adjust:
+  gamma:      Gamma
+  brightness: Brightness
+  contrast:   Contrast
+  saturation: Saturation
+  reset:      Reset
+
+# Context menus
+menu:
+  add_to_playlist:      Add to playlist
+  remove_from_playlist: Remove from this playlist
+  move_to_top:          Move to top
+  move_to_bottom:       Move to bottom
+  new_playlist:         New playlist
+  delete_playlist:      Delete playlist
+  delete_cover:         Delete cover-image
+  go_to_folder:         Go to folder
+  toggle_tag:           Toggle tag
+  export_tune:          Export tune
+  export_tunes:         Export tunes
+  export_playlist:      Export playlist
+  cancel_export:        Cancel export of this tune
+  cancel_exports:       Cancel export of these tunes
+  remove_from_history:  Remove from history
+  clear_older:          Clear older than
+  older_1_month:        1 month
+  older_3_months:       3 months
+  older_6_months:       6 months
+  older_1_year:         1 year
+  clear_history:        Clear history
+  clear_all:            Clear all
+  export_canceled:      Export canceled tunes
+  show_in_explorer:     Show in Explorer
+  show_in_finder:       Show in Finder
+  show_in_file_manager: Show in file manager
+
+# Undo toasts
+toast:
+  undo:             Undo
+  playlist_deleted: Playlist "{}" deleted
+  tune_removed:     Tune removed
+  tunes_removed:    "{} tunes removed"
+  cover_deleted:    Cover-image deleted
+
+# Search
+search:
+  prompt:     What do you want to listen to?
+  empty:      No tunes match your search
+  no_results: No results
+  result:     "{} result"
+  results:    "{} results"
+
+  tag:
+    pioneers:     Pioneers
+    pioneers_tip: The composers who pushed the SID chip forward and shaped its sound.
+
+    gems:     Gems
+    gems_tip: My personal pick of standout tunes.
+
+    winners:     Winners
+    winners_tip: Placed top three in a scene music competition.
+
+    liked:      Liked
+    liked_tip:  Tunes you've liked.
+
+  no_exact_like_tip: |
+    You liked a different tune in this file, not the one that plays by default.
+    Click to like the default tune too.
+
+# Playlist
+playlist:
+  my_playlists:     My Playlists
+  default_name:     My Playlist #1
+  empty:            This playlist is empty
+
+  add_playlist_tip: Add new playlist
+  back_tip:         Back to playlist grid
+  menu_tip:         Playlist options
+
+# Export
+export:
+  header:   Export queue
+  empty:    You haven't exported anything yet
+  menu_tip: Export options
+
+  status:
+    new:          New
+    rendering:    Rendering
+    applying_fx:  Applying FX
+    saving:       Saving
+    complete:     Complete
+    canceled:     Canceled
+    paused:       Paused
+    error:        Can't write to path
+
+# History
+history:
+  header:   History
+  menu_tip: History options
+  empty:    You haven't played anything yet
+
+# The crt/settings strings live in UI/strings/crt-settings.yml (configure-synced
+# from the ultra-shared submodule); Strings appends them to this file
+
+# Settings
+settings:
+  header:
+    settings: Settings
+    storage: HVSC Location
+    user-data: My Data
+    playback: Playback
+    song-lengths: Song Lengths
+    emulation: SID Emulation
+    audio-fx: Audio Enhancements
+    export: Export
+    user-interface: User Interface
+    updates: App Updates
+    keyboard: Keyboard
+    install: Start Menu
+
+settings:
+  location:
+    hvsc: High Voltage SID Collection
+    user: My data (playlists, likes, preferences, tunes)
+    export: Exported tunes location
+
+  browse: Change location
+  move:   Move location
+  move-title:    Move my data?
+  move-message:  "Everything in the current folder is copied to {} and the old folder is removed afterwards. Continue?"
+  move-not-empty: The chosen folder must be empty
+  move-failed:    Copying failed, the data stays where it was
+  move-old-kept:  Moved, but the old folder could not be removed
+  move-done:      Moved
+
+  user-data:
+    title: Export and import
+    help:  Packs the checked categories into a zip file, or brings such a file back in.
+    playlists:   Playlists
+    likes:       Likes
+    history:     History
+    tunes:       My tunes
+    themes:      Themes
+    crt:         CRT overlays, masks and presets
+    preferences: Preferences
+    file:    "{} file"
+    files:   "{} files"
+    entry:   "{} entry"
+    entries: "{} entries"
+    none:    empty
+    export: Export...
+    import: Import...
+    export-title:  Export my data
+    import-title:  Import my data
+    exported:      "{} files exported"
+    export-failed: Export failed
+    nothing-checked:  Nothing is checked
+    not-archive:      Not an ultraSID data archive
+    nothing-selected: The archive holds none of the checked categories
+    import-message: "Import {} from the archive? Merge keeps what you have and adds the archive's content, replace clears those categories first."
+    merge:   Merge
+    replace: Replace
+    cancel:  Cancel
+    imported:      "{} files imported"
+    import-failed: Import failed
+
+  player:
+    normalize: Normalize volume
+    normalize-help: Play all tunes at a consistent volume.
+
+  sound_output: Sound output device
+
+  eq:
+    label: Tone adjustment
+    help:  Adjust the sound to taste.
+    low:   LOW
+    mid:   MID
+    high:  HIGH
+    handle: "{:+.1f} dB"
+
+  theme: Theme
+
+  boot-screen: Boot screen
+
+  player-screen: Player screen
+  player-screen-random: Random
+
+  songs:
+    unknown:        Unknown tune length
+    unknown-help:   How long to play a tune with no known length, in minutes.
+
+    fade-out:       Fade out
+    fade-out-help:  Seconds spent fading to silence at the end.
+
+    minimum:        Minimum length
+    minimum-help:   Play each tune for at least this many seconds.
+
+    max-loops:      Maximum repeats
+    max-loops-help: How many times a tune may repeat before moving on.
+
+  emulation:
+    dac-leakage:      6581 DAC leakage
+    dac-leakage-help: Emulates how 6581 voices never fall completely silent.
+
+  fx:
+    stereo-processing:      Stereo placement
+    stereo-processing-help: Applies curated stereo width to multi-chip tunes that suit it; the rest stay mono.
+
+    transition-time:      Quality transition time
+    transition-time-help: Seconds per step when switching audio quality. 0 is instant.
+
+  export:
+    format:      File format
+    format-help: WAV and FLAC are lossless, OGG is small with excellent quality.
+
+    normalize:      Normalize volume
+    normalize-help: Boost each file to full volume before saving.
+
+    name-template:      File names
+    name-template-help: "{A} author, {T} title, {R} release, {Y} year, {Q} quality, {N} subtune, {NN} and {NNN} zero-padded."
+    name-template-invalid: Invalid pattern
+
+  ui:
+    keep-screen-awake:      Keep screen awake
+    keep-screen-awake-help: Stops the screensaver and display sleep while ultraSID is in focus.
+
+  update:
+    check:                Check for updates online
+    check-help:           Asks the website for a newer version when ultraSID starts.
+    check-frequency:      Check frequency
+    check-frequency-help: How often ultraSID asks the website for a newer version.
+    check-frequency-daily:   Daily
+    check-frequency-weekly:  Weekly
+    check-frequency-monthly: Monthly
+
+  shortcuts:
+    title:  Keyboard shortcuts
+    help:   Every key the player listens to, also on ? or Ctrl+/
+    button: Show shortcuts
+
+  install:
+    title: Start menu and program folder
+    help:  Adds a Start menu entry, or moves to Programs first.
+    shortcut: Add to Start menu
+    move:     Move to Programs
+    shortcut-done:   Start menu entry created
+    shortcut-failed: Could not create the Start menu entry
+    move-title:   Move ultraSID?
+    move-message: "ultraSID moves to {}, gets a Start menu entry and restarts from there. Continue?"
+    move-failed:  Could not move the program, it stays where it is
+
+# Onboarding / HVSC install + update screens
+install:
+  welcome_header:    Welcome to ultraSID
+  installing_header: Installing HVSC
+  update_header:     HVSC is outdated
+  updating_header:   Updating HVSC
+  canceling:         Canceling...
+  replace_title:     Replace the existing folder?
+  replace_message:   {} already exists and everything in it will be deleted before the HVSC is installed. Continue?
+
+#
+# Confirmations
+#
+quit:
+  title:   Quit ultraSID?
+  message: Exports are still running, quit anyway?
+
+#
+# Onboarding screen
+#
+onboarding_welcome: |
+  This SID player requires a copy of the High Voltage SID Collection (HVSC).
+
+  If you already have downloaded and extracted a copy of the HVSC, then please specify the location of your HVSC folder below.
+
+  If you do not have a copy of HVSC, ultraSID can download and install it for you.
+
+#
+# Update HVSC screen
+#
+update_hvsc_welcome: |
+  Your copy of the HVSC is outdated.
+
+  Would you like to update to the latest version of the HVSC automatically?
+
+#
+# These are only temporary until the final values have been found
+#
+crt/settings/fx/hum-volume: R hum level
+
+crt/settings/fx/splitter-freq: Splitter Freq
+crt/settings/fx/splitter-low-gain: Low Gain
+
+crt/settings/fx/wide-mono-width: M wide
+crt/settings/fx/delay-wet: M dly-wet
+crt/settings/fx/delay-feedback: M dly-fbk
+crt/settings/fx/reverb-wet: M reverb
+
+crt/settings/fx/noise-volume: Noise Level
+crt/settings/fx/noise-color: Noise Color
+
+crt/settings/fx/epic-wide-mono-width: E wide
+crt/settings/fx/mythic-wide-mono-width: MY wide
+crt/settings/fx/mythic-delay-wet: MY dly-wet
+crt/settings/fx/mythic-delay-feedback: MY dly-fbk
+crt/settings/fx/mythic-reverb-wet: MY reverb
+crt/settings/fx/epic-delay-wet: E dly-wet
+crt/settings/fx/epic-delay-feedback: E dly-fbk
+crt/settings/fx/epic-reverb-wet: E reverb
+
+# Chip-profile editor (hidden author tool, Ctrl+Shift+F9)
+chip-editor:
+  title:        Chip profile
+  name:         Profile name
+  folder:       HVSC folder
+  flt0dac:      Filter curve
+  fltgain:      Filter gain
+  fltsat:       Filter saturation
+  resonance:    Resonance
+  wavedc:       Wave DC
+  extdc:        EXT-IN DC
+  bias:         Voice bias
+  leakage:      Leakage rate
+  fltcap:       Old filter cap
+  cws:          Combined waves
+  cws_ultra:    Saw-pulse ultra
+  loop:         Loop region
+  no_loop:      not set
+  set_start:    Set start
+  set_end:      Set end
+  clear:        Clear
+  save_user:    Save to user
+  save_factory: Save to factory
+
+# Keyboard shortcuts dialog; the labels are keyed by the verbs in
+# Data/UI/shortcuts.csv
+shortcuts:
+  title: Keyboard Shortcuts
+  hint:  Press {} to toggle this dialog.
+  or:    or
+
+  section:
+    playback:   Playback
+    navigation: Navigation
+    edit:       Edit
+    view:       View
+
+  playback:
+    togglePlay:     Play / pause
+    likePlaying:    Like the playing tune
+    toggleShuffle:  Shuffle
+    cycleRepeat:    Repeat mode
+    previousTrack:  Previous tune
+    nextTrack:      Next tune
+    seekBack:       Seek back 5 seconds
+    seekForward:    Seek forward 5 seconds
+    volumeUp:       Volume up
+    volumeDown:     Volume down
+    toggleMute:     Mute
+    toggleQuality:  Audio quality
+
+  navigation:
+    focusSearch:    Search
+    showLiked:      Liked tunes
+    jumpToPlaying:  Jump to the playing tune
+    showPlaylists:  Playlists
+    showSettings:   Settings
+    showShortcuts:  Keyboard shortcuts
+
+  edit:
+    newPlaylist:    New playlist
+    undo:           Undo
+
+  view:
+    toggleFullscreen: Fullscreen CRT

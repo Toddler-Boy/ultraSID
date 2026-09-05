@@ -1,0 +1,3021 @@
+/MUSICIANS/C/Crowther_Antony/Suicide_Express.sid
+(#1)
+   NAME: "Welcome to Suicide Express"
+(#2)
+   NAME: "Get Ready! Go!"
+(#3)
+   NAME: "Game Over"
+(#4)
+   NAME: "Your score is..."
+(#5)
+   NAME: "Zero"
+(#6)
+   NAME: "One"
+(#7)
+   NAME: "Two"
+(#8)
+   NAME: "Three"
+(#9)
+   NAME: "Four"
+(#10)
+   NAME: "Five"
+(#11)
+   NAME: "Six"
+(#12)
+   NAME: "Seven"
+(#13)
+   NAME: "Eight"
+(#14)
+   NAME: "Nine"
+
+/MUSICIANS/D/Dunn_David/Jump_Jet.sid
+(#2)
+   NAME: "Cleared for take-off"
+(#3)
+   NAME: "Cleared for approach"
+(#4)
+   NAME: "Cleared for landing"
+(#5)
+   NAME: "Mayday, Mayday. I'm bailing out"
+(#6)
+   NAME: "Lieutenant"
+(#7)
+   NAME: "Squadron Leader"
+(#8)
+   NAME: "Wing Commander"
+(#9)
+   NAME: "Captain"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Main.sid
+(#1)
+   NAME: "Spell"
+(#2)
+   NAME: "Spell"
+(#3)
+   NAME: "Spell"
+(#4)
+   NAME: "Spell"
+(#5)
+   NAME: "Spell"
+(#6)
+   NAME: "Spell"
+(#7)
+   NAME: "Spell"
+(#8)
+   NAME: "You found all the crystals. Now find your way out!"
+(#9)
+   NAME: "To continue, enter the correct spelling"
+(#10)
+   NAME: "Almost, but not quite"
+(#11)
+   NAME: "You'll need work on that one"
+(#12)
+   NAME: "It's getting darker"
+(#13)
+   NAME: "Keep up the good work"
+(#14)
+   NAME: "Not bad"
+(#15)
+   NAME: "You're right"
+(#16)
+   NAME: "Fantastic"
+(#17)
+   NAME: "Good work"
+(#18)
+   NAME: "Super"
+(#19)
+   NAME: "I'll be back"
+(#20)
+   NAME: "See you later"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_1.sid
+(#1)
+   NAME: "Air"
+(#2)
+   NAME: "Ant"
+(#3)
+   NAME: "Arm"
+(#4)
+   NAME: "Art"
+(#5)
+   NAME: "Ask"
+(#6)
+   NAME: "Baby"
+(#7)
+   NAME: "Bag"
+(#8)
+   NAME: "Bed"
+(#9)
+   NAME: "Big"
+(#10)
+   NAME: "Bird"
+(#11)
+   NAME: "Boat"
+(#12)
+   NAME: "Box"
+(#13)
+   NAME: "Boy"
+(#14)
+   NAME: "Bug"
+(#15)
+   NAME: "Cake"
+(#16)
+   NAME: "Car"
+(#17)
+   NAME: "Cat"
+(#18)
+   NAME: "Cow"
+(#19)
+   NAME: "Cup"
+(#20)
+   NAME: "Cut"
+(#21)
+   NAME: "Dog"
+(#22)
+   NAME: "Doll"
+(#23)
+   NAME: "Duck"
+(#24)
+   NAME: "Ear"
+(#25)
+   NAME: "Easy"
+(#26)
+   NAME: "Fall"
+(#27)
+   NAME: "Fat"
+(#28)
+   NAME: "Fly"
+(#29)
+   NAME: "Fox"
+(#30)
+   NAME: "Frog"
+(#31)
+   NAME: "Gas"
+(#32)
+   NAME: "Girl"
+(#33)
+   NAME: "Goat"
+(#34)
+   NAME: "Green"
+(#35)
+   NAME: "Ice"
+(#36)
+   NAME: "Joy"
+(#37)
+   NAME: "Kitty"
+(#38)
+   NAME: "Leg"
+(#39)
+   NAME: "Log"
+(#40)
+   NAME: "Man"
+(#41)
+   NAME: "Old"
+(#42)
+   NAME: "Open"
+(#43)
+   NAME: "Popped"
+(#44)
+   NAME: "Red"
+(#45)
+   NAME: "Rip"
+(#46)
+   NAME: "Run"
+(#47)
+   NAME: "Spy"
+(#48)
+   NAME: "Tag"
+(#49)
+   NAME: "Tall"
+(#50)
+   NAME: "Toy"
+(#51)
+   NAME: "*Grab"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_2.sid
+(#1)
+   NAME: "Able"
+(#2)
+   NAME: "Acre"
+(#3)
+   NAME: "Acorn"
+(#4)
+   NAME: "Act"
+(#5)
+   NAME: "Apron"
+(#6)
+   NAME: "Bake"
+(#7)
+   NAME: "Barn"
+(#8)
+   NAME: "Beef"
+(#9)
+   NAME: "Bike"
+(#10)
+   NAME: "Black"
+(#11)
+   NAME: "Book"
+(#12)
+   NAME: "Brown"
+(#13)
+   NAME: "Bunny"
+(#14)
+   NAME: "Busy"
+(#15)
+   NAME: "Clown"
+(#16)
+   NAME: "Club"
+(#17)
+   NAME: "Cool"
+(#18)
+   NAME: "Copy"
+(#19)
+   NAME: "Coughed"
+(#20)
+   NAME: "Dart"
+(#21)
+   NAME: "Desk"
+(#22)
+   NAME: "Early"
+(#23)
+   NAME: "East"
+(#24)
+   NAME: "Even"
+(#25)
+   NAME: "Ever"
+(#26)
+   NAME: "Fact"
+(#27)
+   NAME: "Farm"
+(#28)
+   NAME: "Fear"
+(#29)
+   NAME: "Feel"
+(#30)
+   NAME: "Few"
+(#31)
+   NAME: "Fix"
+(#32)
+   NAME: "Give"
+(#33)
+   NAME: "Glad"
+(#34)
+   NAME: "Good"
+(#35)
+   NAME: "Impf<?>"
+(#36)
+   NAME: "Jelly"
+(#37)
+   NAME: "Lady"
+(#38)
+   NAME: "Make"
+(#39)
+   NAME: "*Mean"
+(#40)
+   NAME: "More"
+(#41)
+   NAME: "Name"
+(#42)
+   NAME: "Now"
+(#43)
+   NAME: "Ride"
+(#44)
+   NAME: "Sick"
+(#45)
+   NAME: "Skin"
+(#46)
+   NAME: "Snake"
+(#47)
+   NAME: "Tidy"
+(#48)
+   NAME: "Tiny"
+(#49)
+   NAME: "Woman"
+(#50)
+   NAME: "Year"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_3.sid
+(#1)
+   NAME: "After"
+(#2)
+   NAME: "Attic"
+(#3)
+   NAME: "Bacon"
+(#4)
+   NAME: "Bakery"
+(#5)
+   NAME: "Bandit"
+(#6)
+   NAME: "Baton"
+(#7)
+   NAME: "Battle"
+(#8)
+   NAME: "Best"
+(#9)
+   NAME: "Bring"
+(#10)
+   NAME: "Careful"
+(#11)
+   NAME: "Carpet"
+(#12)
+   NAME: "Cloud"
+(#13)
+   NAME: "Coin"
+(#14)
+   NAME: "Cold"
+(#15)
+   NAME: "Color"
+(#16)
+   NAME: "Curly"
+(#17)
+   NAME: "Curve"
+(#18)
+   NAME: "Daily"
+(#19)
+   NAME: "Daisy"
+(#20)
+   NAME: "Dimmer"
+(#21)
+   NAME: "Drum"
+(#22)
+   NAME: "Elbow"
+(#23)
+   NAME: "Enter"
+(#24)
+   NAME: "Garden"
+(#25)
+   NAME: "Ice-cream"
+(#26)
+   NAME: "Iron"
+(#27)
+   NAME: "Kind"
+(#28)
+   NAME: "Kiss"
+(#29)
+   NAME: "Luck"
+(#30)
+   NAME: "North"
+(#31)
+   NAME: "Often"
+(#32)
+   NAME: "Paddle"
+(#33)
+   NAME: "Pancake"
+(#34)
+   NAME: "Puppy"
+(#35)
+   NAME: "Rabbit"
+(#36)
+   NAME: "Relax"
+(#37)
+   NAME: "*Repair"
+(#38)
+   NAME: "Safe"
+(#39)
+   NAME: "Seesaw"
+(#40)
+   NAME: "Sink"
+(#41)
+   NAME: "Soft"
+(#42)
+   NAME: "Star"
+(#43)
+   NAME: "Story"
+(#44)
+   NAME: "Stew"
+(#45)
+   NAME: "Taxi"
+(#46)
+   NAME: "Tired"
+(#47)
+   NAME: "Trio"
+(#48)
+   NAME: "*White"
+(#49)
+   NAME: "*Yellow"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_4.sid
+(#1)
+   NAME: "Actress"
+(#2)
+   NAME: "*Address"
+(#3)
+   NAME: "Agree"
+(#4)
+   NAME: "Airport"
+(#5)
+   NAME: "Angry"
+(#6)
+   NAME: "Around"
+(#7)
+   NAME: "Artist"
+(#8)
+   NAME: "Ballet"
+(#9)
+   NAME: "Balloon"
+(#10)
+   NAME: "Barber"
+(#11)
+   NAME: "Before"
+(#12)
+   NAME: "Bitter"
+(#13)
+   NAME: "Buffalo"
+(#14)
+   NAME: "Butterfly"
+(#15)
+   NAME: "Campfire"
+(#16)
+   NAME: "Cargo"
+(#17)
+   NAME: "Certain"
+(#18)
+   NAME: "Cocoa"
+(#19)
+   NAME: "Cocoon"
+(#20)
+   NAME: "Cover"
+(#21)
+   NAME: "Cowboy"
+(#22)
+   NAME: "Crawl"
+(#23)
+   NAME: "Dance"
+(#24)
+   NAME: "Detect"
+(#25)
+   NAME: "Dollar"
+(#26)
+   NAME: "Dolphin"
+(#27)
+   NAME: "Dream"
+(#28)
+   NAME: "*Erase"
+(#29)
+   NAME: "*Equal"
+(#30)
+   NAME: "Exact"
+(#31)
+   NAME: "Fence"
+(#32)
+   NAME: "Fight"
+(#33)
+   NAME: "Giggle"
+(#34)
+   NAME: "Harvest"
+(#35)
+   NAME: "Hungry"
+(#36)
+   NAME: "Little"
+(#37)
+   NAME: "Monkey"
+(#38)
+   NAME: "Music"
+(#39)
+   NAME: "Needle"
+(#40)
+   NAME: "Nothing"
+(#41)
+   NAME: "Obey"
+(#42)
+   NAME: "Overcoat"
+(#43)
+   NAME: "Parent"
+(#44)
+   NAME: "Party"
+(#45)
+   NAME: "Pizza"
+(#46)
+   NAME: "Queen"
+(#47)
+   NAME: "Quiet"
+(#48)
+   NAME: "Rainbow"
+(#49)
+   NAME: "Ticket"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_5.sid
+(#1)
+   NAME: "Advertise"
+(#2)
+   NAME: "Alligator"
+(#3)
+   NAME: "Autograph"
+(#4)
+   NAME: "Banana"
+(#5)
+   NAME: "Banquet"
+(#6)
+   NAME: "Barrel"
+(#7)
+   NAME: "Baseball"
+(#8)
+   NAME: "Beware"
+(#9)
+   NAME: "Calendar"
+(#10)
+   NAME: "Camera"
+(#11)
+   NAME: "Canoe"
+(#12)
+   NAME: "Circus"
+(#13)
+   NAME: "Coffee"
+(#14)
+   NAME: "Country"
+(#15)
+   NAME: "Cousin"
+(#16)
+   NAME: "Daughter"
+(#17)
+   NAME: "Dentist"
+(#18)
+   NAME: "Errand"
+(#19)
+   NAME: "Freedom"
+(#20)
+   NAME: "Gallery"
+(#21)
+   NAME: "Glasses"
+(#22)
+   NAME: "Gorilla"
+(#23)
+   NAME: "Grasshopper"
+(#24)
+   NAME: "Headlight"
+(#25)
+   NAME: "History"
+(#26)
+   NAME: "Island"
+(#27)
+   NAME: "Kitten"
+(#28)
+   NAME: "Laugh"
+(#29)
+   NAME: "Mammal"
+(#30)
+   NAME: "Medicine"
+(#31)
+   NAME: "Mermaid"
+(#32)
+   NAME: "Mirror"
+(#33)
+   NAME: "Museum"
+(#34)
+   NAME: "Nonsense"
+(#35)
+   NAME: "Officer"
+(#36)
+   NAME: "Peanut"
+(#37)
+   NAME: "Piano"
+(#38)
+   NAME: "Picnic"
+(#39)
+   NAME: "Pocket"
+(#40)
+   NAME: "Powerful"
+(#41)
+   NAME: "Quarter"
+(#42)
+   NAME: "Radio"
+(#43)
+   NAME: "Record"
+(#44)
+   NAME: "Science"
+(#45)
+   NAME: "Telephone"
+(#46)
+   NAME: "Tomorrow"
+(#47)
+   NAME: "Tricycle"
+(#48)
+   NAME: "Typewriter"
+(#49)
+   NAME: "Understand"
+(#50)
+   NAME: "Yesterday"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_6.sid
+(#1)
+   NAME: "Accident"
+(#2)
+   NAME: "Adjective"
+(#3)
+   NAME: "Adult"
+(#4)
+   NAME: "Alphabet"
+(#5)
+   NAME: "Ambulance"
+(#6)
+   NAME: "Aquarium"
+(#7)
+   NAME: "Arithmetic"
+(#8)
+   NAME: "Astronaut"
+(#9)
+   NAME: "Autumn"
+(#10)
+   NAME: "Backward"
+(#11)
+   NAME: "Bargain"
+(#12)
+   NAME: "Bought"
+(#13)
+   NAME: "Bracelet"
+(#14)
+   NAME: "Cassette"
+(#15)
+   NAME: "Cemetery"
+(#16)
+   NAME: "Certificate"
+(#17)
+   NAME: "Chemistry"
+(#18)
+   NAME: "Classroom"
+(#19)
+   NAME: "Computer"
+(#20)
+   NAME: "Confide"
+(#21)
+   NAME: "Crazy"
+(#22)
+   NAME: "Crocodile"
+(#23)
+   NAME: "Describe"
+(#24)
+   NAME: "Design"
+(#25)
+   NAME: "Diagram"
+(#26)
+   NAME: "Dilemma"
+(#27)
+   NAME: "Disappear"
+(#28)
+   NAME: "Dungeon"
+(#29)
+   NAME: "Eclipse"
+(#30)
+   NAME: "Elephant"
+(#31)
+   NAME: "Excellent"
+(#32)
+   NAME: "Familiar"
+(#33)
+   NAME: "Favorite"
+(#34)
+   NAME: "Friend"
+(#35)
+   NAME: "Galaxy"
+(#36)
+   NAME: "Ghost"
+(#37)
+   NAME: "Happiness"
+(#38)
+   NAME: "Helicopter"
+(#39)
+   NAME: "Knowledge"
+(#40)
+   NAME: "Library"
+(#41)
+   NAME: "Microscope"
+(#42)
+   NAME: "Mystery"
+(#43)
+   NAME: "Naughty"
+(#44)
+   NAME: "Neighbor"
+(#45)
+   NAME: "Nephew"
+(#46)
+   NAME: "Plumber"
+(#47)
+   NAME: "Prefer"
+(#48)
+   NAME: "Prepare"
+(#49)
+   NAME: "Shoulder"
+(#50)
+   NAME: "Stomach"
+(#51)
+   NAME: "Straight"
+(#52)
+   NAME: "Yoghurt"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_7.sid
+(#1)
+   NAME: "Accurate"
+(#2)
+   NAME: "Aluminum"
+(#3)
+   NAME: "Anniversary"
+(#4)
+   NAME: "Antibiotic"
+(#5)
+   NAME: "Appointment"
+(#6)
+   NAME: "Bicycle"
+(#7)
+   NAME: "Binoculars"
+(#8)
+   NAME: "Business"
+(#9)
+   NAME: "Character"
+(#10)
+   NAME: "Circumference"
+(#11)
+   NAME: "Communicate"
+(#12)
+   NAME: "Cucumber"
+(#13)
+   NAME: "Deceive"
+(#14)
+   NAME: "Difference"
+(#15)
+   NAME: "Electricity"
+(#16)
+   NAME: "Exciting"
+(#17)
+   NAME: "Experience"
+(#18)
+   NAME: "Foreign"
+(#19)
+   NAME: "Frighten"
+(#20)
+   NAME: "Frontier"
+(#21)
+   NAME: "Guarantee"
+(#22)
+   NAME: "Hysterical"
+(#23)
+   NAME: "Immediately"
+(#24)
+   NAME: "Innocent"
+(#25)
+   NAME: "Leprechaun"
+(#26)
+   NAME: "Kilometer"
+(#27)
+   NAME: "Marmalade"
+(#28)
+   NAME: "Mathematics"
+(#29)
+   NAME: "Mayonnaise"
+(#30)
+   NAME: "Millionaire"
+(#31)
+   NAME: "Necessary"
+(#32)
+   NAME: "Nuclear"
+(#33)
+   NAME: "Obedient"
+(#34)
+   NAME: "Observant"
+(#35)
+   NAME: "Opportunity"
+(#36)
+   NAME: "Orchestra"
+(#37)
+   NAME: "Ordinary"
+(#38)
+   NAME: "Parallel"
+(#39)
+   NAME: "Pedestrian"
+(#40)
+   NAME: "Psychology"
+(#41)
+   NAME: "Quarantine"
+(#42)
+   NAME: "Raspberry"
+(#43)
+   NAME: "Restaurant"
+(#44)
+   NAME: "Rhythm"
+(#45)
+   NAME: "Satisfactory"
+(#46)
+   NAME: "Skeleton"
+(#47)
+   NAME: "Thermometer"
+(#48)
+   NAME: "Transparent"
+(#49)
+   NAME: "University"
+(#50)
+   NAME: "*Wednesday"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_8.sid
+(#1)
+   NAME: "Accelerate"
+(#2)
+   NAME: "Announcement"
+(#3)
+   NAME: "Although"
+(#4)
+   NAME: "Calculator"
+(#5)
+   NAME: "Committee"
+(#6)
+   NAME: "Cylinder"
+(#7)
+   NAME: "Dinosaur"
+(#8)
+   NAME: "Dynamite"
+(#9)
+   NAME: "Encyclopedia"
+(#10)
+   NAME: "Hurricane"
+(#11)
+   NAME: "Institute"
+(#12)
+   NAME: "Hypodermic"
+(#13)
+   NAME: "Independence"
+(#14)
+   NAME: "Inquisitive"
+(#15)
+   NAME: "*Invisible"
+(#16)
+   NAME: "Multiply"
+(#17)
+   NAME: "Portrait"
+(#18)
+   NAME: "Rhinoceros"
+(#19)
+   NAME: "Silhouette"
+(#20)
+   NAME: "Somersault"
+(#21)
+   NAME: "Maintenance"
+(#22)
+   NAME: "Approximately"
+(#23)
+   NAME: "Competence"
+(#24)
+   NAME: "Beginning"
+(#25)
+   NAME: "Disastrous"
+(#26)
+   NAME: "Grammar"
+(#27)
+   NAME: "Definite"
+(#28)
+   NAME: "Professor"
+(#29)
+   NAME: "Technique"
+(#30)
+   NAME: "Unusual"
+(#31)
+   NAME: "Pamphlet"
+(#32)
+   NAME: "Discipline"
+(#33)
+   NAME: "Desperate"
+(#34)
+   NAME: "Equivalent"
+(#35)
+   NAME: "Aggressive"
+(#36)
+   NAME: "Accommodate"
+(#37)
+   NAME: "Continue"
+(#38)
+   NAME: "Determine"
+(#39)
+   NAME: "Contribute"
+(#40)
+   NAME: "Incredible"
+(#41)
+   NAME: "Interpret"
+(#42)
+   NAME: "Politics"
+(#43)
+   NAME: "Probable"
+(#44)
+   NAME: "Possible"
+(#45)
+   NAME: "Personal"
+(#46)
+   NAME: "Ridicule"
+(#47)
+   NAME: "Saucer"
+(#48)
+   NAME: "Select"
+(#49)
+   NAME: "Territory"
+(#50)
+   NAME: "Transfer"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_9.sid
+(#1)
+   NAME: "Acquiesce"
+(#2)
+   NAME: "Apostrophe"
+(#3)
+   NAME: "Environment"
+(#4)
+   NAME: "Constitution"
+(#5)
+   NAME: "Extraordinary"
+(#6)
+   NAME: "Philosophy"
+(#7)
+   NAME: "Emphasis"
+(#8)
+   NAME: "Sovereign"
+(#9)
+   NAME: "Propaganda"
+(#10)
+   NAME: "Susceptible"
+(#11)
+   NAME: "Delinquent"
+(#12)
+   NAME: "Consistent"
+(#13)
+   NAME: "Optimism"
+(#14)
+   NAME: "Procedure"
+(#15)
+   NAME: "Vacuum"
+(#16)
+   NAME: "Physical"
+(#17)
+   NAME: "Scarcity"
+(#18)
+   NAME: "Irresistible"
+(#19)
+   NAME: "Magnificent"
+(#20)
+   NAME: "Maneuver"
+(#21)
+   NAME: "Extravagant"
+(#22)
+   NAME: "Irrelevant"
+(#23)
+   NAME: "Permanent"
+(#24)
+   NAME: "Preference"
+(#25)
+   NAME: "Surprise"
+(#26)
+   NAME: "Schedule"
+(#27)
+   NAME: "Receipt"
+(#28)
+   NAME: "Tremendous"
+(#29)
+   NAME: "Unbelievable"
+(#30)
+   NAME: "Cafeteria"
+(#31)
+   NAME: "Coincidence"
+(#32)
+   NAME: "Available"
+(#33)
+   NAME: "Apartment"
+(#34)
+   NAME: "Argument"
+(#35)
+   NAME: "Circumstance"
+(#36)
+   NAME: "Irritate"
+(#37)
+   NAME: "License"
+(#38)
+   NAME: "Obstacle"
+(#39)
+   NAME: "Persuade"
+(#40)
+   NAME: "Obsolete"
+(#41)
+   NAME: "Paralyze"
+(#42)
+   NAME: "Misspell"
+(#43)
+   NAME: "Pronounce"
+(#44)
+   NAME: "Reluctant"
+(#45)
+   NAME: "Minister"
+(#46)
+   NAME: "Daylight"
+(#47)
+   NAME: "Currency"
+(#48)
+   NAME: "Musical"
+(#49)
+   NAME: "Alcohol"
+(#50)
+   NAME: "Discount"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Cave_of_the_Word_Wizard_Set_10.sid
+(#1)
+   NAME: "Chrysalis"
+(#2)
+   NAME: "Photosynthesis"
+(#3)
+   NAME: "Deciduous"
+(#4)
+   NAME: "<?>"
+(#5)
+   NAME: "Feral"
+(#6)
+   NAME: "Pterodactyl"
+(#7)
+   NAME: "Syllable"
+(#8)
+   NAME: "Convenience"
+(#9)
+   NAME: "Kindergarten"
+(#10)
+   NAME: "Rheumatism"
+(#11)
+   NAME: "Correspondence"
+(#12)
+   NAME: "Medieval"
+(#13)
+   NAME: "Supercilious"
+(#14)
+   NAME: "Caffeine"
+(#15)
+   NAME: "Bookkeeper"
+(#16)
+   NAME: "Embarrass"
+(#17)
+   NAME: "Occurrence"
+(#18)
+   NAME: "*Inoculate"
+(#19)
+   NAME: "Separate"
+(#20)
+   NAME: "Accumulate"
+(#21)
+   NAME: "Inaugurate"
+(#22)
+   NAME: "Mosquito"
+(#23)
+   NAME: "Synonymous"
+(#24)
+   NAME: "*Anonymous"
+(#25)
+   NAME: "Unanimous"
+(#26)
+   NAME: "Descendant"
+(#27)
+   NAME: "Curriculum"
+(#28)
+   NAME: "Sophomore"
+(#29)
+   NAME: "Interference"
+(#30)
+   NAME: "Criticism"
+(#31)
+   NAME: "Existence"
+(#32)
+   NAME: "Conceited"
+(#33)
+   NAME: "Acquaintance"
+(#34)
+   NAME: "Persevere"
+(#35)
+   NAME: "Reservoir"
+(#36)
+   NAME: "Lieutenant"
+(#37)
+   NAME: "Pneumonia"
+(#38)
+   NAME: "Pantomime"
+(#39)
+   NAME: "Attendance"
+(#40)
+   NAME: "Yacht"
+(#41)
+   NAME: "Tenement"
+(#42)
+   NAME: "Atrophy"
+(#43)
+   NAME: "Naive"
+(#44)
+   NAME: "Automatic"
+(#45)
+   NAME: "Epicurean"
+(#46)
+   NAME: "Diplomacy"
+(#47)
+   NAME: "Affiliate"
+(#48)
+   NAME: "Oxidize"
+(#49)
+   NAME: "Hippopotamus"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Commodore_Speech_Demo.sid
+(#1)
+   NAME: "One"
+(#2)
+   NAME: "Two"
+(#3)
+   NAME: "Three"
+(#4)
+   NAME: "Four"
+(#5)
+   NAME: "Five"
+(#6)
+   NAME: "Six"
+(#7)
+   NAME: "Seven"
+(#8)
+   NAME: "Eight"
+(#9)
+   NAME: "Nine"
+(#10)
+   NAME: "Oh"
+(#11)
+   NAME: "Zero"
+(#12)
+   NAME: "Ask not...what your country can do for you"
+(#13)
+   NAME: "The time 8:43pm"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Impossible_Mission.sid
+(#1)
+   NAME: "Mission Accomplished; Congratulations"
+(#2)
+   NAME: "Destroy him, my robots"
+(#3)
+   NAME: "Another visitor"
+(#4)
+   NAME: "Stay a while... Stay Forever"
+(#5)
+   NAME: "No... No... No..."
+(#6)
+   NAME: "Haha haha haha..."
+(#7)
+   NAME: "Ah"
+(#8)
+   NAME: "Ahhhhhhhhhhhhhhhhhhhhhhh"
+(#9)
+   NAME: "Another visitor... Stay a while... Stay Forever"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Kennedy_Approach.sid
+(#1)
+   NAME: "Zero"
+(#2)
+   NAME: "One"
+(#3)
+   NAME: "Two"
+(#4)
+   NAME: "Three"
+(#5)
+   NAME: "Four"
+(#6)
+   NAME: "Five"
+(#7)
+   NAME: "Six"
+(#8)
+   NAME: "Seven"
+(#9)
+   NAME: "Eight"
+(#10)
+   NAME: "Nine"
+(#11)
+   NAME: "United"
+(#12)
+   NAME: "American"
+(#13)
+   NAME: "Delta"
+(#14)
+   NAME: "Air France"
+(#15)
+   NAME: "November"
+(#16)
+   NAME: "Sync heading and altitude"
+(#17)
+   NAME: "This is..."
+(#18)
+   NAME: "Emergency"
+(#19)
+   NAME: "...minutes fuel"
+(#20)
+   NAME: "Roger"
+(#21)
+   NAME: "Head"
+(#22)
+   NAME: "Heading"
+(#23)
+   NAME: "Holding at"
+(#24)
+   NAME: "Hold"
+(#25)
+   NAME: "At VOR"
+(#26)
+   NAME: "VOR"
+(#27)
+   NAME: "Turn left to..."
+(#28)
+   NAME: "Turn right to..."
+(#29)
+   NAME: "Turn left to..."
+(#30)
+   NAME: "Turn right to..."
+(#31)
+   NAME: "Left"
+(#32)
+   NAME: "Right"
+(#33)
+   NAME: "...to..."
+(#34)
+   NAME: "...at..."
+(#35)
+   NAME: "Climbing to..."
+(#36)
+   NAME: "Descending to..."
+(#37)
+   NAME: "Climb to..."
+(#38)
+   NAME: "Descend to..."
+(#39)
+   NAME: "...thousand feet"
+(#40)
+   NAME: "Cleared for landing"
+
+/MUSICIANS/E/Electronic_Speech_Systems/Slapshot.sid
+(#1)
+   NAME: "Charge"
+(#2)
+   NAME: "He scores"
+(#3)
+   NAME: "Penalty"
+(#4)
+   NAME: "Fight"
+(#5)
+   NAME: "Shot"
+(#6)
+   NAME: "Hit"
+(#7)
+   NAME: "Tripping"
+
+/MUSICIANS/H/Hubbard_Rob/Crazy_Comets.sid
+(#1)
+   NAME: Main Theme
+(#2)
+   NAME: High score
+
+/MUSICIANS/H/Hubbard_Rob/Commando.sid
+(#1)
+   NAME: Main Theme
+(#2)
+   NAME: High score
+
+/MUSICIANS/H/Hubbard_Rob/Delta.sid
+(#13)
+   NAME: High score
+
+/MUSICIANS/H/Hubbard_Rob/Knucklebusters.sid
+(#1)
+   NAME: In game
+(#2)
+   NAME: Title
+(#3)
+   NAME: Game Start
+
+/MUSICIANS/H/Hubbard_Rob/Master_of_Magic.sid
+(#1)
+   NAME: Main Theme
+(#2)
+   NAME: Game Over (You're dead)
+(#3)
+   NAME: Game beaten
+
+/MUSICIANS/H/Hubbard_Rob/Monty_on_the_Run.sid
+(#3)
+   NAME: High score
+
+/MUSICIANS/H/Hubbard_Rob/Last_V8.sid
+(#4)
+   NAME: "Caution! Avoid radioactive zones"
+(#5)
+   NAME: "V8! Return to base immediately"
+
+/MUSICIANS/H/Hubbard_Rob/Last_V8_C128_version.sid
+(#4)
+   NAME: "Carry out your orders! Go, at once!"
+(#5)
+   NAME: "You have less than two minutes to get to the city"
+(#6)
+   NAME: "Keep an eye on your instruments, and avoid the radiation"
+
+/MUSICIANS/G/Galway_Martin/Rambo_First_Blood_Part_II.sid
+(#1)
+   NAME: Tape Loader
+(#2)
+   NAME: Main Title
+(#4)
+   NAME: High score
+(#9)
+   NAME: Game Over
+(#10)
+   NAME: In game
+(#22)
+   NAME: Enter Your Name
+
+/MUSICIANS/G/Galway_Martin/Arkanoid.sid
+(#1)
+   NAME: Main Title
+
+/MUSICIANS/G/Galway_Martin/Comic_Bakery.sid
+(#1)
+   NAME: Main Title
+(#2)
+   NAME: In game
+(#3)
+   NAME: In game 2
+
+/MUSICIANS/G/Galway_Martin/Green_Beret.sid
+(#1)
+   NAME: Tape Loader (Night in Shanghai)
+(#3)
+   NAME: In game (first level)
+(#10)
+   NAME: Main Title
+(#12)
+   NAME: In game
+
+/MUSICIANS/G/Galway_Martin/Parallax.sid
+(#1)
+   NAME: Main Title (Rendez-Vous)
+(#2)
+   NAME: High score
+(#4)
+   NAME: In game
+(#5)
+   NAME: Start game
+
+/MUSICIANS/G/Galway_Martin/Wizball.sid
+(#2)
+   NAME: Colour completed
+(#5)
+   NAME: Bonus screen
+(#7)
+   NAME: High score
+(#8)
+   NAME: Game Over
+(#9)
+   NAME: Laboratory
+
+/GAMES/0-9/221B_Baker_Street.sid
+(#3)
+   NAME: "Quick Watson, the game is afoot"
+(#4)
+   NAME: "Quite elementary"
+(#5)
+   NAME: "Good <?>"
+(#6)
+   NAME: "Splendid deduction"
+(#7)
+   NAME: "What's your pleasure?"
+(#9)
+   NAME: "Ha ha ha he he"
+
+/GAMES/A-F/Beach_Head_II.sid
+(#2)
+   NAME: "Follow me, men"
+(#3)
+   NAME: "Medic!"
+(#4)
+   NAME: "I'm hit"
+(#5)
+   NAME: "Waahhhhhhhh"
+(#6)
+   NAME: "Ahhh"
+(#7)
+   NAME: "Aahhhhhhhh"
+(#8)
+   NAME: "Hey! Don't shot me!"
+(#9)
+   NAME: "Ha Ha Ha Ha Ha Ha Ha Ha"
+(#10)
+   NAME: "You can't catch me"
+(#11)
+   NAME: "Ahhh"
+(#12)
+   NAME: "Ahhhhhhhhhhhhhhhhhhhhhhh"
+
+/MUSICIANS/L/Lieblich_Russell/Ghostbusters.sid
+(#2)
+   NAME: "Ghostbusters!"
+(#3)
+   NAME: "He slimed me"
+(#4)
+   NAME: "Ha Ha Ha Ha Ha Ha Ha Ha"
+(#5)
+   NAME: "Waahhhhhhhh"
+
+/MUSICIANS/B/Butler_Paul/Desert_Fox.sid
+(#1)
+   NAME: "Minefield"
+(#2)
+   NAME: "Stuka"
+(#3)
+   NAME: "Ambush"
+(#4)
+   NAME: "Rommel"
+(#5)
+   NAME: "Tiger"
+(#6)
+   NAME: "Depo"
+(#7)
+   NAME: "Convoy"
+(#8)
+   NAME: "Achtung"
+(#9)
+   NAME: "Mayday"
+
+/MUSICIANS/B/Bjerregaard_Johannes/Tiger_Mission.sid
+(#1)
+   NAME: Main Theme
+(#3)
+   NAME: In game
+(#5)
+   NAME: High score
+(#6)
+   NAME: Game Over
+
+/MUSICIANS/D/Dunn_Jonathan/RoboCop.sid
+(#6)
+   NAME: "RoboCop"
+(#7)
+   NAME: "Protect the innocent"
+
+/MUSICIANS/H/Huelsbeck_Chris/Madness.sid
+(#2)
+COMMENT: In the original rip voice 2 is nearly inaudible from 2:00 to 2:33,
+         the filter cutoff of three instruments is set too high. The game's
+         main menu lets the player shift the cutoff of all instruments, the
+         rip has the shipped default. Chris confirmed this was never intended,
+         the fixed version lowers the cutoff of those three instruments and
+         changes nothing else.
+
+/DEMOS/UNKNOWN/Misc_Tune_05.sid
+(#1)
+COMMENT: In the original rip voice 3 played two wildly high notes at 0:46 and
+         then ran ahead of the other voices for the rest of the tune, three
+         bytes of one pattern were damaged. The fixed version restores them
+         from the intact second half of the same pattern.
+
+/DEMOS/UNKNOWN/Wham.sid
+COMMENT: In the original rip the bass goes haywire at 2:12 and 2:20, the fill
+         pattern used in those two bars is garbage in every known version. The
+         fixed version plays the regular bass pattern there instead, the
+         original fill is lost.
+
+/MUSICIANS/A/Astovel/Tengu_Warez_1_menu.sid
+COMMENT: In the original rip the drums ran 10 frames longer per loop than the
+         other two voices, so the tune drifted out of sync with every repeat,
+         one drum pattern had two stray rows at the very end of the file. The
+         fixed version ends it after 16 rows like all the others.
+
+/MUSICIANS/S/Svensson_Roger/Walliball.sid
+(#5)
+COMMENT: In the original rip voice 1 lagged two frames behind the other voices
+         on every loop, an empty pattern was left in its sequence. The fixed
+         version drops that entry and the loop is seamless.
+
+/MUSICIANS/W/Wizard_Oxygen/Night.sid
+COMMENT: In the original rip voice 2 plays sharp from 1:14 to the end, a stray
+         byte in its pattern left a slide unfinished and every later note
+         inherited the offset. The fixed version replaces that byte with the
+         note the pattern's first half uses at the same spot.
+
+# Overlong STIL comments re-flowed into paragraphs; the text is identical,
+# only the whitespace differs. These replace the original comments.
+
+/DEMOS/0-9/128_Byte_Blues_BASIC.sid
+COMMENT: "When I first had a look at the 512b/1k Tiny SID compo, I thought
+         it'd be a great way to get back into doing some assembly language on
+         the C=64 (which I haven't done for a long time). I spent a fair
+         amount of time thinking of the best way to reduce the size and
+         decided that one of the best ways would be to really challenge myself
+         and to squeeze some music out of 128 bytes just for fun.
+
+         I really wanted to feature the nature of the C=64, so I thought about
+         several ways to best store the note and instrument data. After a few
+         sketches, I found that I seemed to be wasting a lot of space trying
+         to store both the note and duration data, so I decided that the best
+         way would be to derive the notes and durations directly from the C=64
+         memory and just index into a basic blues scale and generate some
+         music. It took a bit of playing around with techniques, but I found
+         that utilizing individual bits to step up or down within the scale
+         generated the most musical results. Somewhat of a 1-bit DPCM
+         technique except for successive music notes in a scale instead of
+         successive samples.
+
+         So, the code basically cycles through the bits which are displayed in
+         the screen memory and uses them to generate the notes. The note
+         duration is set by combining the jiffy clock and the cursor countdown
+         to give some flex to the tempo. I found that staying in one note
+         sequence was boring, so I made it step through two blues scales.
+
+         I tried to squeeze out more space by removing the low byte of the
+         frequency but found that it either made the music too out of tune or
+         too high in pitch. I also attempted to add a second voice, but ran
+         out of space.
+
+         I really liked the idea of adding something to watch while it's
+         playing, so the colours change as it is reading through the bytes of
+         screen memory. Rolling the bits of screen memory had the additional
+         benefit that the bytes would return to their original form after
+         passing over them eight times when the sequence repeats. Since the
+         tempo is partially derived from the cursor blink, it is possible to
+         change the tempo while moving the cursor. The sequence of notes can
+         also be modified by typing in the upper portion of the screen.
+
+         It should sound fine on any C=64 (NTSC/PAL), SID (6581/8580) or good
+         emulator (VICE, PowerPC etc..). I've had great fun working on this
+         piece and hope others have fun listening and playing around with it
+         as well." (Freaky DNA)
+
+/GAMES/A-F/Catalypse.sid
+COMMENT: Andrea Carboni, the programmer of the game, said in an interview: "I
+         never met Michael Tschoegl, who was contacted by Genias directly. The
+         first music disk was completely broken when it arrived, so I
+         recovered all that I could (almost) hear and composed the full tunes
+         from the beginning.
+
+         When I got the second disk, I realised that the tunes I modified,
+         were not composed for the game parts I used them in. Moreover, they
+         told me that my compositions were a lot better than his!!! Only the
+         final track, the one that plays during the end titles (tune #6),
+         remained untouched. Furthermore, I didn't write about this on the
+         title screen, since actually the basic sound was created by Michael
+         anyway." (info comes from an interview at www.retrogaming.it)
+
+/MUSICIANS/0-9/20CC/van_Santen_Edwin/Vlindertjes.sid
+COMMENT: This is a remix of /MUSICIANS/M/Mueller_Markus/Coco_Intro.sid
+
+         In a demo by Edwin van Santen, which he released about two years
+         after Coco Intro was made popular in the Papillion's crack intro, he
+         claims that he in fact composed the music. This demo contained a new
+         version of the tune (this SID). He explains how he had made the music
+         two years earlier on some composer like Soundmonitor or something
+         similar.
+
+         While at a copyparty, someone supposedly stole his music disk which
+         had the tune on it. This was his only copy of the tune. About two
+         months later, the tune appeared on a Papillions' intro and no credit
+         was given to van Santen.
+
+         See /MUSICIANS/M/Mueller_Markus/Coco_Intro.sid for more details.
+
+/MUSICIANS/A/Ames_John/Jill_of_the_Jungle.sid
+COMMENT: "This is the (almost) complete soundtrack from Epic Megagames' great
+         puzzle/action game 'Jill of the Jungle.' It has some of my favorite
+         OPL3 music in it, so naturally I did a SID mix.
+
+         The one song missing is "It," the ending theme. This is because the
+         timing was so totally screwed up that I couldn't make head or tail of
+         it. Oh well.
+
+         BTW, the song names here are the filenames minus the .ddt extension.
+
+         P.S. If anyone wants to attempt a C=64 port of Jill (not outside the
+         realm of possibility, in my opinion,) feel free to use this. The
+         sample channel could be used for playing the game sounds." (JA)
+
+/MUSICIANS/A/Audial_Arts/Peters_Patrick/Lambada.sid
+COMMENT: "I can tell you that the Lambada tune, used in our demo's/openings
+         are from me. At that time I hadn't any player and I didn't want to
+         spend too much time in making one. I ripped the 20CC player by
+         analyzing the code in assembler. Then I programmed the codeblocks
+         myself to get the Lambada tune right.
+
+         I laughed when 20CC found out that their player was used and Falco
+         Paul or Edwin van Santen hadn't made that tune earlier!!! They
+         accused me of ripping routines etc. etc. Well.. they were right, I
+         never claimed that it was my player but I merged my Lambada tune
+         blocks via assembler into their old music blocks (I overwrote it).
+
+         The funniest thing was that the Lambada tune from me was very
+         populair at that time. When 20CC heard it they made their own Lambada
+         tune, hehehehe..." (Patrick Peters)
+
+/MUSICIANS/B/Bayliss_Richard/This_Way_to_X2008.sid
+COMMENT: "A nice disco style tune, with better instruments for a change. I was
+         dead impressed with the quality of this nice piece of music.
+
+         This song was originally entered for the X-2008 music compo, but I
+         was unfortunate to not have been able to enter this tune into the
+         compo, as the organizers disallowed email music submissions this time
+         round. Probably because of the amount of music entries they received.
+         They did enter my demo, Crazy Fish into the compo.
+
+         The music later got used as the tape loading music for the Mayhem in
+         Monsterland music mix. Glad I found some use for this nice piece of
+         music. I feel that this tune is probably one of my best efforts so
+         far," (RB)
+
+/MUSICIANS/B/Blues_Muz/Gallefoss_Glenn/Ode_to_Bugg.sid
+COMMENT: Prior to public release, GRG believed this tune was originally done
+         on the Amiga by Liljedahl. According to GRG, when fellow countryman
+         Geir Tjelta heard the SID, Tjelta informed GRG that he thought the
+         original was actually done by Bug (Stein Erik Giske) rather than
+         Liljedahl. Tjelta also informed GRG that Bug passed away in 1992 thus
+         giving GRG inspiration to rename the tune before releasing publicly.
+
+         Unfortunately Tjelta's credit information was incorrect, however
+         Tjelta does not recall giving GRG incorrect credits perhaps
+         suggesting there was a miscommunication between the two. Another
+         theory is that there may have been confusion between
+         Jogeir's "Mystified" and one of Bug's tunes named "Slider" where the
+         first few notes are similar but indeed the two tunes are very
+         different.
+
+         Reflecting back, Jogeir Liljedahl, a friend and group member of the
+         late Bug, adds the following: "When it comes to Mystified, it's 100%
+         my original tune. I haven't even thought about the similarities to
+         Bug's Slider tune, but the 5-6 first notes of the song are similar to
+         Mystified. But it's a completely different song of course. Either me
+         or Bug noticed that back then, and Bug was a huge fan of Mystified,
+         since he was among the first to hear the song (along with Olav Rasmus
+         Vorren aka Shorty)."
+
+/MUSICIANS/B/Blues_Muz/Gallefoss_Glenn/Pepita.sid
+COMMENT: "Pepita was a crappy (imo) worktune I did in 1996 when SDI was about
+         to be finished, coding while in the army. GRG has done the jamming
+         from 1:00 onwards, quite nice actually.
+
+         But I never thought this tune saw day of light until I discovered it
+         hidden in a bass-amp in California/USA. The Line6 Lowdown 150 and 300
+         amp. Reason why I knew about the Line6 thing was the DSP engineer guy
+         had put out instruction on the net on how to start the hidden SID
+         tune. Hold buttons A+D while powering it up, I think it was.
+         Hilarious. (I was working in the music bizz back then - small world).
+
+         Around same time, the Line6 Spider came out (guitar amp), same DSP
+         engineer guy (true SID fan) included dozens of SID tunes in it."
+         (Geir Tjelta)
+
+/MUSICIANS/B/Blues_Muz/Nordboe_Kjell/Last_Flight.sid
+COMMENT: "'Last Flight' is the song about a person which is taking drugs. It
+         is a sad story for both the family to the user, and the user itself,
+         which later in the song dies, it's the user's last flight.
+
+         The family which stands back with their dead son or daughter is so
+         unhappy and sad that they don't know anything anymore. They're
+         feeling a huge emptyness inside, they only wish their child back
+         again, staying alive. But that will never happen...
+
+         The last few minutes when the child was alive, it dreamed about a sky
+         of marvelous and wonderful things flying all around. The longer it
+         lasted the longer away this person was to all real things we know
+         here on earth. This child, so young, has left the world. Not alive
+         anymore. Doesn't exist, only the body left for the family to bury and
+         their memories to keep.
+
+         Why do some want to legalize it?" (KN)
+
+/MUSICIANS/B/Booker/Dope.sid
+COMMENT: "This is actually a remix of various Amiga modules. I can recall the
+         work of XTD and Jester.
+
+         Having a look on the info part inside the the tune I realized we
+         aparently must have followed the legal situation in Poland of those
+         years, where actually you could legally buy pirated copies of
+         commercial records!
+
+         Why is that? Well, the info says (C)1994 Caution, (C)1995 Amorphis
+         but actually the tune doesn't belong to any of these groups, right?
+         It is a mix of originally someone's else work. The (C) sign there is
+         merely just an indication of what groups released, or used this tune.
+
+         It was meant firstly to be used in 1994 in a Caution production but
+         used only in 1995 in the music collection by our group Amorphis."
+         (MK)
+
+/MUSICIANS/C/Chiummo_Gaetano/Arcade_Memories_3SID.sid
+COMMENT: "The inspiration for the tune came from the arcade game 'Zero Wing',
+         especially that noisy rhythm pattern! The song is very short, and
+         features a very fast solo at the end which is one of my most favorite
+         things in the whole collection.
+
+         In the last part there's a little joke: the tune goes 'lo-fi' (only
+         three rectangular waveforms are used), and some sound effects play
+         along; this should give the idea of someone actually playing a game!
+         If you listen carefully, you can figure out what is happening: the
+         player shoots some alien robots, gets some power-ups and eventually
+         gets hit! I had a lot of fun composing this part, as I had to design
+         the sound effects too!" (GC)
+
+/MUSICIANS/C/Chiummo_Gaetano/New_Adventure_3SID.sid
+COMMENT: "I composed the main harmony on guitar, and then finished the tune
+         and arranged it on Psycle, trying to figure out how I could use the
+         three SIDs at their best.
+
+         The most obvious thing to do was to dedicate one SID to the chords
+         (this was a bit limiting, as I could only use three notes chords),
+         another SID to the lead instrument and the bass, and another one to
+         the drums.
+
+         As for the lead instrument, I could use two tracks: one for the main
+         instrument, and the other one for a counter melody or for some
+         special effects, such as the 'sync'.
+
+         As for the drums, the snare and the hi-hat used two voices both,
+         while the bass drum only played on one track: this made the
+         arrangement a bit difficult, as I didn't want to make any instrument
+         sound 'stopped'." (GC)
+
+/MUSICIANS/C/Chotaire/Positive.sid
+COMMENT: "[...] But now let me tell something about this music. It was
+         composed and tracked within hours on january, 23rd. This is a kind of
+         jazz tune, it's not my style ya know, but I felt like doing a tune
+         like this because lots a people like it. Therefore I added sum of my
+         music style to the tune, that's why it sounds a bit techno like..
+
+         Try to enjoy this tune with a stereo, you'll like it I guess.. By the
+         way remember that all C128 computers have a different filter set on
+         their SID chips,so the music sounds a bit different than on normal
+         C64 computers, you'll hear the difference on the bass, the filters
+         doesn't open theirselves so much on C128! But who the fuck cares,
+         this music runs on all computers, that's what counts! [...]"
+
+         (Taken from a note added to the tune "Positive" by Chotaire himself)
+
+/MUSICIANS/C/Cooksey_Mark/Airwolf.sid
+COMMENT: "When I was interviewed by Brian Wilcox at Elite for a job they sent
+         me home with a little task to prove that I had some computer and
+         progamming skills. The task was to make the Oric Atmos computer I had
+         at home play the theme tune to Airwolf. Over the weekend I managed to
+         get the tune playing using a very simple assembler that I had written
+         in basic.
+
+         As a result I got the job at Elite and the first thing they had me
+         doing was programming the Airwolf tune on the C64 as they were doing
+         a game based on the TV show. After this I found myself doing music
+         all the time and that is how I got started." (MC)
+
+/MUSICIANS/C/Cooksey_Mark/Gremlins_2-The_New_Batch.sid
+COMMENT: "I remember this project very well because most of Elite went down to
+         the 20th Cent Fox HQ in London. We had a private pre-release
+         screening of Gremlins II in their mini cinema, kitted out with
+         surround sound. The computer press were invited and Steve Wilcox gave
+         a talk before the film was screened. After wards we went to a Thai
+         restaurant but being a potatoes & gravy man I passed on the food and
+         hot footed it home.
+
+         Worryingly, listening to the music I'm not 100% sure if I did it or
+         not. I think I did cause certain elements sound like my music but the
+         highscore tune (No 6) sounds far too good. Perhaps by 1990 I had
+         improved the music player routine and decided to do a good job for
+         this game." (MC)
+
+/MUSICIANS/C/Cooksey_Mark/Ramparts.sid
+COMMENT: The loader lets you adjust the filter of two sound effects.
+
+         "The 2nd tune in this file has a Ghost n Goblin type of start then
+         goes into a Tubular Bells type bit, then finally goes into a sort of
+         pop meets the 16th century type theme. Tune 3, the win ditty sounds
+         much like one of the Bombjack ditties! I must have felt a bit lazy on
+         that day. Tune 1 is the highscore tune and I have done a full version
+         of this on keyboard etc.
+
+         The people who developed this game had a pokey little room on the
+         upper story of a computer store in Walsall before they moved into
+         more spacious offices. I can't remember much about them, but the head
+         bloke's first name may have been Sean, wonder where he is now?" (MC)
+
+/MUSICIANS/C/Cooksey_Mark/Space_Harrier.sid
+COMMENT: "I used to love playing this arcade machine when we had got it at the
+         offices at Elite, those Easter Island type stone heads that flew
+         towards you were especially effective. The original in game tune had
+         got a memorable melody so I decided to stick to it.
+
+         The middle section of my version may be original though, the tune
+         plays a little faster than on the arcade machine. This was due to the
+         fact that my routine didn't contain a fractional timer at that point.
+         Speeds were determined by the shortest note length which could be
+         1,2,3 or 4 etc. The speed differences were thus 100%, 50,33% etc.
+         with no in between values.
+
+         The rest of the tunes in the set are original compositions I think,
+         maybe tune 2 was close to the arcade version." (MC)
+
+/MUSICIANS/D/Danko_Tomas/Shock_Magazine.sid
+COMMENT: "They wanted a title-theme for Shock Magazine, and gave me the first
+         issue. There was a song in there, and I had no clue what it really
+         was but thought it captured the feel of the entire magazine. So I
+         simply made a cover of it, Danko style. I never had any hangups about
+         having to do it all, music is all about sharing and developing ideas
+         together in order to reach higher grounds.
+
+         The chords aren't identical to Jeroen's version, in fact we had a
+         little thing over that at a party in Oslo back in '94 or so. We hung
+         over a keyboard and I played the chords my style, and he went like
+         'No! It's like THIS!' and I said 'Well, I want it THIS way!'. *grin*
+         One of the guys at the party leaned over to me and whispered that he
+         in fact preferred my version of the track. *smirk*
+
+         Jeroen superimposed a sus2 chord throughout the progression until it
+         folds back to the tonic, where the sus2 becomes a m7. It's a nice
+         move, one that I personally use quite a lot myself. But this time
+         around I expanded the progression to plain chords following the
+         bassline.
+
+         After I had done the tune I found out that it was from Rubicon, but
+         to me it doesn't matter.
+
+         Later on I made a remix of it, called it Schizomix, with weird
+         sounds. Because Rubicon had been a double-speed song, or something
+         similar, I wanted to make weird and similar sounds but in a single-
+         speed player. And that's all it was, a messed up version of my first
+         cover so to speak." (TD)
+
+/MUSICIANS/D/Detert_Thomas/Gordian_Tomb.sid
+COMMENT: "After we got the contract [for Gordian Tomb] with a good value of
+         money, we discussed how to divide it to the people. This was a mess.
+         We at least lost some days of programming. Michael [Detert] was
+         menacing with a dropout if Thomas didn't compose the music. So I
+         thought ok, we are a team and I am busy with programming - why not?
+
+         But then we couldn't unite about the amount of money. Thomas should
+         get the twice of a normal level for a salary. If I had been a better
+         businessman these days I had done everything by myself, but at least
+         we had a great time and a lot of fun. And the teamwork was always
+         accurate. Finally Thomas had known that the salary was overdrawn and
+         he repaid every dollar with the longest music ever [32:06 minutes] on
+         Commodore 64." (Info from Markus Schneider).
+
+         "I had no Editor for our Music-Routine at that time, so i was forced
+         to compose and arrange some of my early Game-Tunes with the
+         SOUNDMONITOR. My brother Michael transfered the music data into our
+         Routine while i was drinking lots of coffee in his room. It was a
+         PITA for him and took ages, but it was worth the output." (TD)
+
+/MUSICIANS/D/Dunn_David/Pipes.sid
+COMMENT: "I was in a computer shop in Dartford, Kent and I said to someone:
+         'BASIC is so slow, is there anything that goes faster?' Suddenly,
+         Anil Gupta pops up out of nowhere, literally, and says: 'You need
+         this', handing me what turned out to be a compiler program.
+
+         I then mentioned that I wrote music, and his eyes started to shine.
+         He asked me to come back once I'd done something in machine code,
+         which I did. It was a demo program made up of some really naff
+         graphics in BASIC, combined with some machined-coded versions of The
+         Mexican Hat Dance, The Thames TV Logo trail and Pipes of Peace. [...]
+         Most importantly, though, Anil was amused." (JD)
+
+/MUSICIANS/E/ELA/Desperate.sid
+COMMENT: "Made with Megastyle's editor.
+
+         I had Quit Cosine, and then got word from Megastyle that they wanted
+         me as a member making tons of intro/demo-tunes. I got their editor
+         but they never used ANY of my music. Their player was based on
+         JB/MON's Stormlord tunes. I decided to join my local friends in the
+         Norway/Finland/Germany-based group Antimon instead. Most of my music
+         had been used by them anyway.
+
+         This is like most of my tunes in in C-minor and rather sad sounding.
+         I put a lot of work into this one (and not quitting early like
+         usually do). I used this tune in a demopart with an atom-plotter
+         (Antimon is an atom ya know). Editor=Megastyle-editor" (ELA)
+
+/MUSICIANS/G/Galway_Martin/Arkanoid.sid
+COMMENT: This is the very first published tune on the C64 that used samples.
+
+         "Q: How did you get involved with using sampled sounds?
+
+         MG: I figured out how samples were played by hacking into someone
+         else's code... OK, I admit it... It was a drum synthesizer package
+         called Digidrums, actually, so you could still say I was the first to
+         include samples in a piece of music.
+
+         [...] Never would I claim to have invented that technique, I just got
+         it published first. In fact, I couldn't really figure out where they
+         got the sample data, just that they were wiggling the volume
+         register, so I tried to make up my own drum sample sounds in realtime
+         - which is the flatulence stuff that shipped in 'Arkanoid'.
+
+         [...] After the project was in the shops I gained access to some real
+         drum samples, and I slid those into my own custom version of the
+         tune. The one that's in the shops is kind of a collage of farts &
+         burps, don't you think?
+
+         [...] Later I was able to acquire some proper drum samples and by
+         'Game Over' it got quite sophisticated." (MG)
+
+/MUSICIANS/G/Galway_Martin/Helikopter_Jagd.sid
+(#1)
+COMMENT: "I was still freelancing when I worked on that music first in 1984,
+         and I just said to Tony Pomfret 'what do you want for the music?' to
+         which he replied 'I want the B-side from the Limahl
+         single "Neverending Story" I bought the other day.' At no time were
+         we thinking Ocean would publish a "Neverending Story" game, it was
+         very much just a cool tune to do. (It was a Georgio Moroder filler
+         tune, whose style I had a lot of respect for as a producer).
+
+         It was the first tune I did pulse-width sweeps on, but didn't get
+         released 'til after a bunch of other games had come out I think. The
+         sound blew everyone away." (MG)
+
+/MUSICIANS/G/Galway_Martin/Miami_Vice.sid
+COMMENT: "The Miami Vice game was a very quick job. I had been handed 'Miami
+         Vice' and 'Highlander' because the outside development team working
+         on it hadn't worked out who was going to do the sound (notice those
+         games have little or no sound-effects), so I did my best in a very
+         short time. I [...] picked 'The Chase' and the 'Main Theme' as the
+         two tunes I would do. We had settled on two modes for the game - in
+         your car and out of it I think. (Or maybe it was in the game and out
+         of it, I can't remember.)
+
+         I started on 'The Chase' and if you listen to the first few seconds
+         of that you can hear the basis of that super-filter-echo tune that is
+         so cool. I recall David Collier was sitting in the office with me
+         while I was working on it.
+
+         But while messing with it while everyone else was at lunch, I came
+         across this cool sound. I added to it and added to it, and when we
+         applied the non-sync'd filter sweep we both flipped out! I decided to
+         abandon the conversion of that tune and simply go with the cool
+         sounds I had stumbled upon. When the guys came back from lunch and
+         listened to it they swore that there was a cassette deck connected
+         somewhere and it wasn't the C64 playing it! Such a sound had not been
+         heard before by any of us out of the C64. So I extended it and turned
+         it into this tripping-out 11-minute piece.
+
+         The main theme itself... I simply did my best with no drums (Rob
+         Hubbard's strength). I think my strength with guitar solos helped
+         pull it off. Both of those problematic games benefited from my music,
+         actually, and the Ocean management were very relieved
+         (understatement)." (MG)
+
+/MUSICIANS/G/Galway_Martin/Short_Circuit.sid
+COMMENT: "I believe it to be my most elaborate, complete and successful
+         conversion of a 'digital audio sourced' tune. ZZAP! 64 only gave the
+         music 79%, my worst score since 'Roland's Rat Race', so you can
+         imagine my disappointment.
+
+         One of the other tunes was easy, that's the simple ballad melody
+         'come and follow me', which I was able to arrange quite successfully.
+         The other one was a nightmare since it's the tune right from the
+         beginning of the movie with all the robotic short notes & arpeggios.
+         The tune just built up so massive that the poor C64 was short of
+         notes by about 30 seconds into it, so I had to fudge the end a bit
+         and make it repeat, basically." (MG)
+
+/MUSICIANS/G/Galway_Martin/Street_Hawk.sid
+COMMENT: "The game was re-assigned in early 1986 to Comic Bakery's programmer
+         Colin Gresty and artist Steve Wahid, and they enthusiastically got to
+         work on it, coming up with an all-new approach with nicer graphics -
+         more like the early Grand Theft Auto games (top-down viewed from a
+         chase camera).
+
+         However it was very slow going for those guys and while the
+         art/design was done by mid-1987, Colin was still finishing the
+         programming towards the end of that year, say, about September.
+
+         Ocean, who'd been advertising the game in magazines for months, were
+         very annoyed by this delay and were not going to make their intended
+         profit. (Perhaps their option window to publish the game was expiring
+         too, who knows?) So they cancelled the project when it was at the
+         99%-complete stage and fired Colin." (MG)
+
+         The tune names shown are what Galway called them in his source code.
+
+/MUSICIANS/G/Galway_Martin/Street_Hawk_Prototype.sid
+COMMENT: "Of course I have recollections... where do I begin... are you
+         sitting comfortably? The fact that there are two versions of
+         Streethawk music is part of the whole mystery of Streethawk, really.
+
+         It started in 1985 and was programmed by Mike Webb, who'd just come
+         off Amstrad Kong Strikes Back. Lateral thinker that he is, he had a
+         rather unique design going (a sideways scrolling platform-jumping
+         design which is probably now lost forever), and I think he went on
+         holiday for a week or two, and when he came back they decided to have
+         him do another project - or, he left to join forces with Richard Kay
+         at Software Creations. (He definitely did the latter, but I can't
+         remember the timeline exactly.)" (MG)
+
+/MUSICIANS/G/Galway_Martin/Terra_Cresta.sid
+COMMENT: "I tried to create this feeling of a massive behemoth robot monster
+         on its way to destroy you. Thus the marching beat and the minor
+         chords and stark tones. I had to stick in the inevitable jamming solo
+         towards the end of course.
+
+         I was starting to face the glass ceiling imposed by the filter on the
+         C64. While my particular SID sounded great, others were not like it
+         at all and the solos were almost inaudible! At the other extreme the
+         new C64C's were coming out and this filter unreliability had been
+         fixed as part of a silicon revision. BUT the filters were way too
+         open all the time and you could hardly hear any filtering! This
+         caused the filtered note to come out a lot louder than it should have
+         and 'stick out' rather unattractively.
+
+         So I developed a 'filter adjustment' parameter for my music program
+         which would allow the customer to control this filter unreliability
+         and get their particular machine to sound cool. But David Collier
+         never put it in the options screen. (DOH!) There's always something
+         wrong, eh?" (MG)
+
+/MUSICIANS/G/Galway_Martin/Wizball.sid
+(#4)
+COMMENT: "I was working at the Sensible Software office at the time of the
+         major music creation, but the title screen music never got finished.
+         When I returned to Ocean I got on with some other things, all the
+         time worrying about this unfinished tune. Finally I slapped something
+         on the end of it.
+
+         I knew I could never top the first part, that's what the problem was.
+         In my mind the second part of the tune is pretty lame compared with
+         the first part. But for some people it represents the mysterious,
+         magical, unconventional aspect of 'Wizball' so it fits in some ways.
+         But you can tell it's not really like the other music in the game,
+         which was primarily developed when I was with the Sensi boys, basking
+         in that Sensi VIBE." (MG)
+
+         "I really worked on the sound design of the voices a lot. The music
+         seems to "flow" and "breathe" unlike anything before it." (MG)
+
+/MUSICIANS/G/Galway_Martin/Yie_Ar_Kung_Fu_II.sid
+COMMENT: "I just tried to come up with a crazy way of settling on a beginning
+         note (my favourite beginning note of course, G - almost everything I
+         do is in G). So I plugged in this echoing waveform thing and let it
+         rip. The tune isn't particularly Chinese sounding, but I was working
+         on producing that 'perfect melody', the one you'd be humming all day,
+         you know. That was a phase I went through.
+
+         [...] The sound I was converting from was itself a conversion of the
+         arcade cabinet, which I have NEVER SEEN. It sounded like it was a
+         lame conversion too, so I easily did a better sounding version. (The
+         MSX's music only used two notes at once, for example.)" (MG)
+
+         The MSX version of the game was the original release on cartridge in
+         1985. Therefore Martin Galway's recollection is covering the MSX
+         release, as this game did not get an arcade release.
+
+/MUSICIANS/G/Gray_Matt/Bangkok_Knights_Loader.sid
+COMMENT: "Sometime in November 1987, I got a phone call from Mark Cale of
+         System 3 Software, asking if I could provide a loading track for
+         Bangkok Knights, but they needed it next week. Rob had done the
+         in-game, but I think he was departing for the US and didn't have time
+         to do another track. This was a big opportunity, to effectively stand
+         in for my SID hero. There was also the tempting prospect of perhaps
+         working on the sequel to The Last Ninja the following year.
+
+         I went up to their Hampstead offices in London the following week
+         with my loading track for Bangkok Knights. Mark listened to it and
+         approved it, then we went for a drink, where he offered me an
+         exclusive contract to work for System 3. I said yes, and that was
+         that. In mid-January of 1988, I started work on The Last Ninja 2."
+         (MDG)
+
+/MUSICIANS/G/Gray_Matt/Driller.sid
+COMMENT: "Driller, which I did for Incentive Software, was another big turning
+         point for me. They wanted something long and epic, not short and
+         repetitive. Concept-wise, it was the perfect game for me. It was
+         exactly the sort of thing I had been waiting to get my teeth into
+         musically.
+
+         It took four weeks to complete, including an almost two-week pause in
+         the middle when the Great Storm of 1987 struck the UK, leaving us
+         without electricity or heating for about ten or eleven days. I can
+         remember walking down our road one dark evening, wondering if I would
+         ever get to use the C64 again, and suddenly noticing all the
+         neighbours' lights were finally on again. I went straight in, fired
+         up the assembler and carried on composing." (MDG)
+
+/MUSICIANS/G/Gray_Matt/Last_Ninja_2.sid
+COMMENT: "In 1988, as mentioned, I did The Last Ninja 2 for System 3. I did
+         the Central Park tracks first, which was important in order to stamp
+         some sort of "sound" on the game. It basically took from mid-January
+         until early April to finish. It's about as big a project as you would
+         want to undertake, but everything just seemed to work without any
+         real hitches.
+
+         I was given a fairly free hand to produce what I thought would be
+         most suitable and luckily, every time I took in new tracks for each
+         level, I got the thumbs up. It was a great time for me personally, to
+         suddenly be working full time on C64 music. I was almost 18, but I
+         had no real worries in the world beyond whether I could afford to buy
+         a better car.
+
+         I think the entire The Last Ninja 2 soundtrack is my proudest
+         achievement, especially the Central Park tracks, as they seem to mean
+         so much to so many people. The project itself was a pleasure to be
+         part of. The whole team involved were probably at the top of their
+         C64 game at the time, from John's programming to Hugh's fantastic
+         graphics, Tim's storyboarding and of course Mark's overall vision and
+         commitment. It's amazing that we're still talking about it nearly 30
+         years on." (MDG)
+
+/MUSICIANS/G/Gray_Matt/Quedex.sid
+COMMENT: "Paul Docherty and/or Graham Hunter passed one of my CNet demos on to
+         Paul Cooper at Thalamus. They wanted to use it for the loading
+         sequence, but it had been written on Soundmonitor. Somehow, they
+         managed to get it to play while the game loaded.
+
+         The in-game tunes needed to be written in such a way that if a sound
+         effect played, it didn't destroy the music too much. Stavros Fasoulas
+         and Paul Cooper drove up to my parents' house where I basically had
+         the top floor of a bungalow to myself. Stavros loaded up his game
+         demos and went through what was needed. I think it took me about two
+         weeks to do all the tunes and FX. Working for such a big name in the
+         industry definitely opened up more doors." (MDG)
+
+/MUSICIANS/H/Hubbard_Rob/Human_Race.sid
+COMMENT: "Human Race was a very interesting project. The tunes tried to
+         capture some of the feel of the game, evolution etc... One of the
+         tunes was also used for an ST game (GoldRunner I think). I only used
+         2 SID voices for all these tunes because I used the other for
+         SFX......
+
+         Most of the tunes were sketched out on a small keyboard and
+         manuscript paper. I used paper to keep track of the basic ideas and
+         arrangement, and I still have all the original manuscripts. A lot of
+         the manuscripts are not readable because I used to work very fast and
+         never updated many of the changes I made.
+
+         I used to use a machine code monitor to edit music data and sound
+         patch data on the file while the tune was playing. This allowed me to
+         really fine tune the SID parameters for the music." (RH)
+
+/MUSICIANS/H/Hubbard_Rob/Thrust.sid
+COMMENT: Review copies of this game had a bugged loader which mucked up the
+         music and so reviewers of the game gave the music a much lower
+         rating. Julian Rignall (ex-editor of Zzap! 64) takes up the story:
+
+         "I remember the God awful cacophony that was our review copy of
+         Thrust's music as though it were still playing. This was the problem:
+         the drum sounds worked, but all the other instrument sounds were
+         screwed - basically it resulted in this horrible screeching noise
+         playing to drums, rather than the cool heavyish sound that was heard
+         in the final version of the game. It sounded really harsh and so it
+         was duly shot down by us in the review.
+
+         I remember hearing the 'proper' version of the game at a later dater
+         and thinking 'ooooops!'. After all it was a classic tune (it became
+         one of my faves, indeed) and we'd mercilessly beaten it down in the
+         review, which was totally unfair. Still, it was good to be able to do
+         a ZZAPback on it and remedy the error."
+
+/MUSICIANS/H/Huelsbeck_Chris/R-Type.sid
+COMMENT: Very interesting story here. Katakis was released in September 1988
+         by Rainbow Arts, however it never got a release in the UK as
+         Activision had it cancelled because of similarities to R-Type, to
+         which Activision had bought the conversion rights.
+
+         Activision were getting nowhere with their conversion of R-Type and
+         they liked what they saw of Katakis, so they hired the same
+         programming team (Manfred Trenz and others) to do the C64 conversion.
+         They only got 6 weeks to write the conversion, and sadly, it shows.
+         Katakis was eventually altered and released as Denaris in 1989.
+
+         Tunes #2 to #14 all cover of the arcade game.
+
+/MUSICIANS/J/JCH/Tecnetium.sid
+COMMENT: "I always get mixed feelings when I play this music. The title- tune
+         is long and I put a lot of work into it in april 1989, but today I
+         can hear loads of harmonic errors here and there.
+
+         The game was done for a sideways shoot'em up which a couple of
+         totally unknown danish guys was making. They soon lost all interest
+         in their game, however.
+
+         The hiscore theme was a conversion of the old Cliff Richard hit
+         'Congratulations' done right out my head. I always wanted to make
+         such a hiscore tune, because I always thought Rob Hubbard did it all
+         wrong when he made 'sad' hiscore tunes. It is a sad thing when the
+         game ends, but getting a high score is supposed to be a GOOD thing!
+         :)" (JCH)
+
+/MUSICIANS/J/Julian_Jaymz/Blood_Starlight_Rain.sid
+COMMENT: "Sitting in a backpackers hostel in sydney, get a call from my
+         parents, I can't come home, they've rented out my room. I've been
+         here for 5 weeks now, but only finally got a laptop this day.
+
+         I was feeling incredibly dark, having spent the last week in bed ill,
+         I really wanted to go home, or failing that, I wanted someone to take
+         a few minutes out of their day to see if I was still alive (okay, so
+         I was feeling kind of melodramatic, lol), This girl promised to hang
+         out with me, and then cancelled or forgot every time for weeks
+         straight, and I was stupid (read: thinking with my heart instead of
+         my head) and didn't want to acknowlage that she was ignoring me... I
+         was losing my mind, and this music represents that.
+
+         The full verse is "Blood, Starlight, Rain like tears, Drink from
+         this, and let go the years". I don't know who penned those words, but
+         I dropped the latter half from the title because I promised said girl
+         that I would.
+
+         This music was made on an emulator (vice 1.8, and of course I had
+         resid turned on :-p). It was also one of my bigger expermients with
+         filters synced from different channels to the one they're targetting.
+         If it works at all on a real C64, I'd consider myself very lucky,
+         lol, because I didn't have access to one at the time." (JJ)
+
+/MUSICIANS/J/Julian_Jaymz/Follower_v1.sid
+COMMENT: "This was the first thing I did in Sid Duzz It, and the only one
+         which I actully released (I also did a cover of Elwood's "Fall From
+         Sky" in it, after hearing The Alien's version, which was missing my
+         favorite part of the module, but it was lost to a bad disk :(, and a
+         cover of a PC music I did called 'Midi Drums', which a few people
+         had, but I don't, and I'm betting that it's dissapered from everyone
+         else's disks too. But that's another story...).
+
+         This version has no pulse width modulation on the bass notes, which
+         makes the drums sound harder. Anyhow, I stopped using that
+         editor/player, because I found it far too limiting." (JJ)
+
+/MUSICIANS/J/Julian_Jaymz/Green_Hill.sid
+COMMENT: "I beat this game in a couple of hours when it first came out, but
+         always loved the music, and this tune in particular.
+
+         Fast forward to mid 2000, and I'm sitting in a backpackers hostel in
+         Prague with my gamegear, and I have no alarm clock and a 9am flight
+         to catch, with my girlfriend (who I hadn't seen for 5 months) is
+         waiting on the other end of it. So hence I can't really go to sleep
+         (I'd die if I missed said flight :-p), but hey, I have a gamegear
+         with this game, and so I play until Green Hill zone, and then listen
+         to this music for 7 hours straight, at which point I finally ran out
+         of spare lives and continues.
+
+         Fast forward to June/July 2001, and I've got some weird illness where
+         I can't stand up or hold down food (never did work out what the was,
+         heh), and my girlfriend runs away to america because the idea that
+         for once in her life she has to be an adult is to damned hard to deal
+         with (Hey, Gundam Wing Hentai is much more fun), and I havn't slept
+         for 2 weeks or eaten in 4 weeks (not an exaggeration), which has had
+         the predictable effects on my mind. Crawl over to my C64, load TFX,
+         bury myself of memories of that night in Prague and happy fun music!
+         Only digital love is eternal." (JJ)
+
+/MUSICIANS/J/Julian_Jaymz/Happy_Happy_Joy_Joy.sid
+COMMENT: "Despite my first C64 music being made in 1988, this is probably the
+         first one I did which wasn't complete and utter crap (Well, maybe
+         this and "Not so JCH based", but it was done on a bad emulator and
+         breaks on a real C64, it turns out ^_^. Maybe one day I'll remake it
+         and release it, because the ideas in it were good, just bad
+         implentation as is the usual thing with me :).
+
+         It wasn't until later that year the the message penetrated my brain
+         that, if you want to make an okay music, you need to spend more than
+         an hour on it ;). If I was running WOW, I would have kicked me out
+         for being completly lame ;). But hey, I learned my lesson (sort
+         of....)" (JJ)
+
+/MUSICIANS/J/Julian_Jaymz/Midi_Drums.sid
+COMMENT: "This is the second attempt I made to do this song on the C64, and
+         was in fact the song that TFX table variables were created for.
+
+         I originally tried to do this in Sid Duzz It in early 1999, but the
+         number of arpeggio commands required for the places where there is
+         two leads in one channel, and the blips in the drum/bass channel,
+         overwelmed that editor. So I tried in JCH v20g4, where I had managed
+         to succed with Sunset Spirals, due to the ability it has to change
+         the wavetable from within a song, but this too was not to be, due to
+         the limitations of the editor.
+
+         So, I started writing a new editor, which was specifically designed
+         to handle this situation, by splitting each channel into six virtual
+         channels, and using special rules to modulate them together. But this
+         took up a lot of ram and raster time, indeed it too so much ram in
+         the editor that I could only store five patterns at a time, so this
+         was not to be either.
+
+         So Ray introduced me to TFX, and I asked him about changing the wave
+         table from within the song, but he wouldn't have this, because it
+         would confuse people, but he suggested a viable alternative, which is
+         to support variables in the wave table, and promised to add this
+         feature asap. That was January 2001, but he was too busy to implement
+         them for the next two and a half years.
+
+         So I started bugging him to just give me the source and the bits to
+         build it, and in November 2003, he did. So, I put my money where my
+         mouth was, and added that feature (and a bunch of others which I had
+         been wanting for a long time), and I was _finally_ able to do a
+         version of this that I happy with. To anyone else but me, this is
+         just another mediocre game tune, but for me it was an achievement."
+         (JJ)
+
+/MUSICIANS/J/Julian_Jaymz/Sunset_Spirals.sid
+COMMENT: "This is, musically, probably the best thing that I have ever done on
+         the C64. Ironically, all of my C64 friends complained that it was off
+         key, etc, and all of my PC friends love this version. Yet I had
+         exactly the opposite reaction to the original version (c64 guys
+         tended to like it, pc guys tended to complain that it was off key.).
+
+         For the record, except for one or two notes, because I ran out of
+         arpeggios (I do that a lot... there are two or three other musics
+         which got scrapped half way through because I ran out of arpeggios.
+         Thankfully, we've come up with a solution to this in the new version
+         of TFX :)), the notes are NOT off key, and I don't care what you all
+         think :-p.
+
+         Said PC guys decided to take ownership of this song, and wanted me to
+         create more like it, but I havn't had the motivation to actully
+         finish any of them. (There are many, many, many stories that I could
+         tell about the digiradi guys, but that's for another day, but the
+         credit of the music to "Coder" is a part of that insanity. They were
+         great times)." (JJ)
+
+/MUSICIANS/J/Julian_Jaymz/Tim_Got_High.sid
+COMMENT: "The Tim in question is Tim Bray, who does an act "Casionova", where
+         he shows off 80's home keyboards, and other chip instruments,
+         including a Commodore 64 with a guitar strap attached. Loscha and I
+         were at one of his gigs, and he was tanking really badly (indeed, we
+         could remember more of the words to his songs than he could!). This
+         was mostly because, we think, he was completly off the planet.
+
+         So, we came back to my place, after the gig, and I was showing off
+         the new version of TFX, and we wrote the bass/chord/drum line (which
+         is all one channel) to demonstrate some of the new features. The file
+         needed a name, and so we just typed in "Tim got high", and the name
+         stuck.
+
+         This song also has a lot of ring modulation (Joxstrap/WOW said too
+         much :-p), which I love as always." (JJ)
+
+/MUSICIANS/J/Julian_Jaymz/Yawlag_Xard_Hcj.sid
+COMMENT: "This is the only released music made in the modified version of
+         JCH's player that I was hacking up during 1999 (I had all of my stuff
+         stolen, including the only copy of the player sources etc).
+
+         I originally wanted to create Galway style tune, but changed my mind
+         half way and thought I'd make a Drax style music instead, and then
+         put a JCH style lead on it. Read the title backwards, and it will all
+         make sense.
+
+         This was also the first music of mine that I know of to be used in
+         someone else's production (of course *I* use my own music, but well,
+         it's crap, so no-one else does), which was a graphic collection by
+         someone in Sonic Dreams (Rat I think). Those guys were great fun, and
+         some of them actully liked my music, which was a nice change, but
+         goddamn the organisation of that group turned into a clusterfuck :-p,
+         But it was all fun at the end of the day." (JJ)
+
+/MUSICIANS/K/Kawasaki_Ryo/
+COMMENT: Ryo Kawasaki's own comments are denoted (RK).
+
+         "When the first time Commodore 64 computer hit the market in 1983, I
+         rushed to buy it by paying $600 at some electronic store on 45th
+         street in Manhattan. It was 8-bit with only 64KB of memory.
+
+         Then I spent two years to write these four programs as well as
+         unpublished Midi-Workstation (8-track real-time Midi recorder) all by
+         machine code using SuperMon without assembler so that it runs fast
+         and leave enough memory for music data. Each of these programs was
+         sold for $49.95 in retail stores furnished with handsome package came
+         with 5-inch floppy disk and manual.
+
+         In 15 years, now we can buy 1GHz PC for the same price as I bought my
+         first C64. And I wonder what kind of computer we can buy 15 years
+         from now by paying $600?" (RK)
+
+         Sadly, Ryo Kawasaki passed away on April 13th, 2020 at the age of 73.
+
+/MUSICIANS/L/Leitch_Barry/I_C_U_P_S.sid
+COMMENT: "Icups - my first published work... I had written the tune as a demo,
+         and I had been trading with Bogg for a few years, and I had
+         re-written his tune just to see how I would have taken his initial
+         idea and run with it myself.
+
+         Anyways, I had sent disks with a load of tunes on to all the major
+         software companies at the time. Firebird contacted me, they wanted to
+         use Icups. I told them at the time that it was kind of a rip off of
+         Bogg's Detergent, but they were quite happy to offer to buy it. They
+         offered me 150 pounds, and then when someone pointed out again to
+         them that it was based on Bogg's tune, they gave him half the money
+         too which I was quite happy with." (BL)
+
+/MUSICIANS/M/Metal/Koeleskab.sid
+COMMENT: "Made with JCH Newplayer v20.
+
+         I made this tune in December 1991 especially for the upcoming Lethal
+         Display 4, but I ended up delivering if to Steve/X-factor, as he had
+         just started his software label called Imagination Developments. So,
+         at The Party 1 in 1991 he got the finished tune and plugged it into
+         the demo, which was then released...
+
+         Syndrom liked this tune so much that he did a 90% copy of it. He
+         explained to me later on, that he did it to gain experience, which is
+         OK my me, but unfortunately it got used in game for which Syndrom got
+         some money... Anyway, we've straightened that out long ago.
+
+         BTW, the title means Fridge." (TH)
+
+/MUSICIANS/N/NecroPolo/Bricks_n_Balls.sid
+COMMENT: SW1.9-EMU "The Shadow introduced me to Zarko who was working on a C64
+         game project called Bricks'n'Walls, under Avatar flag. Zarko is a
+         very cool and humbe guy with an awesome work ethic so we quickly got
+         along well. His game project was a tribute to wallbreaker games like
+         Krakout or Arkanoid. Out of respect, we agreed on adding a couple of
+         tune covers of legendary wallbreaker music to the game project.
+
+         It includes a lot of subtunes. The ingame ones were tricky as they
+         had to be 2-channel as the 3rd channel was reserved for sound FX. The
+         audio engine that provided all (+SFX) was SID-Wizard 1.9 tracker by
+         Hermit who also offered some very good tech assistance on the way.
+
+         About composing, all of the songs were recorded with a MIDI keyboard,
+         arranged inside Reaper DAW and exported as 3-channel MIDI. The
+         SWMconvert.exe turned it into 3-channel note data for SID-Wizard
+         where the sounds became added / tweaked and the data assigned to
+         subtunes. Using a MIDI converter is a very fast process. This way,
+         the whole project took about the same time as feeding music data to a
+         tracker manually for a single tune would." (NP)
+
+/MUSICIANS/N/NecroPolo/Lilac_and_Gooseberries.sid
+COMMENT: SW1.8 "That is where 20 minutes can bring you with SID-Wizard.
+
+         I wanted to do something for the final round of C64 Grand Tour
+         challenge that no other tracker can do so I recorded a short tune
+         with an Arturia Keylab49 keyboard in Reaper, quantised and arranged
+         channels for a better conversion, exported a 3-channel MIDI file, ran
+         swmconvert.exe on it and set the sounds and some other stuff. The
+         music data is not touched so virtually it is me playing the keyboard.
+         SID-Wizard is a beast of workflow.
+
+         The title refers to Yennefer from Witcher books, also my childhood as
+         our garden was full of lilac and gooseberries. By today, due to
+         climate change they all gone around my area so that fragrance and
+         memories of the taste also remind me of good people who gone and it
+         completely rips my heart out. After those flashbacks I can't find my
+         way for days.
+
+         Anyway, this tune is included on Diabouls in Musica LP with lyrics
+         and acoustic guitars. Coupled with deep lyrics I always have to focus
+         to the extreme to not to collapse mentally during live shows when we
+         perform this song called 'V�gtelen vid�k' or 'Infinite Landscape' as
+         it is about letting it go and saying goodbye forever inevitably."
+         (NP)
+
+/MUSICIANS/N/NecroPolo/Monologue.sid
+COMMENT: SW1.9-EMU "The the multplatform version of SID-Wizard 1.9 was quite a
+         big thing for me. Before the release I did a lot of testing for
+         Hermit and the result was this tune. I am so honored to be involved
+         in the test team. SW-EMU as we called it, is a beast, the king of
+         workflow. I've been using that since then, almost excusively.
+
+         About the tune itself, around the covid lockdowns I started to enjoy
+         making these tunes with cleaner orchestration. It is basically a bass
+         synth, a melody line and a drum sequencer. I record these on a synth
+         then convert into a C64 tune with SWMconvert.exe. It adds a little
+         personality to the playing as I play the parts a little different
+         from beat to beat I guess. 3 channels and that's it.
+
+         Maybe it doesn't sound as heavy as my older stuff where the SID8580
+         chip wanted to fall apart but still dark as hell, just a different
+         way." (NP)
+
+/MUSICIANS/N/NecroPolo/Time_Paradox_tune_1.sid
+COMMENT: SW1.9-EMU "To create this demo we used a video sequencer and
+         bits'n'pieces from my music score for TV drama 'Henry IV' by
+         Pirandello. Finally it never became released so Time Paradox is the
+         first appearance.
+
+         This demo is very special to me because we met Level 64 guys the very
+         first time on X party '26 where it was released, after all those
+         years of working together.
+
+         As for the tech side it is a SW tune of mine so it is a MIDI
+         conversion. We used a video sequencer to sync it all together so
+         basically it is me playing the keyboard while watching the screen
+         action, the very same method that I use for film score composing."
+         (NP)
+
+/MUSICIANS/O/Odi/Lords_of_Synthesis.sid
+COMMENT: "Done with my first own music player.
+
+         Having read about the great features of Soundmonitor, I got fed up
+         with the limits of The Music System (TMS) and the music commands from
+         BASIC V7.0. So I wrote my own soundplayer. That thing ate memory and
+         rastertime like I drink tea and used a notation similar to the BASIC
+         commands. But -- it worked and had cool *filters*!
+
+         I planned to use it in a Snake-like game I was coding (Crowding
+         Crawlers), but the game made heavy use of raster interrupts and color
+         effects and thus would not work with the music (rastertime ranging
+         from $03 to $80 or so...). I never finished the game anyway. But my
+         trumpet teacher liked the tune _very_ much! =:-> " (OK)
+
+/MUSICIANS/P/PVCF/Access_Denied_intro.sid
+COMMENT: "This was done very quick & dirty, if I remember right I've had only
+         3-4 hours time to compose this track in our new developed and
+         finished Reflex-Tracker, a 2 channel sampletracker. Access Denied
+         sample spoken by me. The bass-drumm split was make with an Amiga 500
+         and converted to my C64. Later in version v1.1 of Reflex-Tracker the
+         user could do this without directly in the trakker.
+
+         Funny: most of the time in this song I use only one digichannel,
+         after release I created a remix which prooves the ability of
+         Reflex-Tracker a little bit better.
+
+         After winning the C64 democompo at THE PARTY'94 in Denmark, most of
+         the people thought our group name is 'Access Denied' but it was
+         'Reflex' instead ;)" (PVCF)
+
+/MUSICIANS/P/PVCF/Bladeswede.sid
+COMMENT: "I listened to Allister Brimble's great song on Amiga and decided
+         that this song has to be remixed to the C64. Unfortunately I don't
+         have the needed amount of channels so I used a big bunch of
+         arpeggio-lead & bass-splits. The patterns looks like a exploded
+         memorydump, it was very hard to compose this with a durationeditor
+         (DMC4.x). I really forced the lead melody between the arpeggios.
+
+         The music got used in Access Denied trackmo-notefile with a raytraced
+         animation and a layered scroller.
+
+         Regarding our tradition to use some special in our trackmo-notefiles
+         I tried a faked 4 speed tune, that means: normal doublespeed routine
+         and additionally I called the sidroutine 2 times (without the
+         filterroutine), that gives: 4speed wave and 2speed filter." (PVCF)
+
+/MUSICIANS/P/PVCF/Breitbandkatze.sid
+COMMENT: "This is one of the few songs which I have made in our own SID-editor
+         called LSD (Low Sound Dealer, IIRC). Nothing special here, I think I
+         have composed this tune mustly to show what clear filter sounds are
+         possible with this routine. It's a single speeder.
+
+         Unfortunately I didn't know the trackmo (Breitbandkatze / Reflex) and
+         the demo parts during composing. You need a new SID chip, or you will
+         miss some complete channels.
+
+         It's possible that this tune is the track, which I would do just for
+         fun with the goal that no voices are listenable on a old SID chip.
+         But I'm not sure if I realy have done this, its not very hard to do
+         such things ;) (my intention: all my filtereffects sounds horrible on
+         a old SID and I thought it was better to show listeners with old SID
+         nothing than crap) it was the last song which I did on C64 after 5
+         years of SID composing.
+
+         Since 2001 and now (2008) I rarely compose SID tunes with QuadraSID,
+         one or two times per year. Some of this tracks you can download from
+         my website as mp3 (www.reflex-studio.com)" (PVCF)
+
+/MUSICIANS/P/PVCF/Game_Over.sid
+COMMENT: "The samples were ripped from Jeroen Tel, Rob Hubbard/Simon Nicol and
+         Chris H�lsbeck if I remember right. One of my countless Rockmonitor
+         songs. I composed about 8-9 months with some versions of H�lsbeck'
+         Soundmonitor and Rockmonitors and similar composing programs. I made
+         about 30-40 songs with digis, not a single one was released!
+
+         In 1997 I gave this bunch of disks to Happymaker, together with tons
+         of disks with samples... Only this song and Trance_HQ.sid are left,
+         which I found later (1999) on a disc which was in a 1541 drive which
+         I plugged on my PC just to look if I can use StarCommander to
+         transfer stuff from a C64 disc to a harddrive." (PVCF)
+
+/MUSICIANS/P/PVCF/Geometric_2.sid
+(#1)
+COMMENT: "The task: compose a absolut High Quality techno song for the intro
+         of our AFLI game :) I think its my best techno song on C64, it's a
+         doublespeeder which really forces the 8580 to its limits. The ingame
+         songs are simple singlespeeders, but I've spent much time in editing
+         filter LFOs to get those clear and hard sounds on DMC3.
+
+         IIRC the coder (Quiss) gave the tester of a german C64 mag
+         called "64'er" a call and asked him to use a new SID chip for the
+         review of the game. I got 10 of 10 points for the music :)
+
+         Sadly only one of the 2 ingame tracks were used. Some memory
+         problems... The same sh*t like nowadays on NintendoDS :(" (PVCF)
+
+/MUSICIANS/P/PVCF/Mathematica_tune_2.sid
+COMMENT: "This is one of the few songs which I have made in our own SID-editor
+         called LSD (Low Sound Dealer, IIRC). One of my costly and longest LSD
+         tracks.
+
+         in this routine I could trigger demoparts with numeric commands in
+         the soundpattern, Quiss (the programmer of LSD and some of the
+         trackmoparts in Mathematica) have included a fallback routine in the
+         demo, that waits 10 sec if the floppydrive of the user is to slow and
+         a trigger was missed. Unfortunately he forgot to tell me that the
+         first numeric trigger he was expecting was a "0". But I began the
+         count with "1" ... so 10 sec failbackpause is in all versions of
+         mathematica, right before the Doom-part.
+
+         Funny thing: exact 5.34 min long was the centerpart, I composed exact
+         5.34 min :) but I don't know about the 10 sec fall back routine, and
+         Quiss didn't tell me... he simply took notice that the music was
+         too "short", removed the stop-bytes at the end of the LSD track and
+         was satisfied.
+
+         Watching the trackmo first time and live at THE PARTY'95 I was pissed
+         of as I saw/heard the result: the music wild remixed itself after
+         5.34 unless the last part was finished. I learned one thing: (its
+         true up to now, 2008!!) programmers don't have any savvy about music.
+
+         Last funny thing: I asked all people around me what they thought
+         about this crazy and disharmonic music? All(!) comments sounded like
+         this: "If PVCF compose like this it has to be like this" ... aha.. ha
+         ..ha...
+
+         Funny thing: after the democompetition the organizers have shown this
+         trackmo again, in this time (1995) Mathematica was like a revolution
+         on C64 in design & code and I put in at 1:36 a little irish sounding
+         melody which forced some people with hooked arms to dance together on
+         tables, I was very very very proud :p It's possible that you need a
+         new SID chip to hear this part, sorry for that. (yes, the trackmo has
+         a SID chip-selector and detector, but this should be used in an other
+         trackmo of us, read the STIL comments for Mathematica_tune_1_6581.sid
+         for more information about this)." (PVCF)
+
+/MUSICIANS/P/PVCF/Megasweet_6581.sid
+COMMENT: "Uhh, this song taught me a very hard lesson: save your work every
+         3-5 minutes, ... save !!!!
+
+         I worked on Megasweet a whole day and I swear, it was twice as good
+         as what you can hear now. But after about 8 hours of composing on my
+         C64 (it was a sunny day, I ought to learn for my A-level examination)
+         the C64 was freezed (a DMC-crash which occured about once per year).
+         After that I was so frustrated that I released this truly unfinished
+         version. Check out the great mp3 conversion from DJ SKITZ.
+
+         To be honest I have ripped out the idea for the filtered glide effect
+         in the main bassline from an Amiga-mod called "Megasweet". I thought
+         it would be nice to try something similar on C64 for testing purpose.
+         Then I added the chord, but didn't play it as arpeggio-sound (typical
+         C64), instead I played it like a triad, very slow and voila - the
+         base idea of the first real trance/chill techno music on C64 was
+         born.
+
+         Now the "work" begun: in DMC4 doesn't exists a filtercommand in
+         pattern, so I must use different filtered basses and endless
+         glide-effects in bassline. It's not much fun to work like this."
+         (PVCF)
+
+/MUSICIANS/P/PVCF/Radio_Napalm.sid
+COMMENT: "This was made for and released in the trackmo 'Radio Napalm' of our
+         group 'Reflex', which has won a party, but I can't remember which.
+         [It won the X'95 demo competition held in Utrecht, Netherlands]
+
+         Quiss told me it was shown with a old SID chip 6581 and the music
+         wasn't that what it should be supposed to, but the crowd was so
+         impressed by the trackmo that the applause during the whole demo was
+         even louder than the sound equipement. So the old SID wasn't that
+         much of a problem :)
+
+         It's a DMC music and I hate it for the 16 slots instrument
+         limitation, you can hear it: the filter doesn't sweep smooth at the
+         first part, they are like triggered in a mod file. :( Later I
+         released this song in one of our Brainbeat music collections, but I
+         forgot to relocate the song, so every one could load the tune
+         directly in his DMC. The result: some very bad remixes (which uses
+         this horrible filter off-set soundsystem).
+
+         The party [the demo was released on] had a limitation in length of
+         demos: 5 minutes. So first I composed the music as a 5 minutes track.
+         Unfortunately Quiss (the coder of the trackmo) didn't get enough
+         parts in time to fill up the 5 minutes complete. We first have
+         planned to show during the whole demo a backward timer which runs
+         from 5 min to 0 with the comment "We hate timelimits!!!". After Quiss
+         told me the lack of a needed last part I shortened the music
+         drastically.
+
+         I have done this track on a new SID chip, KB/TOM (now farbrausch)
+         later converted this song for the old SID chip and released a "old
+         SID chip" version of the trackmo." (PVCF)
+
+/MUSICIANS/P/PVCF/Reflection.sid
+COMMENT: "This is one of the few songs which I have made in our own SID-editor
+         called LSD (Low Sound Dealer, IIRC). Again I got the whole finished
+         trackmo 'Reflection' from Quiss and I could compose the music right
+         fitting to the parts.
+
+         It's an unusual multispeed setup: the first channel is singlespeed,
+         the second double and the third something around 4-6, don't know
+         anymore. It was only possible with our new NMI timer trackmosystem,
+         no dull rastertime ;). Hehe, no one have beat this, I think 8)
+
+         The next step should be a trackmo with multispeed LSD music and a one
+         channeled digiroutine. LSD was prepared for this, but Quiss and I
+         haven't found the time to manage a new trackmo and complete the LSD
+         composer due to our gamedeveloping ambitions on PC.
+
+         I don't know exactly at which party we released this trackmo, but it
+         could be THE PARTY 95 together with Mathematica, but I'm not sure as
+         mentioned." (PVCF)
+
+         [The demo Reflection was released at the Convention 1996]
+
+/MUSICIANS/P/PVCF/execute_overdrive_intro.sid
+COMMENT: "I was very surprised in 2004 as I heard this track in a new Smash
+         Designs trackmo. Hm, I stopped composing on C64 in 1997 and in 2004
+         there appears a new song... what happened?
+
+         After analyzing the chords and melodies it was clear: it must be a
+         working track, maybe a loader tune for Centric. AEG, which is the
+         lead programmer of Smash Designs, has the permission (since 1995) to
+         use all PVCF-C64 songs on all C64 productions and so he did :) I'm
+         not sure, but I think he used more of my musics in his trackmos than
+         we could in Reflex ;)
+
+         Ah, AEG, if you care (and if you read this) : I've really planned in
+         1992(?) (after your first demo (bei nebenwirkungen essen sie die
+         packungsbeilage...)) to ask you if I could join Smash Designs, no
+         joke! But in those times my musics were so bad that I waited and then
+         I got an offer from Reflex." (PVCF)
+
+/MUSICIANS/P/Page_Jason/Forth.sid
+COMMENT: "I decided that if I could make the percussion sounds more
+         'realistic', then I'd effectively have a synth and a drum machine.
+         For too long, people seem to have used the same techniques for
+         creating percussion sounds (since Maniacs of Noise...). I think that
+         a lot of people stopped pushing the SID, and the music (although
+         great) seemed to be stuck in a rut.
+
+         I knew FORTH was on the right track, as some people thought it was
+         fake (using samples / multiple SID's) which made me happy! It was
+         here that I also tested my theories for some of my percussion sounds.
+
+         The hi hats and clap sounds were what I hoped would raise my SID's to
+         a new level. The hi hats especially, as these really changed the
+         overall sound of the SID. Most SID's don't have those high
+         frequencies. And the clap, it sounded like a real drum machine. So
+         again, helped change the perceptions of a lot of listeners regarding
+         the pushing of SID boundaries." (JP)
+
+/MUSICIANS/P/Page_Jason/Sanxion_Remix.sid
+COMMENT: "This was another experiment, where I wanted to see if I could remix
+         an existing (and brilliant) SID tune, but only using a SID. I've
+         heard (and made) a number of remixes on Remix64, but wanted to
+         attempt to do the same and hopefully be better than a lot of those,
+         but with nothing but a SID.
+
+         This was far more difficult to do than Turrican! I initially
+         converted the whole of Sanxion to SidTracker64. So, all of the
+         patterns and instruments. So at this point, I had a version of the
+         track that ran on ST64 in 4x speed (something I've been doing since
+         Forth. It's how I can get the definition on the clap and snare...).
+         Only at that point could I start remixing.
+
+         I didn't want to completely destroy the feeling of the original, but
+         I wanted to change it enough to make it worthwhile remixing. It was
+         difficult to gauge what I could do to keep that balance.
+
+         Also, the whole track is basically based around ringmod and sync
+         instruments. What this means is that the sound of, say, the lead
+         instrument, is effected by another instrument. So, if I modify one
+         instrument for the remix, it could easily mess up another completely.
+         Likewise, even when porting to ST64, if an instrument wasn't created
+         exactly as the original, or if I used the wrong note, it could make
+         the whole thing sound wrong.
+
+         But, it seems that a lot of people like the result. I knew it would
+         be down to personal taste, as the original track is so iconic. I knew
+         some just wouldn't like it. I can live with that." (JP)
+
+/MUSICIANS/S/SIDwave/Mixed_Emotions.sid
+COMMENT: "That's exactly what my emotions were as I used this tune in my last
+         demo, on the last screen. It was the Dexion-party in 1988. I had
+         released 'Apolloguys' the same day, and I had bought my Amiga 500
+         only 2 weeks before coming to this party.
+
+         The first screen featured 'Like Galway', and me writing a lot of text
+         about who and what 'Rambones' was. The middle screen was the 'Amiga
+         Noid' screen, with a small picture of an Amiga, and a scroll telling
+         that TST would soon rule it. The last one, with this music, was a 10
+         point list of things about the C64 that bored the hell out of me.
+         Things like colorbars, sprites moving in sinus, Hubbard alike
+         drums/routines, all with the same sound and generally everything that
+         was in at that time.
+
+         For me it was sad to see a large variety of composers using more or
+         less the same routine, leaving the music in a grey state. I admire
+         the sound of Fred Gray, Martin Galway, Rob Hubbard, David Whittaker,
+         Ben Daglish and Antony Crowther, and any other programmer that built
+         it all up from scratch." (JH)
+
+/MUSICIANS/S/SIDwave/Oceanic.sid
+COMMENT: "This needs filter! (C64)... As I saw that Jonathan Dunn continued to
+         make music for Ocean, I thought that maybe I had a chance also, so I
+         sent this tune to the company. I never got a reply. :) well, I didn't
+         really care anyway because I now was using Soundtracker every day,
+         all day long. My newfound inspiration: SLL .. :)
+
+         After having made my first few Soundtracker-modules, I sent a demo
+         with some musics and a picture to Hewson. They replied: your music is
+         quite good, but we cannot accept you as a graphics-artist, the
+         picture lacks all kind of inspiration. Arrrghh.... Their music in
+         their games sucked bigtime back then...
+
+         This is the last tune that I made in 1988." (JH)
+
+/MUSICIANS/S/Sonic_Graffiti/Hayes_Ben/Feedback_Experiment.sid
+COMMENT: "This tune does exactly what it says on the box, basically trying to
+         get a ring-mod effect that sounded like an electric guitar being left
+         leaning on a Marshall amplifier turned up to 11. I was fairly pleased
+         with the result, it sounds quite uncomfortable on headphones.
+
+         The tune was written on a SoedeSoft editor, which explains the rather
+         fuzzy triggering and messy drum sounds, but gliding and filter
+         control was much more versatile than anything else around at the
+         time, I felt, and you could sustain notes for about 5 hours.
+
+         The tune was not written especially for the "Acid At The PC Show"
+         demo, having being composed around 8 weeks earlier, but Shane (coder)
+         wanted to use them." (BH)
+
+/MUSICIANS/S/Sonic_Graffiti/Hayes_Ben/Greed_Monster.sid
+COMMENT: "Another day, another pointless budget game. Yogi Bear deserved
+         better! I can't remember if I composed the tune or if it was a
+         conversion of some Atari ST music, written by some bloke who's name I
+         can't remember.
+
+         We used to do a few conversions back then. These were great fun to
+         do. The software company would sent Gerard Gourley a copy of the
+         original music, usually recorded on a cassette recorder sitting by
+         the TV. He'd then play the tune down the telephone to me, and I'd
+         record it on another cassette from the telephone's earpiece. The
+         resulting hi-fidelity master recording would then be my basis. I
+         usually had to guess at the basslines, as they'd become totally
+         inaudible on the tape.
+
+         Then I'd U-U the result back to Gerard within 2 hours, and if I was
+         lucky I'd get �100 about 6 months later after the 'middle man' had
+         taken his bit. Or half that if the tune was for Ocean." (BH)
+
+/MUSICIANS/S/SounDemoN/Bojojoing.sid
+(#1)
+COMMENT: "Some people claim that everything imaginable has been done on the
+         C64. This is true to a certain extent. The typical scenario is indeed
+         that you come up with something new just to find out that someone
+         else has done it 10 years ago... But sometimes strange things happen
+         and even lamers like myself stumble on new stuff.
+
+         This happened when we were working on our 4k intro Pico! for
+         Breakpoint this year. I was coding the music player and tried to
+         create some drum sounds when I accidentally got some harsh, very
+         distorted sounds. The funny thing was that I was using the noise
+         waveform and got something that sounded like a synthesized electric
+         guitar!" (SounDemoN)
+
+/MUSICIANS/T/Taylor_Stuart/Sky_Runner.sid
+COMMENT: "I had been commissioned by Orpheus Software (ironically the makers
+         of Electrosound) to code the music for their game Sky Runner. They
+         sent me a work-in-progress version of the game along with a
+         sort-of-completed Electrosound composition. They wanted me to
+         transpose this to a non-Electrosound version and make it my own -
+         what you hear on here is the end result.
+
+         Unfortunately the MD of Orpheus at the time was a complete nightmare
+         to work with - I was young and naive at the time but this was my
+         first experience, commercially, of trying to get money out of
+         someone. He just wouldn't pay - kept saying cheque would be in the
+         post, give it another week or so etc etc....looking at Sky Runner for
+         the first time ever (on [CSDb.dk]) it looks like the programmer's
+         deal with Orpheus went pretty sour as well. I see the game was
+         published by another software house (Cascade?) and the music had gone
+         back to it's original Electrosound composition - obviously I had no
+         dealings with Cascade - they probably didn't even know about my
+         arrangement!!....
+
+         About 1 year later, under new management, Orpheus approached me again
+         asking me to do some more music. OK, I said, firstly you pay me for
+         Sky Runner and secondly I want the money for the new music (I think
+         it was an adaption of some board game involving moving buses around
+         London???) up front - they obliged so there was a happy ending to
+         this story." (ST)
+
+         The original tune can be found in /GAMES/S-Z/Sky_Runner.sid
+
+/MUSICIANS/W/Waz/Quadraped_Tearaways.sid
+COMMENT: "Originally, after the album music demo got rejected for Zzap! 64's
+         covermount tape, the plan was for this demo to be released in a
+         strictly limited edition of 100 copies. In the end I only distributed
+         20 of them.
+
+         Eventually in 2017, 25 years after the demo was released, I made it
+         publicly available along with a PDF version of the novella I wrote
+         which I sent with the 20 disks.
+
+         And yes, the spelling of the word quadruped is deliberately wrong in
+         the album title - this was to derail the trainspotters in the same
+         style that Factory Records used to do for those attempting to collect
+         all their releases." (WP)
+
+/MUSICIANS/W/Wijnhoven_Joachim/As_de_sterre_dao_baove_straole.sid
+COMMENT: "The demo in which this sound was spread contained the full lyrics of
+         the song written in South Dutch dialect. This tune consists of a
+         double lead to get a sort of echo effect.
+
+         The reason why I made this song: In the south of Holland we celibrate
+         Carnival each year around the end of February and because I live in a
+         provence of Southern Holland called Limburg I decided to make one of
+         the best Carnival songs on the C64! During Carnival everyone dresses
+         up in some strange costume and goes into pubs to party and of course
+         drink a lot of beer.
+
+         The title of the song translated into English is: When the stars are
+         shining up there. Written in waltz tempo. Hope you like it." (JW)
+
+/MUSICIANS/W/Wijnhoven_Joachim/Beast_III_Title.sid
+COMMENT: "Of course I had to squeeze the Amiga 4 tracks in to C64's 3. But the
+         tune uses 2 tracks for the part which isn't the lead or bass. How do
+         you call that part anyway? (backing?)
+
+         While going through old Amiga 500 games with buddy Roland (we were
+         looking through because we are planning a C64 demo consisting
+         converted Amiga pics in FLI-Interlace) we stumbled upon this tune. I
+         like it very much so I tried if I could rip it with my Datel
+         Electronics' Amiga Action Replay MK III. I froze the game and typed
+         in tracker. And golly yes! The cartridge found the tune and I saved
+         it to disc and loaded it in my Protracker soundtool. Together with
+         Roland I converted it. (He works much quicker than me). We are
+         planning to do more conversions.
+
+         After this conversion Roland made a program to convert from MOD to
+         SID, right into my player as I said in Action Biker Remix STIL text.
+         But now it even converts arpeggios!
+
+         The presets are: bass from Psycho Pigs UXB. Flute resembles Amiga
+         lead sample instrument but has a little waveform 41 tick at the
+         beginning and is made by Roland. Other preset is from Henning
+         Rokling's Henning_Rokling-02.sid which is used in demo Wild At Heart.
+
+         We first made an arpeggio sound consisting of two different c notes
+         but it didn't work out well. In beginning of the tune you can hear a
+         build up of decay and sustain in this preset. To get this effect we
+         had to make 4 presets just changing the decay and sustain from 2 to
+         8. The wave on effects on bass and Rokling preset make it sound ok on
+         C64. Often this effect is used to substitute normal hi hat sounds.
+         This ditty is one of my favourite tunes!" (JW)
+
+/MUSICIANS/W/Wijnhoven_Joachim/Lullaby.sid
+COMMENT: "Called sleeping song because Roland thought it was a song from which
+         you get very sleepy. The chords are taken from the beginning of the
+         music of a Dutch USA team demo called Nemesis, I made use of some
+         sawtooth presets to get that Galway feel. Bassline is simply using a
+         C note and the C note an octave higher.
+
+         Made in Music Assembler which was shortened by pally Roland Hermans,
+         so it only occupies memory from $1000-$12EF on the C64 which is 3
+         blocks (less than 1 K!).
+
+         Neil Baldwin's Music Demo Number One was an example for me, using 2
+         tracks for lead when the bass is suspended. The nicest thing of the
+         C64 SID chip is that you can create a warm analogue sound." (JW)
+
+/MUSICIANS/W/Wijnhoven_Joachim/Merlins_Dream.sid
+COMMENT: "This is my Mekka Symposium 2001 SID competition entry. It finished
+         11th from the 29 and got 32 votes. Too bad there is no independent
+         jury on the Mekka party so if you know a lot of people who will vote
+         for you, you will finish 1st.
+
+         The first part (from 0:00 to 0:45) was made back in '92. The rest was
+         made in 2 weeks in 2001. At the party SIDs are played up to 4
+         minutes. So I had to stop at the end of the 4th minute.
+
+         Since this msx contains a sample beat it must be played on an old
+         SID, as was done on the party. You had to mention on the entry sheet
+         which SID they had to use. Too bad the music was played too soft on
+         the party (held during Easter). The zax might be a bit too
+         long-winded. The DD III part was converted from an Amiga MOD" (JW)
+
+         The Double Dragon III music is better known by its real name of Water
+         II and was one of the tracks on Andrew Barnabas' CD.
+
+/MUSICIANS/W/Wijnhoven_Joachim/Rolfie_Title_Remix.sid
+COMMENT: "This is a remix of the title theme I made for a children's cd rom I
+         am making together with some pallies of mine. The cd rom is
+         called "Rolfie Op Wereldreis" which is translated: "Rolfie On A World
+         Trip" and is about a cat which travels around the world visiting 10
+         countries from which England and America are divided into 2 pages.
+
+         So in total there are 12 different country drawings, a title page, a
+         credits page and and end page. With every page there comes an
+         appropriate, spheric music plus lyrics about what can be seen in the
+         drawings. All the sight seeing objects can be seen in a picture of
+         each country.
+
+         For instance in Egypt you can see: some pyramids, a sphinx, the Nile,
+         a palm tree, some background items and Rolfie the cat on a camel.
+         When you click on an object it starts to animate and a WAV-file
+         begins to play making e.g. a camel sound and telling a story about
+         e.g. a camel.
+
+         This title tune is apart from the melody altered heavily to let it
+         sound ok on the C64. This is the first tune I made since 1992 which
+         was spread, so you can call it a sort of test tune. And this is also
+         the first tune made for mainly Poland based group Axelerate which has
+         died in the beginning of 2001.
+
+         All presets are the same as in Linko music except before every bass
+         sound (from 0:15), there is a kick drum sound added. Idea for 3 track
+         chords in beginning is from Reyn Ouwehand's Deadlock (brilliant title
+         tune). Wind sound was added, as always if something needs to be
+         added, it was done by pally Roland 'Neo' Hermans. Hope U like it!"
+         (JW)
+
+/MUSICIANS/W/Wijnhoven_Joachim/Turrican_III_Level_3.sid
+COMMENT: "Another MIDI file conversion taken from the Video Game Music Archive
+         (www.vgmusic.com). It was first intended to be a high score music for
+         a shoot'em up from Protovision, but they didn't want covers in their
+         games.
+
+         Roland and I first put the filter on the arpeggios like Robocop title
+         but in most cases it is best to put it on the bass like we did in
+         this tune. I think this is one of the best basslines I ever heard.
+         It's pretty complex! Chris is/was probably the best German computer
+         zax composer ever. I think!
+
+         The arpeggios are not chords they consist of 2 notes. Lead is from
+         Dunn's Robocop title, rest by Roland. Hope U like it!" (JW)

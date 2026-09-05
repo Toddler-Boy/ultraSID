@@ -1,0 +1,10 @@
+{
+	"constants": [
+		{ "labelW": 120 }
+	],
+
+	"components": [
+		{ "id": "label", "x": 0, "y": 0, "w": "labelW", "h": "parH" },
+		{ "id": "slider", "x": "prevR", "y": 0, "r": "parW", "h": "parH" }
+	]
+}

@@ -1,0 +1,30 @@
+{
+	"constants": [
+		{ "vGap": 2 },
+		{ "vh": 26 },
+		{ "stateH": "vh * 3 + vGap * 2" }
+	],
+
+	"components": [
+		{ "id": "chipBackground", "bounds": "parent" },
+		{ "id": "state", "cx": "parW2 + 10", "cy": 146, "w": "parW * 0.8", "h": "stateH + 18",
+			"components": [
+				{ "id": "filter", "r": "parW", "y": 0, "w": "parW / 5.5", "h": "stateH",
+					"components": [
+						{ "grid": "mode, cutoff, resonance", "bounds": "parent", "rows": 3, "cols": 1, "rowGap": "vGap" }
+					]
+				},
+				{ "id": "voice[1..3]", "x": 0, "y": "idIdx * (vh + vGap)", "w": "getX('filter') - 10", "h": "vh",
+					"components": [
+						{ "grid": "pitch / 2fr, ctrl, vol, tri / 2fr, saw / 2fr, pls / 2fr, nse", "bounds": "parent", "rows": 1, "cols": 7, "colGap": 2 }
+					]
+				},
+				{ "id": "labels", "x": "prevX", "r": "getR('filter')", "y": "prevB + 6", "h": 12 }
+			]
+		},
+		{ "id": "chipLogo", "cx": "parW2 + 10", "cy": "prevY - 28", "w": "114 * 1.15", "h": "25 * 1.15" },
+		{ "id": "chipProfileIndicator", "x": "prevX - 24", "cy": "prevCY + 1", "w": 12, "h": 12 },
+		{ "id": "digi", "x": "getX('state/filter') + getX('state')", "w": "getW('state/filter')", "b": "getY('state') - 10", "h": 32 },
+		{ "id": "portrait", "cx": 48, "cy": 68, "w": 36, "h": 36 }
+	]
+}

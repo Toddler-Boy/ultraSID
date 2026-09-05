@@ -1,0 +1,15 @@
+# Tunes rendered with the SID filter DISABLED (one name per line, .sid
+# extension optional, case-insensitive). Mirrors the app's per-tune database
+# setting; everything not listed renders with the filter enabled.
+# After changing this file, delete the tune's Tests/reference/<name>.wav so a
+# new reference gets recorded.
+Arcade_Classics
+Commando
+Hysteria
+Forbidden_Forest
+Bowling_BASIC
+Peek_and_Poke
+House_Designs
+No_Women_Allowed
+Paradise
+Poing

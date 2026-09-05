@@ -1,0 +1,9 @@
+{
+	"components": [
+		{ "id": "main", "bounds": "0, 8, parW, parH - 8" },
+		{ "id": "onboarding", "bounds": "prev" },
+		{ "id": "updateHVSC", "bounds": "prev" },
+		{ "id": "about", "bounds": "0, 0, parW, parH" },
+		{ "id": "shortcuts", "bounds": "prev" }
+	]
+}

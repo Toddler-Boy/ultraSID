@@ -1,0 +1,51 @@
+{
+	"components": [
+		{ "id": "search", "bounds": "parW, parH - bentoGap",
+			"components": [
+				{ "id": "searchBar", "bounds": "bentoGap * 2, 0, parW - bentoGap * 4, 40" },
+				{ "id": "search/tag/pioneers", "x": "prevX + 2", "y": "prevB + bentoGap + 2", "w": 0, "h": 26, "properties": { "focusRadius": "tag-button/corner" } },
+				{ "id": "search/tag/winners", "xd": 5, "properties": { "focusRadius": "tag-button/corner" } },
+				{ "id": "search/tag/gems", "xd": 5, "properties": { "focusRadius": "tag-button/corner" } },
+				{ "id": "search/tag/liked", "xd": 5, "properties": { "focusRadius": "tag-button/corner" } },
+				{ "id": "info", "x": "getX('searchBar') + getH('searchBar') / 2", "y": "prevB + bentoGap * 2", "r": "getR('searchBar') - getH('searchBar') / 2", "h": 12 },
+
+				{ "id": "results", "x": "bentoGap", "y": "prevB + bentoGap", "r": "parW - bentoGap", "b": "parH" }
+			]
+		},
+		{ "id": "playlistGridWrapper", "bounds": "prev",
+			"components": [
+				{ "id": "playlistGrid", "bounds": "parent",
+					"components": [
+						{ "id": "header", "x": "bentoGap * 2", "y": 0, "r": "parW - bentoGap * 2", "h": 40 }
+					]
+				}
+			]
+		},
+		{ "id": "playlist", "bounds": "prev",
+			"components": [
+				{ "id": "back", "x": "bentoGap * 2", "y": "bentoGap * 2", "size": "32, 32" },
+				{ "id": "covers", "x": "prevR + bentoGap * 2", "y": "prevY", "size": "100, 100" },
+				{ "id": "header", "x": "prevR + 16", "y": "prevY - 1", "r": "parW - bentoGap * 2", "h": 38 },
+				{ "id": "info", "x": "prevX + 2", "y": "prevB + 4", "r": "prevR", "h": 16 },
+				{ "id": "play", "x": "prevX - 2", "y": "prevB + 8", "size": "32, 32" },
+				{ "id": "menu", "x": "prevR + bentoGap", "y": "prevY", "size": "32, 32", "properties": { "focusRadius": 1000 } }
+			]
+		},
+		{ "id": "history", "bounds": "prev",
+			"components": [
+				{ "id": "header", "x": "bentoGap * 2", "y": 0, "r": "parW - bentoGap * 2 - 32", "h": 40 },
+				{ "id": "menu", "x": "prevR", "y": "prevY + 4", "size": "32, 32", "properties": { "focusRadius": 1000 } },
+				{ "id": "results", "x": "bentoGap", "y": "getB('header')", "r": "parW - bentoGap", "b": "parH" }
+			]
+		},
+		{ "id": "export", "bounds": "prev",
+			"components": [
+				{ "id": "header", "x": "bentoGap * 2", "y": 0, "r": "parR - bentoGap * 2 - 32", "h": 40 },
+				{ "id": "menu", "x": "prevR", "y": "prevY + 4", "size": "32, 32", "properties": { "focusRadius": 1000 } },
+				{ "id": "exportItems", "x": "bentoGap", "y": "getB('header')", "r": "parW - bentoGap", "b": "parH" }
+			]
+		},
+		{ "id": "crt", "bounds": "parW, parH" },
+		{ "id": "settings", "bounds": "parW, parH - bentoGap" }
+	]
+}

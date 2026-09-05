@@ -1,0 +1,11 @@
+**/.*/
+JuceLibraryCode
+Builds
+bin
+Builds
+/Tests/data-roots.txt
+/Tools/sid_scanner/sync-roots.txt
+/Tools/sid_scanner/Data/mail.yml
+*.7z
+/Tools/sid_scanner/Data/bugs.txt
+__pycache__
