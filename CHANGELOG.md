@@ -2,6 +2,10 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.0.2 (2026-09-07)
+
+- Fixed some unexpected jumps in the playlist overview.
+
 ## 85.0.1 (2026-09-07)
 
 - Fixed the last page not being restored at startup. It always landed on search.

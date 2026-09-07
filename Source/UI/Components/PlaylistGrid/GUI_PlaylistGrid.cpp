@@ -51,6 +51,10 @@ GUI_PlaylistGrid::GUI_PlaylistGrid ( GUI_Pages& _pages, const bool _mini )
 	viewport.setViewedComponent ( &grid, false );
 	addAndMakeVisible ( viewport );
 
+	// Clicks on empty grid space leave the focus alone
+	viewport.setMouseClickGrabsKeyboardFocus ( false );
+	grid.setMouseClickGrabsKeyboardFocus ( false );
+
 	grid.setName ( "items" );
 	grid.addKeyListener ( &itemKeys );
 }
@@ -97,12 +101,11 @@ void GUI_PlaylistGrid::addPlaylist ( const juce::String& name, const bool withSo
 
 	item->onClick = [ item, this ]
 	{
-		setCursor ( items.indexOf ( item ) );
-
 		// Prevent unselected buttons from firing
 		if ( item->isToggleable () && ! item->getToggleState () )
 			return;
 
+		setCursor ( items.indexOf ( item ) );
 		msg::ShowPlaylist { item->getName () }.send ();
 	};
 
