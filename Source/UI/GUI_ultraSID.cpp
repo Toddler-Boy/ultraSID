@@ -865,19 +865,19 @@ void GUI_ultraSID::restoreState ()
 	// Restore page
 	//
 	{
-		auto	pageStr = settings->get<std::string> ( "ui/page" );
+		lastPage = settings->get<std::string> ( "ui/page" );
 
-		if ( pageStr == "onboarding" || pageStr == "updateHVSC" )
-			pageStr = "search";
+		// lastPage is always a main page
+		if ( lastPage == "onboarding" || lastPage == "updateHVSC" )
+			lastPage = "search";
 
-		if ( ! isHVSCRootValid () )
+		if ( isHVSCRootValid () )
+			showPage ( lastPage );
+		else
 		{
-			pageStr = "onboarding";
 			onboardingScreen.startOver ();
+			showPage ( "onboarding" );
 		}
-
-		lastPage = pageStr;
-		showPage ( pageStr );
 	}
 
 	mainScreen.pages.setCRTPage ( settings->get<int> ( "ui/crt-image" ) );

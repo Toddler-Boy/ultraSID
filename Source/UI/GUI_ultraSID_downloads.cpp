@@ -171,7 +171,7 @@ void GUI_ultraSID::registerDownloadActions ()
 		}
 
 		// Installed and current
-		showPage ( "search" );
+		showPage ( lastPage );
 	} );
 
 	router.on<msg::DownloadScreenshot> ( [ this ] ( const auto& e )	{	downloadScreenshot ( e.url.trim () );	} );

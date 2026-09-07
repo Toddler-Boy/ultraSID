@@ -4,6 +4,7 @@ Headline changes only: small fixes and internal work are not listed.
 
 ## 85.0.1 (2026-09-07)
 
+- Fixed the last page not being restored at startup. It always landed on search.
 - Chip profiles and bug reports without a portrait show a placeholder instead of
   nothing.
 - Fixed a crash when the program was moved while running.
