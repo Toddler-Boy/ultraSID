@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 4.3.0 FATAL_ERROR)
+cmake_minimum_required (VERSION 4.2.0 FATAL_ERROR)
 
 set (CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 set (CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -464,6 +464,13 @@ endif()
 if(UNIX AND NOT APPLE)
 	target_link_libraries (ultraSID PRIVATE curl)
 	target_compile_options(ultraSID PRIVATE $<$<CONFIG:Debug>:-g -O0>)
+	# libSidplayEZ's x86 convolve kernels target the SSE4.2 baseline
+	if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|i[3-6]86)$")
+		set (ULTRA_SIMD_BASELINE "-msse4.2")
+		target_compile_options(ultraSID PRIVATE -msse4.2)
+	else()
+		set (ULTRA_SIMD_BASELINE "")
+	endif()
 endif()
 
 # ---------------------------------------------------------------------------
@@ -488,7 +495,7 @@ if (WIN32)
 	set_target_properties(sidplay_ab_test PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
 	target_compile_options(sidplay_ab_test PRIVATE -Wno-missing-braces $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations)
 else()
-	target_compile_options(sidplay_ab_test PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
+	target_compile_options(sidplay_ab_test PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations ${ULTRA_SIMD_BASELINE})
 endif()
 
 # FX / EQ golden-output regression + performance test. The effects are
@@ -658,7 +665,7 @@ if (WIN32)
 	target_compile_options (sid_scanner PRIVATE $<$<CONFIG:Development>:/Z7>)
 	target_link_options (sid_scanner PRIVATE $<$<CONFIG:Development>:/DEBUG>)
 else()
-	target_compile_options (sid_scanner PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
+	target_compile_options (sid_scanner PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations ${ULTRA_SIMD_BASELINE})
 endif()
 
 # The database builder lives inside sid_scanner (DatabaseBuilder.cpp),
