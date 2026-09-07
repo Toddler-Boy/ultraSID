@@ -2,6 +2,12 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.0.1 (2026-09-07)
+
+- Chip profiles and bug reports without a portrait show a placeholder instead of
+  nothing.
+- Fixed a crash when the program was moved while running.
+
 ## 85.0.0 (2026-09-05)
 
 - Initial release, built against HVSC 85.
