@@ -206,6 +206,23 @@ int main ()
 		check ( rnd != nullptr && ! rnd->deflated, "incompressible entry stored" );
 	}
 
+	//
+	// Mapped reads survive a move of the archive
+	//
+	{
+		PakFile	mapped;
+		check ( mapped.open ( zipFile, true ), "mapped open" );
+		check ( mapped.load ( "DOCUMENTS/STIL.txt" ) == model[ lower ( "DOCUMENTS/STIL.txt" ) ].data, "mapped deflated content" );
+		check ( mapped.load ( "random.bin" ) == model[ lower ( "random.bin" ) ].data, "mapped stored content" );
+		check ( mapped.load ( "empty.bin" ).getSize () == 0 && mapped.exists ( "empty.bin" ), "mapped empty entry" );
+
+		const auto	movedFile = dir.getChildFile ( "moved.zip" );
+		check ( zipFile.moveFileTo ( movedFile ), "move while mapped" );
+		check ( mapped.load ( "DOCUMENTS/STIL.txt" ) == model[ lower ( "DOCUMENTS/STIL.txt" ) ].data, "mapped deflated content after move" );
+		check ( mapped.load ( "random.bin" ) == model[ lower ( "random.bin" ) ].data, "mapped stored content after move" );
+		check ( movedFile.moveFileTo ( zipFile ), "move back" );
+	}
+
 	check ( zip.folderExists ( "MUSICIANS" ), "folderExists MUSICIANS" );
 	check ( zip.folderExists ( "DEMOS/A-F" ), "folderExists DEMOS/A-F" );
 	check ( ! zip.folderExists ( "NOPE" ), "folderExists NOPE" );
