@@ -30,7 +30,7 @@ public:
 		rawText = arr.joinIntoString ( "\n" ).trimEnd ();
 
 		if ( author.isNotEmpty () )
-			setAuthor ( author, datasource::loadImage ( "Portraits/Bugs/" + author + ".jpg" ), false );
+			setAuthor ( author, datasource::loadImage ( "Portraits/Bugs/" + author + ".jpg" ) );
 	}
 
 private:

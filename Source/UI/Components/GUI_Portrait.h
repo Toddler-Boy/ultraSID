@@ -4,6 +4,8 @@
 
 #include "ultra-shared/Helpers/MipMap.h"
 
+#include "GUI_PortraitPlaceholder.h"
+
 //-----------------------------------------------------------------------------
 
 class GUI_Portrait final : public juce::Component
@@ -19,9 +21,10 @@ public:
 	void setBitmap ( const juce::String& bitmap, const bool useGoldenBorder );
 
 private:
-	juce::String	bitmap;
-	MipMap			mipMap;
-	bool			useGoldenBorder = false;
+	juce::String			bitmap;
+	MipMap					mipMap;
+	GUI_PortraitPlaceholder	placeholder;
+	bool					useGoldenBorder = false;
 
 	juce::ColourGradient	goldGradient;
 	juce::ColourGradient	silverGradient;

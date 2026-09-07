@@ -4,6 +4,9 @@
 
 #include "ultra-shared/Config/DataSource.h"
 #include "ultra-shared/UI/Components/GUI_RoundedClip.h"
+#include "ultra-shared/UI/UI_Helpers.h"
+
+#include "UI/ui-colors.h"
 
 //-----------------------------------------------------------------------------
 
@@ -79,11 +82,21 @@ void GUI_Portrait::paint ( juce::Graphics& g )
 		return;
 	}
 
-	// Author portrait
+	// Author portrait, or the placeholder when none ships for the profile
 	auto drawPortrait = [ &g, &b, this ] ( const float opacity )
 	{
 		const auto	pb = b.reduced ( 2.0f );
 		const auto	gs = GUI_RoundedClip ( g, pb, 100'000.0f );
+
+		if ( ! mipMap.isValid () )
+		{
+			const auto	tint = findColour ( UI::chipText );
+
+			g.setColour ( UI::getColorWithPerceivedBrightness ( tint.withAlpha ( 1.0f ), 0.1f ).withAlpha ( opacity ) );
+			g.fillRect ( pb );
+			placeholder.draw ( g, pb, tint.withMultipliedAlpha ( opacity ) );
+			return;
+		}
 
 		g.setOpacity ( opacity );
 		mipMap.draw ( g, pb, juce::RectanglePlacement::fillDestination );
@@ -128,6 +141,8 @@ void GUI_Portrait::setBitmap ( const juce::String& _bitmap, const bool _useGolde
 	bitmap = _bitmap;
 	useGoldenBorder = _useGoldenBorder;
 
+	auto	visible = false;
+
 	if ( bitmap.isEmpty () )
 		mipMap = {};
 	else
@@ -140,10 +155,13 @@ void GUI_Portrait::setBitmap ( const juce::String& _bitmap, const bool _useGolde
 			bitmap = bitmap.replaceCharacter ( ' ', '_' );
 
 		mipMap.setImage ( datasource::loadImage ( folder + bitmap + suffix ) );
+
+		// A musician without a picture still shows the profile ring
+		visible = mipMap.isValid () || ! isEmuProfile;
 	}
 
-	setVisible ( mipMap.isValid () );
-	if ( mipMap.isValid () )
+	setVisible ( visible );
+	if ( visible )
 		repaint ();
 }
 //-----------------------------------------------------------------------------

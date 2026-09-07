@@ -15,7 +15,7 @@ public:
 		setName ( "quote" );
 
 		if ( speaker.isNotEmpty () )
-			setAuthor ( speaker, datasource::loadImage ( "Portraits/Musicians/" + speaker + ".jpg" ), true );
+			setAuthor ( speaker, datasource::loadImage ( "Portraits/Musicians/" + speaker + ".jpg" ) );
 	}
 
 private:

@@ -142,11 +142,11 @@ protected:
 		return int ( layoutSupport.getConstant ( name, defaultValue ) );
 	}
 
-	void setAuthor ( const juce::String& name, juce::Image image, const bool portraitIconFallback )
+	void setAuthor ( const juce::String& name, juce::Image image )
 	{
 		authorImage = image;
 
-		portrait = std::make_unique<GUI_STIL_Portrait> ( portraitIconFallback );
+		portrait = std::make_unique<GUI_STIL_Portrait> ();
 		portrait->getImage = [ this ] { return authorImage; };
 		portrait->getTint = [ this ] { return textColor (); };
 

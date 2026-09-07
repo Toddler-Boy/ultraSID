@@ -2,9 +2,10 @@
 
 #include <JuceHeader.h>
 
-#include "ultra-shared/Resources/Icons.h"
 #include "ultra-shared/UI/Components/GUI_RoundedClip.h"
 #include "ultra-shared/UI/UI_Helpers.h"
+
+#include "UI/Components/GUI_PortraitPlaceholder.h"
 
 //----------------------------------------------------------------------------------
 
@@ -13,8 +14,7 @@
 class GUI_STIL_Portrait final : public juce::Component
 {
 public:
-	GUI_STIL_Portrait ( const bool _iconFallback )
-		: iconFallback ( _iconFallback )
+	GUI_STIL_Portrait ()
 	{
 		setName ( "portrait" );
 		setInterceptsMouseClicks ( false, false );
@@ -35,25 +35,14 @@ public:
 			g.setImageResamplingQuality ( juce::Graphics::highResamplingQuality );
 			g.drawImage ( img, b, juce::RectanglePlacement::fillDestination );
 		}
-		else if ( iconFallback )
-		{
-			const juce::SharedResourcePointer<Icons>	icons;
-
-			// Tinted with the owning box's content color
-			const auto	tint = getTint ? getTint () : juce::Colours::white;
-
-			g.fillAll ( tint.withMultipliedAlpha ( 0.33f ) );
-			g.setColour ( tint.withMultipliedAlpha ( 0.66f ) );
-			g.fillPath ( UI::getScaledPathWithSize ( icons->get ( "portrait-unknown" ), b.translated ( 0.0f, b.getHeight () * 0.1f ), juce::RectanglePlacement::centred ) );
-		}
 		else
 		{
-			g.fillAll ( juce::Colours::black );
+			placeholder.draw ( g, b, getTint ? getTint () : juce::Colours::white );
 		}
 	}
 
 private:
-	bool	iconFallback;
+	GUI_PortraitPlaceholder	placeholder;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_STIL_Portrait )
 };
