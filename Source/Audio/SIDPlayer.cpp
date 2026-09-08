@@ -345,7 +345,7 @@ void SIDPlayer::applyLiveProfile ()
 	if ( ! last || last->leakageRate != s.leakageRate )
 		engineEZ.set6581LeakageRate ( s.leakageRate );
 	if ( ! last || last->cwsLevel != s.cwsLevel )
-		engineEZ.setCombinedWaveforms ( reSIDfp::CombinedWaveforms ( s.cwsLevel ), 1.0f );
+		engineEZ.set6581CombinedWaveforms ( reSIDfp::CombinedWaveforms ( s.cwsLevel ), 1.0f );
 	if ( ! last || last->cwsSawPulseUltra != s.cwsSawPulseUltra )
 		engineEZ.set6581SawPulseUltra ( s.cwsSawPulseUltra );
 
