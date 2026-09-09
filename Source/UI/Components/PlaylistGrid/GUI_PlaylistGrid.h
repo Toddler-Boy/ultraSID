@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+#include "ultra-shared/Resources/Strings.h"
 #include "ultra-shared/UI/Components/GUI_Label.h"
 #include "ultra-shared/UI/Components/GUI_SVG_Button.h"
 #include "ultra-shared/UI/Components/GUI_ViewportSmoothScroll.h"
@@ -34,6 +35,7 @@ public:
 
 	// juce::Component
 	void resized () override;
+	void paintOverChildren ( juce::Graphics& g ) override;
 
 	// this
 	void setPlaylists ( const juce::StringArray& list );
@@ -82,6 +84,8 @@ private:
 	GUI_ViewportSmoothScroll	smoothScroll { viewport };
 
 	juce::OwnedArray<GUI_PlaylistGridItem>	items;
+
+	juce::SharedResourcePointer<Strings>	strings;
 
 	int	itemWidth = 0;
 	int	itemHeight = 0;

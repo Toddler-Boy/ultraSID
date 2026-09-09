@@ -137,6 +137,7 @@ playlist:
   my_playlists:     My Playlists
   default_name:     My Playlist #1
   empty:            This playlist is empty
+  no_playlists:     You haven't created a playlist yet
 
   add_playlist_tip: Add new playlist
   back_tip:         Back to playlist grid

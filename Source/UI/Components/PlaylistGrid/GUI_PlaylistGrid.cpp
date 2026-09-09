@@ -79,6 +79,17 @@ void GUI_PlaylistGrid::resized ()
 }
 //-----------------------------------------------------------------------------
 
+void GUI_PlaylistGrid::paintOverChildren ( juce::Graphics& g )
+{
+	if ( mini || ! items.isEmpty () )
+		return;
+
+	g.setColour ( findColour ( UI::colors::textMuted ) );
+	g.setFont ( UI::font ( UI::fonts::list_placeholder ) );
+	g.drawFittedText ( strings->get ( "playlist/no_playlists" ), viewport.getBounds (), juce::Justification::centred, 3 );
+}
+//-----------------------------------------------------------------------------
+
 void GUI_PlaylistGrid::setPlaylists ( const juce::StringArray& list )
 {
 	grid.removeAllChildren ();
@@ -350,6 +361,8 @@ void GUI_PlaylistGrid::updateGridItemByName ( const juce::String& name )
 
 void GUI_PlaylistGrid::layout ()
 {
+	repaint ();
+
 	if ( items.isEmpty () )
 	{
 		grid.setSize ( 0, 0 );
