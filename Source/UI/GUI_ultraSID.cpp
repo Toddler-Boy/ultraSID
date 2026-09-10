@@ -197,24 +197,26 @@ void GUI_ultraSID::globalFocusChanged ( juce::Component* focused )
 {
 	focusRing.focusChanged ( focused );
 
-	if ( ! buildinfo::isDeveloperMode () )
-		return;
-
-	if ( ! focused )
-	{
-		Z_INFO ( "Focus: none" );
-		return;
-	}
-
-	// Class plus the path of component names down from the top level
-	juce::String	path;
-	for ( auto c = focused; c; c = c->getParentComponent () )
-	{
-		const auto	name = c->getName ().isNotEmpty () ? c->getName () : juce::String ( "?" );
-		path = path.isEmpty () ? name : name + "/" + path;
-	}
-
-	Z_INFO ( "Focus: " << typeid ( *focused ).name () << " at " << path << " (order " << focused->getExplicitFocusOrder () << ")" );
+	// Focus trace for tab-order debugging, class plus the path of component
+	// names down from the top level
+	//
+	// if ( ! buildinfo::isDeveloperMode () )
+	// 	return;
+	//
+	// if ( ! focused )
+	// {
+	// 	Z_INFO ( "Focus: none" );
+	// 	return;
+	// }
+	//
+	// juce::String	path;
+	// for ( auto c = focused; c; c = c->getParentComponent () )
+	// {
+	// 	const auto	name = c->getName ().isNotEmpty () ? c->getName () : juce::String ( "?" );
+	// 	path = path.isEmpty () ? name : name + "/" + path;
+	// }
+	//
+	// Z_INFO ( "Focus: " << typeid ( *focused ).name () << " at " << path << " (order " << focused->getExplicitFocusOrder () << ")" );
 }
 //-----------------------------------------------------------------------------
 

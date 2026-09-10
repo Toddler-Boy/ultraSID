@@ -164,7 +164,7 @@ private:
 	// gin::FileSystemWatcher::Listener
 	void fileChanged ( const juce::File& file, gin::FileSystemWatcher::FileSystemEvent event ) override;
 
-	// juce::FocusChangeListener: feeds the focus ring, logs in developer mode
+	// juce::FocusChangeListener: feeds the focus ring
 	void globalFocusChanged ( juce::Component* focused ) override;
 
 	// juce::Component
