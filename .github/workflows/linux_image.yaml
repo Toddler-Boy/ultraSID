@@ -1,0 +1,28 @@
+name: Linux image
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "ci/linux/Dockerfile"
+
+# The Linux build job of build.yaml runs inside this image; rebuilding it is
+# how the Linux toolchain gets updated
+jobs:
+  image:
+    name: Build and push the image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build and push
+        shell: bash
+        run: |
+          image="ghcr.io/$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')/ultrasid-linux:22.04"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
+          docker build -t "$image" ci/linux
+          docker push "$image"
