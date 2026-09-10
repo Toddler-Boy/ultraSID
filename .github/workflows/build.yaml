@@ -146,6 +146,9 @@ jobs:
     timeout-minutes: 60
     env:
       DEBIAN_FRONTEND: noninteractive
+      # Non-ASCII data file names (7z reads them as bytes of the current locale)
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
     steps:
       - name: Install the toolchain and build dependencies
         shell: bash
