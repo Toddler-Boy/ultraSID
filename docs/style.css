@@ -195,7 +195,8 @@ h1, h2 {
   background: var(--surface);
 }
 
-.mac [data-os="macos"] {
+.mac [data-os="macos"],
+.linux [data-os="linux"] {
   order: -1;
 }
 

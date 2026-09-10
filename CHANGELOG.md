@@ -2,6 +2,14 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.1.0 (2026-09-10)
+
+- Linux version, as an AppImage for Ubuntu 22.04 or later (and other distributions
+  from that era on). Same features, same self-update as Windows and macOS.
+- Repeat all now loops a single tune when no playlist is playing.
+- Camera: a camera that fails to open is retried quietly, and one plugged in later is
+  picked up.
+
 ## 85.0.2 (2026-09-07)
 
 - Fixed some unexpected jumps in the playlist overview.
