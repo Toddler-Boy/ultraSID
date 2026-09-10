@@ -32,9 +32,14 @@ public:
 
 		bckAlpha[ 0 ] = bckAlpha[ 1 ] = getStage () ? 0.5f : 0.0f;
 
-		msg::Transport { getName () }.send ();
+		if ( ! polled )
+			msg::Transport { getName () }.send ();
 	}
 	//-----------------------------------------------------------------------------
+
+	// Mode buttons (shuffle, repeat) are read via getStage() when the queue
+	// advances, only the momentary ones announce a click
+	bool	polled = false;
 
 private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_TransportButton )
