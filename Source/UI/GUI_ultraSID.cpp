@@ -152,7 +152,7 @@ GUI_ultraSID::GUI_ultraSID ()
 
 	mainScreen.badge.version.onClick = [ this ]
 	{
-		if ( AppUpdater::canInstall && appUpdater.updatePending () )
+		if ( AppUpdater::canInstall () && appUpdater.updatePending () )
 			appUpdater.install ();
 		else
 			appUpdater.checkNow ();
