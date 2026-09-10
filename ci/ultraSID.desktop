@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=ultraSID
+Comment=Commodore 64 SID music player
+Exec=ultraSID
+Icon=ultraSID
+Categories=AudioVideo;Audio;Player;Music;
+Terminal=false

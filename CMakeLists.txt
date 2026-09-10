@@ -462,8 +462,20 @@ if (WIN32)
 endif()
 
 if(UNIX AND NOT APPLE)
-	target_link_libraries (ultraSID PRIVATE curl)
-	target_compile_options(ultraSID PRIVATE $<$<CONFIG:Debug>:-g -O0>)
+	target_compile_options(ultraSID PRIVATE -Wno-missing-braces -fno-math-errno -ffast-math -fno-finite-math-only -msse4.2 -ffp-contract=fast -funsafe-math-optimizations $<$<CONFIG:Debug>:-g -O0> $<$<CONFIG:Development>:-g>)
+	# System libcurl via dlopen (a link-time -lcurl carries the builder's
+	# distro symbol versions). JUCE adds JUCE_USE_CURL=0 unless asked to link
+	# curl; drop it, the app's JUCE_USE_CURL=1 stands alone
+	get_target_property(_defs ultraSID COMPILE_DEFINITIONS)
+	list(FILTER _defs EXCLUDE REGEX "^JUCE_USE_CURL=")
+	set_target_properties(ultraSID PROPERTIES COMPILE_DEFINITIONS "${_defs}")
+	target_compile_definitions(ultraSID PRIVATE JUCE_USE_CURL=1 JUCE_LOAD_CURL_SYMBOLS_LAZILY=1)
+	# Everything above the OS layer links statically; the OS set (glibc, GL,
+	# X11, ALSA, JACK, freetype, fontconfig) stays dynamic. lld: the distro's
+	# GNU ld predates the DWARF forms clang emits
+	target_link_options(ultraSID PRIVATE -fuse-ld=lld -static-libstdc++ -static-libgcc)
+	# The CPU check must not use the instructions it tests for
+	set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Source/App/CpuCheck_Linux.cpp PROPERTIES COMPILE_OPTIONS "-march=x86-64;-mno-sse4.1;-mno-sse4.2")
 endif()
 
 # ---------------------------------------------------------------------------

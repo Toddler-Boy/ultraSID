@@ -12,7 +12,13 @@ void GUI_ultraSID::initAudio ()
 		preferred.sampleRate = internalSamplerate;
 		preferred.bufferSize = internalSamplerate / 100;	// 10ms
 
-		if ( const auto error = deviceManager.initialise ( 0, 2, nullptr, true, {}, &preferred ); error.isNotEmpty () )
+		// The saved device opens directly ("System default" = JUCE's pick): a
+		// switch right after opening the default fails on Linux, the sound
+		// server still holds the card
+		const auto	saved = settings->get<juce::String> ( "output/device" );
+		const auto	preferredName = saved == "System default" ? juce::String () : saved;
+
+		if ( const auto error = deviceManager.initialise ( 0, 2, nullptr, true, preferredName, &preferred ); error.isNotEmpty () )
 			Z_WARN ( "Audio device init: " << error );
 	}
 

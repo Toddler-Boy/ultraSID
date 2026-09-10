@@ -194,6 +194,43 @@ OSAEOF
   fi
 fi
 
+# Data.pak (Windows and Linux): the ultra-shared Data tree packs first, so app
+# entries would win a name clash (matching the naked-mode precedence); it is
+# tiny and text-only, one weakest-deflate pass. App tree: images carry their
+# own compression and get stored, the rest gets the weakest deflate.
+# -mcu=on: always UTF-8 entry names, the reader assumes them
+build_pak() {
+  local pak="$1"
+  local dir
+  dir=$(dirname "$pak")
+
+  (
+    cd "$ROOT/Source/ultra-shared/Data"
+    find . -mindepth 1 \( -name '!src' -o -name '.*' \) -prune -o -type f ! -name Thumbs.db -print | sed 's|^\./||' > "$dir/_pakshared.txt"
+    7z a -tzip -mx=1 -mcu=on "$pak" @"$dir/_pakshared.txt" > /dev/null
+  )
+
+  (
+    cd "$ROOT/Data"
+    find . -mindepth 1 \( -name '!src' -o -name '.*' \) -prune -o -type f ! -name Thumbs.db -print | sed 's|^\./||' > "$dir/_pakfiles.txt"
+    grep -iE '\.(png|jpg)$' "$dir/_pakfiles.txt" > "$dir/_pakimages.txt"
+    grep -ivE '\.(png|jpg)$' "$dir/_pakfiles.txt" > "$dir/_pakrest.txt"
+    7z a -tzip -mx=0 -mcu=on "$pak" @"$dir/_pakimages.txt" > /dev/null
+    7z a -tzip -mx=1 -mcu=on "$pak" @"$dir/_pakrest.txt" > /dev/null
+  )
+
+  # Completeness: every listed file made it into the pak. A name clash between
+  # the two trees would collapse into one entry and trip the count
+  local expected actual
+  expected=$(cat "$dir/_pakshared.txt" "$dir/_pakfiles.txt" | wc -l)
+  actual=$(7z l -ba "$pak" | wc -l)
+  if [ "$expected" -ne "$actual" ]; then
+    echo "Data.pak entry count mismatch: $actual packed, $expected on disk"
+    exit 1
+  fi
+  rm "$dir"/_pak*.txt
+}
+
 # Build linux version
 if [ "$OS_NAME" = "Linux" ]; then
   cd "$ROOT"
@@ -201,10 +238,41 @@ if [ "$OS_NAME" = "Linux" ]; then
   cmake --preset ninja-clang "${SEED_ARGS[@]}"
   cmake --build --preset ninja-clang --config Release --parallel
 
-  cd "$ROOT/Builds/ninja-clang"
-  cpack -G DEB -C Release
+  STAGE="$ROOT/ci/bin/stage"
+  rm -rf "$STAGE"
+  mkdir -p "$STAGE"
 
-  cp "$ROOT/Builds/ninja-clang/"*.deb "$ROOT/ci/bin/"
+  # Strip first: any later ELF rewrite would drop the appended pak
+  strip -o "$STAGE/ultraSID" "$ROOT/Builds/ninja-clang/ultraSID_artefacts/Release/ultraSID"
+
+  # The pak rides appended to the binary (zip is end-anchored, ELF loaders
+  # ignore trailing bytes), making it fully self-contained
+  build_pak "$STAGE/Data.pak"
+  cat "$STAGE/Data.pak" >> "$STAGE/ultraSID"
+  rm "$STAGE/Data.pak"
+
+  # AppImage: binary, desktop entry and icon in an AppDir, packed by a pinned
+  # appimagetool onto the vendored static runtime (libfuse3 built in; the
+  # tool would otherwise fetch an unpinned one). extract-and-run: the tool is
+  # an AppImage itself
+  TOOLS="$ROOT/Builds/tools"
+  APPIMAGETOOL="$TOOLS/appimagetool-x86_64.AppImage"
+  APPIMAGETOOL_SHA256=ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0
+  mkdir -p "$TOOLS"
+  if ! echo "$APPIMAGETOOL_SHA256  $APPIMAGETOOL" | sha256sum -c --status 2>/dev/null; then
+    curl -sSL -o "$APPIMAGETOOL" https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage
+    echo "$APPIMAGETOOL_SHA256  $APPIMAGETOOL" | sha256sum -c --status
+    chmod +x "$APPIMAGETOOL"
+  fi
+
+  APPDIR="$STAGE/AppDir"
+  mkdir -p "$APPDIR/usr/bin"
+  mv "$STAGE/ultraSID" "$APPDIR/usr/bin/"
+  ln -s usr/bin/ultraSID "$APPDIR/AppRun"
+  cp "$ROOT/ci/ultraSID.desktop" "$APPDIR/"
+  cp "$ROOT/icons/windows_big.png" "$APPDIR/ultraSID.png"
+
+  ARCH=x86_64 "$APPIMAGETOOL" --appimage-extract-and-run --runtime-file "$ROOT/ci/runtime-x86_64" "$APPDIR" "$ROOT/ci/bin/ultraSID.AppImage"
 fi
 
 # Build Win version
@@ -219,40 +287,10 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
   mkdir -p "$STAGE"
   cp "$ROOT/Builds/vs/ultraSID_artefacts/Release/ultraSID.exe" "$STAGE/"
 
-  # Data.pak: the ultra-shared Data tree packs first, so app entries would win
-  # a name clash (matching the naked-mode precedence); it is tiny and
-  # text-only, one weakest-deflate pass
-  (
-    cd "$ROOT/Source/ultra-shared/Data"
-    find . -mindepth 1 \( -name '!src' -o -name '.*' \) -prune -o -type f ! -name Thumbs.db -print | sed 's|^\./||' > "$STAGE/_pakshared.txt"
-    7z a -tzip -mx=1 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakshared.txt" > /dev/null
-  )
-
-  # App tree: images carry their own compression and get stored, the rest gets
-  # the weakest deflate
-  (
-    cd "$ROOT/Data"
-    find . -mindepth 1 \( -name '!src' -o -name '.*' \) -prune -o -type f ! -name Thumbs.db -print | sed 's|^\./||' > "$STAGE/_pakfiles.txt"
-    grep -iE '\.(png|jpg)$' "$STAGE/_pakfiles.txt" > "$STAGE/_pakimages.txt"
-    grep -ivE '\.(png|jpg)$' "$STAGE/_pakfiles.txt" > "$STAGE/_pakrest.txt"
-    # -mcu=on: always UTF-8 entry names, the reader assumes them
-    7z a -tzip -mx=0 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakimages.txt" > /dev/null
-    7z a -tzip -mx=1 -mcu=on "$STAGE/Data.pak" @"$STAGE/_pakrest.txt" > /dev/null
-  )
-
-  # Completeness: every listed file made it into the pak. A name clash between
-  # the two trees would collapse into one entry and trip the count
-  expected=$(cat "$STAGE/_pakshared.txt" "$STAGE/_pakfiles.txt" | wc -l)
-  actual=$(7z l -ba "$STAGE/Data.pak" | wc -l)
-  if [ "$expected" -ne "$actual" ]; then
-    echo "Data.pak entry count mismatch: $actual packed, $expected on disk"
-    exit 1
-  fi
-  rm "$STAGE"/_pak*.txt
-
   # The pak rides appended to the exe (zip is end-anchored, so the file stays
   # both a valid PE and a valid zip), making the exe fully self-contained.
   # Order matters: signing afterwards seals code and data under one signature
+  build_pak "$STAGE/Data.pak"
   cat "$STAGE/Data.pak" >> "$STAGE/ultraSID.exe"
   rm "$STAGE/Data.pak"
 
