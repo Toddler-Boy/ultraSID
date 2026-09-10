@@ -186,14 +186,18 @@ void GUI_ultraSID::updatePlaylistPosition ()
 		return;
 	}
 
-	// Repeat "one"
-	if ( getRepeatMode () == PlayQueue::Repeat::one )
+	const auto	repeat = getRepeatMode ();
+	const auto	inPlaylist = playQueue->position >= 0;
+
+	// A single tune (search result, subtune, dropped file) is a playlist of
+	// one, so "repeat all" loops it just like "repeat one"
+	if ( repeat == PlayQueue::Repeat::one || ( repeat == PlayQueue::Repeat::all && ! inPlaylist ) )
 	{
 		player.seek ( 0 );
 		return;
 	}
 
-	if ( playQueue->position < 0 )
+	if ( ! inPlaylist )
 	{
 		mainScreen.pages.setPlaying ( "", -1 );
 		mainScreen.sidebarRight.setTunePlaying ( -1 );
