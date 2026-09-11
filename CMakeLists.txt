@@ -80,15 +80,11 @@ endmacro ()
 set (JUCE_ENABLE_MODULE_SOURCE_GROUPS ON)
 
 # Soft pin on develop: the fixes land there months before a tagged release.
-# PATCH_COMMAND re-runs after every update, so the patched file is reset first.
-# Drop the patch (and this hook) once the fix has landed upstream.
 FetchContent_Declare (JUCE
 					GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
 					GIT_TAG origin/develop
 					GIT_SHALLOW TRUE
-					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE
-					PATCH_COMMAND git checkout -- modules/juce_gui_basics/windows/juce_ComponentPeer.cpp
-					COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/Tools/juce-handleFocusGain.patch)
+					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE)
 FetchContent_MakeAvailable (JUCE)
 
 # Binary Data (icons)
