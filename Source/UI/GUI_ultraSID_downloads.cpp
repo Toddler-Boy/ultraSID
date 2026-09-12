@@ -151,7 +151,10 @@ void GUI_ultraSID::registerDownloadActions ()
 				hvscInstaller.downloadUpdate ();
 				return;
 			}
-			showPage ( "updateHVSC" );
+
+			// Applied: leave the progress page, back to where the user was
+			updateHVSCScreen.startOver ();
+			showPage ( lastPage );
 			return;
 		}
 
