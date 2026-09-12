@@ -5,6 +5,7 @@ Headline changes only: small fixes and internal work are not listed.
 ## 85.1.1 (2026-09-12)
 
 - Linux: fixed menus and dropdowns showing up as a black box under KDE Plasma.
+- Fixed the HVSC update getting stuck on the progress page after it had finished.
 
 ## 85.1.0 (2026-09-10)
 
