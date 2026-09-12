@@ -345,6 +345,10 @@ void HVSCInstaller::cancelUpdate ()
 	if ( onCanceling )
 		onCanceling ( false );
 
+	// Extraction and scripts always run to the end: no half-applied update
+	if ( isThreadRunning () )
+		return;
+
 	downloader.cancelDownload ( installState->hvsc.downloadId );
 	installState->hvsc.downloadId = 0;
 

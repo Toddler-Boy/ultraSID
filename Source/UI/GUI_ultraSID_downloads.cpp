@@ -146,15 +146,9 @@ void GUI_ultraSID::registerDownloadActions ()
 	{
 		if ( updateHVSCScreen.isUpdating () )
 		{
-			if ( installState->hvsc.needsUpdate () )
-			{
-				hvscInstaller.downloadUpdate ();
-				return;
-			}
-
-			// Applied: leave the progress page, back to where the user was
+			// Up to date = finished update, otherwise back to the update page
 			updateHVSCScreen.startOver ();
-			showPage ( lastPage );
+			showPage ( installState->hvsc.needsUpdate () ? "updateHVSC" : lastPage );
 			return;
 		}
 
