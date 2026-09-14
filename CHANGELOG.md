@@ -2,6 +2,11 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.1.2 (2026-09-14)
+
+- The equalizer moved from the settings page into a popup in the footer, next to the
+  volume control (Ctrl+Shift+E or Ctrl+G toggles it).
+
 ## 85.1.1 (2026-09-12)
 
 - Linux: fixed menus and dropdowns showing up as a black box under KDE Plasma.

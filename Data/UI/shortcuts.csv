@@ -11,7 +11,7 @@ playback,volumeUp,Ctrl+Up
 playback,volumeDown,Ctrl+Down
 playback,toggleMute,Ctrl+M
 playback,toggleQuality,Ctrl+E
-playback,toggleEQ,Ctrl+T
+playback,toggleEQ,Ctrl+Shift+E|Ctrl+G
 navigation,focusSearch,Ctrl+L|Ctrl+F
 navigation,showLiked,Alt+Shift+S
 navigation,jumpToPlaying,Alt+Shift+J
