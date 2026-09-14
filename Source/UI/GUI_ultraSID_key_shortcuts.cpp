@@ -57,7 +57,7 @@ bool GUI_ultraSID::keyPressed ( const juce::KeyPress& key )
 			msg::CloseAbout {}.send ();
 		else if ( shortcutsScreen.isVisible () )
 			msg::CloseShortcuts {}.send ();
-		else
+		else if ( ! mainScreen.footer.closePopups () )
 			return false;
 
 		return true;
@@ -142,6 +142,7 @@ void GUI_ultraSID::registerShortcutActions ()
 	router.on<msg::VolumeDown> ( [ this ]		{	mainScreen.footer.changeVolume ( -5.0 );	} );
 	router.on<msg::ToggleMute> ( [ this ]		{	mainScreen.footer.toggleMute ();	} );
 	router.on<msg::ToggleQuality> ( [ this ]	{	mainScreen.footer.toggleQualitySelector ();	} );
+	router.on<msg::ToggleEQ> ( [ this ]			{	mainScreen.footer.toggleEQPopup ();	} );
 	router.on<msg::JumpToPlaying> ( [ this ]	{	jumpToPlayingTune ();	} );
 	router.on<msg::ShowSettings> ( [ this ]		{	showPage ( "settings" );	} );
 	router.on<msg::Undo> ( [ this ]				{	undoManager->undo ();	} );

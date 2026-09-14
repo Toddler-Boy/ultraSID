@@ -13,7 +13,7 @@
 // pixels (the values every theme starts from).
 // Derived radii (pills via height / 2, circles, dots) stay in code
 #define CORNER_ROLES(X) \
-	X(quality_selector,	"quality-selector/corner",	8.0f) \
+	X(popup,			"popup/corner",				8.0f) \
 	X(main_menu_button,	"main-menu/button-corner",	8.0f) \
 	X(playlist_cover,	"playlist/cover-corner",	5.0f) \
 	X(search_bar,		"search-bar/corner",		1000.0f) \

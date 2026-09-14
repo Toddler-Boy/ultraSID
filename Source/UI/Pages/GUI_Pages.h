@@ -116,8 +116,6 @@ public:
 	void setHVSCStatus ( const GUI_SettingsLocationStatus::Status status, const juce::String& message )	{	settingsPage.setHVSCStatus ( status, message );	}
 	void restoreSettingsPreferences ()	{	settingsPage.restorePreferences ();	}
 	void refreshExportPreview ()		{	settingsPage.refreshExportPreview ();	}
-	void setFFTSources ( const FFTMeasurement& left, const FFTMeasurement& right )	{	settingsPage.setFFTSources ( left, right );	}
-	void spectrumChanged ( const bool stereo )	{	if ( settingsPage.isShowing () ) settingsPage.spectrumChanged ( stereo );	}
 
 	// Search
 	void repaintSearch ()	{	search.repaint ();	}

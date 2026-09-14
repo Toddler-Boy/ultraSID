@@ -17,8 +17,6 @@ namespace
 {
 	constexpr const char*	bandNames[ 3 ] = { "low", "mid", "high" };
 
-	constexpr float	boxBlend = 0.067f;		// the GUI_SettingsBox fill the curve sits on
-
 	constexpr float	handleGap = 2.0f;		// clearance left at full deflection
 	constexpr float	hoverGrow = 3.0f;		// dot growth under the mouse
 

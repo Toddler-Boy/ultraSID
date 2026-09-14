@@ -25,11 +25,7 @@
 								{ "id": "player-normalize", "factory": "set-toggle(player, normalize)",  "x": 20, "y": 20, "r": "parW - 20", "h": 42 },
 								{ "id": "line", "factory": "line", "yd": 20, "h": 1 },
 								{ "id": "label", "factory": "set-label(sound_output)", "x": 20, "y": "prevB + 20", "w": 280, "h": 32 },
-								{ "id": "output", "factory": "audio-device", "x": "prevR + 1", "y": "prevY", "r": "parW - 20", "h": "prevH" },
-								{ "id": "line2", "factory": "line", "x": 20, "y": "prevB + 20", "r": "parW - 20", "h": 1 },
-								{ "id": "label-eq", "factory": "set-entry(eq/label)", "x": 20, "y": "prevB + 20", "r": "getX('output') - 1", "h": 21 },
-								{ "id": "help-eq", "factory": "set-help(eq/help)", "yd": 0 },
-								{ "id": "eq", "factory": "eq-curve", "x": "getX('output')", "y": "getY('label-eq')", "r": "getR('output')", "h": 120 }
+								{ "id": "output", "factory": "audio-device", "x": "prevR + 1", "y": "prevY", "r": "parW - 20", "h": "prevH" }
 							]
 						},
 						{ "id": "label-song-lengths", "factory": "header2(song-lengths)", "x": "prevX + 10", "y": "prevB + sectionPadding", "w": "prevW", "h": 30 },

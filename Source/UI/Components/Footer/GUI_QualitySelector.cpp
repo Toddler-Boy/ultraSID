@@ -7,12 +7,11 @@
 //-----------------------------------------------------------------------------
 
 GUI_QualitySelector::GUI_QualitySelector ()
+	: GUI_Popup ( "qualitySelector" )
 {
-	setName ( "qualitySelector" );
-
 	constexpr auto	totalHeight = ( 80 * 5 ) + ( 24 + 15 + 20 );
 
-	setSize ( 400 + 24, totalHeight + 24 );
+	setSize ( 400 + shadowMargin * 2, totalHeight + shadowMargin * 2 );
 
 	addAndMakeVisible ( qualityLabel );
 
@@ -41,12 +40,9 @@ GUI_QualitySelector::GUI_QualitySelector ()
 
 void GUI_QualitySelector::resized ()
 {
-	auto	b = getLocalBounds ().reduced ( 12 );
+	GUI_Popup::resized ();
 
-	shadowPath.clear ();
-	shadowPath.addRoundedRectangle ( b.toFloat (), UI::corner ( UI::corners::quality_selector, b.toFloat () ) );
-
-	b.reduce ( 10, 10 );
+	auto	b = getPanelBounds ().reduced ( 10 );
 
 	b.removeFromTop ( 5 );
 	qualityLabel.setBounds ( b.removeFromTop ( 24 ).translated ( 10, 0 ) );
@@ -54,16 +50,6 @@ void GUI_QualitySelector::resized ()
 
 	for ( auto& qb : qButs )
 		qb.setBounds ( b.removeFromTop ( 80 ) );
-}
-//-----------------------------------------------------------------------------
-
-void GUI_QualitySelector::paint ( juce::Graphics& g )
-{
-	shadow.render ( g, shadowPath );
-
-	const auto	col = findColour ( juce::TooltipWindow::backgroundColourId );
-	g.setColour ( col );
-	g.fillPath ( shadowPath );
 }
 //-----------------------------------------------------------------------------
 
@@ -76,54 +62,22 @@ void GUI_QualitySelector::setQuality ( const int _quality )
 }
 //-----------------------------------------------------------------------------
 
-void GUI_QualitySelector::open ()
+void GUI_QualitySelector::focusOnOpen ()
 {
-	if ( isOpen () )
-		return;
-
-	previouslyFocused = juce::Component::getCurrentlyFocusedComponent ();
-
-	addToDesktop ( juce::ComponentPeer::windowIsTemporary );
-
 	if ( juce::isPositiveAndBelow ( quality, int ( std::size ( qButs ) ) ) )
 		qButs[ quality ].grabKeyboardFocus ();
+	else
+		grabKeyboardFocus ();
 }
 //-----------------------------------------------------------------------------
 
-void GUI_QualitySelector::close ()
+bool GUI_QualitySelector::popupKeyPressed ( const juce::KeyPress& key )
 {
-	if ( ! isOpen () )
-		return;
-
-	// Hand the focus back only if the selector still holds it; a click outside
-	// has already placed it elsewhere
-	const auto	restoreFocus = hasKeyboardFocus ( true );
-
-	removeFromDesktop ();
-
-	if ( restoreFocus && previouslyFocused != nullptr && previouslyFocused->isShowing () )
-		previouslyFocused->grabKeyboardFocus ();
-
-	previouslyFocused = nullptr;
-}
-//-----------------------------------------------------------------------------
-
-bool GUI_QualitySelector::keyPressed ( const juce::KeyPress& key )
-{
-	if ( key.getModifiers ().isAnyModifierKeyDown () )
-		return unhandledKey && unhandledKey ( key );
-
-	if ( key.isKeyCode ( juce::KeyPress::escapeKey ) )
-	{
-		close ();
-		return true;
-	}
-
 	const auto	up = key.isKeyCode ( juce::KeyPress::upKey );
 	const auto	down = key.isKeyCode ( juce::KeyPress::downKey );
 
 	if ( ! up && ! down )
-		return unhandledKey && unhandledKey ( key );
+		return false;
 
 	// Move the focus from the focused (or selected) quality, wrapping around
 	const auto	count = int ( std::size ( qButs ) );
@@ -198,7 +152,7 @@ void GUI_QualitySelector::QualityButton::paintButton ( juce::Graphics& g, bool i
 		const auto&	description = strings->get ( "footer/quality/" + getName () );
 
 		g.setColour ( findColour ( UI::colors::textMuted ) );
-		g.setFont ( UI::font ( UI::fonts::quality_selector_help ) );
+		g.setFont ( UI::font ( UI::fonts::popup_help ) );
 		g.drawFittedText ( description, r.toNearestInt (), juce::Justification::topLeft, 2, 1.0f );
 	}
 }

@@ -23,7 +23,6 @@
 #include "App/ExportName.h"
 #include "Config/Preferences.h"
 #include "Helpers/Messages.h"
-#include "UI/Components/GUI_EQCurve.h"
 #include "UI/Components/GUI_SettingsLocation.h"
 #include "UI/Components/GUI_SettingsText.h"
 #include "UI/Components/GUI_SettingsUserData.h"
@@ -151,11 +150,6 @@ void GUI_Settings::resized ()
 
 		// Set the HVSC status for the HVSC location component
 		setHVSCStatus ( hvscStatus, hvscStatusMessage );
-
-		// Hook the EQ widget up to the FFT measurements stored before the build
-		eqCurve = componentutils::findComponent<GUI_EQCurve> ( "audio-device/eq", componentMap );
-		if ( eqCurve != nullptr && fftLeft != nullptr && fftRight != nullptr )
-			eqCurve->setFFTSources ( *fftLeft, *fftRight );
 
 		// The boot-screen drop-down lists the Basic screens on disk, stored
 		// as the file name without extension
@@ -301,23 +295,6 @@ void GUI_Settings::refreshExportPreview ()
 }
 //-----------------------------------------------------------------------------
 
-void GUI_Settings::setFFTSources ( const FFTMeasurement& left, const FFTMeasurement& right )
-{
-	fftLeft = &left;
-	fftRight = &right;
-
-	if ( eqCurve != nullptr )
-		eqCurve->setFFTSources ( left, right );
-}
-//-----------------------------------------------------------------------------
-
-void GUI_Settings::spectrumChanged ( const bool stereo )
-{
-	if ( eqCurve != nullptr )
-		eqCurve->spectrumChanged ( stereo );
-}
-//-----------------------------------------------------------------------------
-
 void GUI_Settings::restorePreferences ()
 {
 	if ( componentMap.empty () )
@@ -347,9 +324,6 @@ void GUI_Settings::restorePreferences ()
 		else if ( auto	ud = dynamic_cast<GUI_SettingsUserData*> ( comp ) )
 			ud->refresh ();
 	}
-
-	if ( eqCurve != nullptr )
-		eqCurve->restorePreferences ();
 
 	updateDisablers ();
 }

@@ -41,6 +41,7 @@ footer:
     unmute_tip: Unmute
 
   quality_tip:  Audio quality settings
+  eq_tip:       Equalizer
 
   play_tip:               Play
   pause_tip:              Pause
@@ -237,8 +238,7 @@ settings:
   sound_output: Sound output device
 
   eq:
-    label: Tone adjustment
-    help:  Adjust the sound to taste.
+    label: Equalizer
     low:   LOW
     mid:   MID
     high:  HIGH
@@ -425,6 +425,7 @@ shortcuts:
     volumeDown:     Volume down
     toggleMute:     Mute
     toggleQuality:  Audio quality
+    toggleEQ:       Equalizer
 
   navigation:
     focusSearch:    Search

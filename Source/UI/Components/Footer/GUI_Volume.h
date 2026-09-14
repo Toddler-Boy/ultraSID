@@ -8,6 +8,7 @@
 #include "Config/Preferences.h"
 #include "UI/Components/GUI_QualitySelectorButton.h"
 
+#include "GUI_EQPopup.h"
 #include "GUI_QualitySelector.h"
 
 //-----------------------------------------------------------------------------
@@ -28,14 +29,16 @@ public:
 
 	// this
 	void changeVolume ( double delta );
-	void updateQualityPosition ();
 	void restorePreferences ();
+	void updatePopupPositions ();
 
 	[[ nodiscard ]] const std::unordered_map<std::string, std::variant<int, float>> getState () const;
 
 	GUI_QualitySelectorButton	quality { "quality", "REAL,PURE,MAGIC,EPIC,MYTHIC" };
+	GUI_SVG_Button		eq { "eq", { "footer/eq" } };
 	GUI_SVG_Button		mute { "mute", { "footer/volume/high" } };
 	GUI_QualitySelector	qualitySelector;
+	GUI_EQPopup			eqPopup;
 
 private:
 	juce::SharedResourcePointer<Preferences>	preferences;

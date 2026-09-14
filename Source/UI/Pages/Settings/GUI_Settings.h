@@ -8,9 +8,6 @@
 #include "UI/ComponentFactory.h"
 #include "UI/Components/GUI_SettingsLocationStatus.h"
 
-class FFTMeasurement;
-class GUI_EQCurve;
-
 //-----------------------------------------------------------------------------
 
 class GUI_Settings final : public juce::Component
@@ -26,11 +23,6 @@ public:
 	void restorePreferences ();
 	void refreshExportPreview ();
 	void setHVSCStatus ( GUI_SettingsLocationStatus::Status status, const juce::String& message );
-
-	// The FFT measurements are owned by the app, shared with the sidebar FFTs;
-	// they feed the EQ widget's spectrum
-	void setFFTSources ( const FFTMeasurement& left, const FFTMeasurement& right );
-	void spectrumChanged ( bool stereo );
 
 private:
 	void updateDisablers ();
@@ -49,12 +41,6 @@ private:
 
 	GUI_SettingsLocationStatus::Status	hvscStatus;
 	juce::String						hvscStatusMessage;
-
-	// The layout builds lazily in resized (), so the FFT sources arrive before
-	// the EQ widget exists
-	GUI_EQCurve*			eqCurve = nullptr;
-	const FFTMeasurement*	fftLeft = nullptr;
-	const FFTMeasurement*	fftRight = nullptr;
 
 	// Boot- and player-screen drop-down values, item id - 1 indexes them
 	// ("Random" leads the player list)

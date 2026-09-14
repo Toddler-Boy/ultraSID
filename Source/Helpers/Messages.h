@@ -77,6 +77,7 @@ SIMPLE_MESSAGE ( VolumeUp,			"volumeUp" );
 SIMPLE_MESSAGE ( VolumeDown,		"volumeDown" );
 SIMPLE_MESSAGE ( ToggleMute,		"toggleMute" );
 SIMPLE_MESSAGE ( ToggleQuality,		"toggleQuality" );
+SIMPLE_MESSAGE ( ToggleEQ,			"toggleEQ" );
 SIMPLE_MESSAGE ( FocusSearch,		"focusSearch" );
 SIMPLE_MESSAGE ( ShowLiked,			"showLiked" );
 SIMPLE_MESSAGE ( JumpToPlaying,		"jumpToPlaying" );

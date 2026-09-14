@@ -67,7 +67,7 @@ GUI_ultraSID::GUI_ultraSID ()
 	mainScreen.layout.setConstant ( "windowed", 1 );
 
 	mainScreen.sidebarRight.setFFTSources ( fftMeasureLeft, fftMeasureRight );
-	mainScreen.pages.setFFTSources ( fftMeasureLeft, fftMeasureRight );
+	mainScreen.footer.setFFTSources ( fftMeasureLeft, fftMeasureRight );
 
 	setWantsKeyboardFocus ( true );
 
@@ -128,8 +128,8 @@ GUI_ultraSID::GUI_ultraSID ()
 		player.seek ( newPosition );
 	} );
 
-	// The open quality selector has its own window, so the shortcuts come via callback
-	mainScreen.footer.onQualitySelectorKey ( [ this ] ( const juce::KeyPress& key )
+	// An open footer popup has its own window, so the shortcuts come via callback
+	mainScreen.footer.onPopupKey ( [ this ] ( const juce::KeyPress& key )
 	{
 		return keyPressed ( key );
 	} );
@@ -243,6 +243,8 @@ void GUI_ultraSID::toFullscreen ()
 
 	auto	parent = static_cast<juce::DocumentWindow*> ( getParentComponent () );
 
+	mainScreen.footer.closePopups ();
+
 	// Only hide monitor/crt settings if they are open
 	if ( ( settingsAreVisible = mainScreen.pages.areCRTSettingsVisible () ) )
 		mainScreen.pages.showCRTSettings ( false );
@@ -275,7 +277,7 @@ void GUI_ultraSID::toWindowed ()
 
 void GUI_ultraSID::moved ()
 {
-	mainScreen.footer.updateQualityPosition ();
+	mainScreen.footer.updatePopupPositions ();
 	positionUndoToast ();
 }
 //-----------------------------------------------------------------------------
@@ -290,7 +292,7 @@ void GUI_ultraSID::resized ()
 		toWindowed ();
 
 	if ( ! kioskMode )
-		mainScreen.footer.updateQualityPosition ();
+		mainScreen.footer.updatePopupPositions ();
 
 	positionUndoToast ();
 	badgeOverlay.setBounds ( getLocalBounds () );
@@ -321,9 +323,9 @@ void GUI_ultraSID::mouseDoubleClick ( const juce::MouseEvent& evt )
 
 void GUI_ultraSID::mouseDown ( const juce::MouseEvent& evt )
 {
-	// Click outside quality-selector hides it
-	mainScreen.footer.dismissQualityOnOutsideClick ( evt.originalComponent,
-													 evt.getEventRelativeTo ( this ).getScreenPosition () );
+	// A click outside an open footer popup closes it
+	mainScreen.footer.dismissPopupsOnOutsideClick ( evt.originalComponent,
+													evt.getEventRelativeTo ( this ).getScreenPosition () );
 }
 //-----------------------------------------------------------------------------
 
@@ -355,7 +357,7 @@ void GUI_ultraSID::update ( double time )
 	// Call various update functions
 	//
 
-	// The sidebar FFTs and the settings EQ share the measurements
+	// The sidebar FFTs and the footer's EQ popup share the measurements
 	const auto	stereoAmount = dspEffects.outputStereoAmount ();
 	const auto	leftChanged = fftMeasureLeft.update ();
 	const auto	rightChanged = stereoAmount > 0.0f && fftMeasureRight.update ();
@@ -381,7 +383,7 @@ void GUI_ultraSID::update ( double time )
 		mainScreen.footer.setTransportTime ( player.getTimeMS (), player.getRenderProgressMS () );
 
 	if ( leftChanged || rightChanged )
-		mainScreen.pages.spectrumChanged ( stereoAmount > 0.0f );
+		mainScreen.footer.spectrumChanged ( stereoAmount > 0.0f );
 
 	// Chip-profile editor loop region: the emulation can't seek backward, a
 	// wrap re-renders from 0:00 with the current tweaks and resumes at start

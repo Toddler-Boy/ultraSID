@@ -77,6 +77,8 @@ crt:
       zoom:        font-awesome/magnifying-glass-solid-full
 
 footer:
+  eq: material/instant_mix
+
   volume:
     mute:    footer/volume_mute
     low:     footer/volume_low

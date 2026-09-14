@@ -123,10 +123,12 @@ quality-button:
   font: 15 600
   corner: 6
 
-quality-selector:
+popup:
   corner: 8
   header-font: 15.4 800
   help-font: 14 500
+
+quality-selector:
   button-font: 9 800
   button-corner: 8
 

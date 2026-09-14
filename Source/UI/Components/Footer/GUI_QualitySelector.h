@@ -3,46 +3,34 @@
 #include <JuceHeader.h>
 
 #include "ultra-shared/Resources/Strings.h"
-#include "ultra-shared/Resources/Theme.h"
 #include "ultra-shared/UI/Components/GUI_Label.h"
-#include "ultra-shared/UI/Components/GUI_Line.h"
+
+#include "UI/Components/GUI_Popup.h"
 
 //-----------------------------------------------------------------------------
 
-class GUI_QualitySelector : public juce::Component
+// The quality popup: Up/Down move between the qualities, Enter/Space select
+
+class GUI_QualitySelector final : public GUI_Popup
 {
 public:
 	GUI_QualitySelector ();
 
 	// juce::Component
 	void resized () override;
-	void paint ( juce::Graphics& g ) override;
-	bool keyPressed ( const juce::KeyPress& key ) override;
 
 	// this
 	void setQuality ( const int quality );
 
-	// Shown as a temporary desktop window that owns the keyboard focus while
-	// open: Up/Down move between the qualities, Enter/Space select, Escape closes
-	void open ();
-	void close ();
-
-	[[ nodiscard ]] bool isOpen () const	{	return isOnDesktop ();	}
-
 	std::function<void ( const int )>	qualityChanged;
 
-	// Keys the selector doesn't use (the global shortcuts keep working while it's open)
-	std::function<bool ( const juce::KeyPress& )>	unhandledKey;
+protected:
+	// GUI_Popup
+	bool popupKeyPressed ( const juce::KeyPress& key ) override;
+	void focusOnOpen () override;
 
 private:
 	int	quality = 0;
-
-	juce::WeakReference<juce::Component>	previouslyFocused;
-
-	juce::SharedResourcePointer<Theme>	theme;
-
-	juce::Path				shadowPath;
-	melatonin::DropShadow	shadow { 12.0 };
 
 	class QualityButton : public juce::ToggleButton
 	{
@@ -63,7 +51,7 @@ private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( QualityButton )
 	};
 
-	GUI_DynamicLabel		qualityLabel { "footer/quality/header", UI::fonts::quality_selector_header };
+	GUI_DynamicLabel		qualityLabel { "footer/quality/header", UI::fonts::popup_header };
 	QualityButton			qButs[ 5 ] = {
 		{ "real", 0 },
 		{ "pure", 1 },

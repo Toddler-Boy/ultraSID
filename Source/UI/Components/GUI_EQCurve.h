@@ -11,7 +11,7 @@ class FFTMeasurement;
 
 //-----------------------------------------------------------------------------
 
-// The user's global tone preference on the settings page: one 3-band
+// The user's global tone preference, in the footer's EQ popup: one 3-band
 // offset curve (-1..+1 per band, SIDEffects maps it to dB) applied on top of
 // every mode's preset EQ, REAL included, their adaptation to the listening
 // environment. Drawn as a line through three equal-width low/mid/high bands
@@ -22,6 +22,9 @@ class GUI_EQCurve final : public juce::Component
 {
 public:
 	GUI_EQCurve ();
+
+	// The fill the host paints under the curve
+	static constexpr float	boxBlend = 0.067f;
 
 	// juce::Component
 	void resized () override;

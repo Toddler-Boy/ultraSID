@@ -54,8 +54,8 @@
 	X(onboarding_button, "onboarding/button-font",	15.4f,	600) \
 	X(onboarding_status, "onboarding/status-font",	12.3f,	600) \
 	X(quality_button,	"quality-button/font",		13.8f,	600) \
-	X(quality_selector_header,	"quality-selector/header-font",	15.4f,	800) \
-	X(quality_selector_help,	"quality-selector/help-font",	13.1f,	500) \
+	X(popup_header,		"popup/header-font",		15.4f,	800) \
+	X(popup_help,		"popup/help-font",			13.1f,	500) \
 	X(quality_selector_button,	"quality-selector/button-font",	8.5f,	800) \
 	X(playlist_info,	"playlist/info-font",		10.0f,	700) \
 	X(grid_big_header,	"grid-big/header-font",		32.0f,	700) \

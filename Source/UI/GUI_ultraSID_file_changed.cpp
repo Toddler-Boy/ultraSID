@@ -119,7 +119,7 @@ void GUI_ultraSID::fileChanged ( const juce::File& file, gin::FileSystemWatcher:
 
 			strings->load ();
 			repaint ();
-			mainScreen.footer.repaintQualitySelector ();
+			mainScreen.footer.repaintPopups ();
 		}
 
 		// UI icons
@@ -130,7 +130,7 @@ void GUI_ultraSID::fileChanged ( const juce::File& file, gin::FileSystemWatcher:
 
 			icons->load ();
 			repaint ();
-			mainScreen.footer.repaintQualitySelector ();
+			mainScreen.footer.repaintPopups ();
 		}
 
 		// Hand-drawn player screens and their wash sidecars

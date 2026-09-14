@@ -45,30 +45,46 @@ public:
 	void changeVolume ( const double delta )	{	volume.changeVolume ( delta );	}
 	void toggleMute ()							{	volume.mute.triggerClick ();	}
 	void toggleQualitySelector ()				{	volume.quality.triggerClick ();	}
-	void hideQualitySelector ()					{	volume.qualitySelector.close ();	}
-	void updateQualityPosition ()				{	volume.updateQualityPosition ();	}
-	void repaintQualitySelector ()				{	volume.qualitySelector.repaint ();	}
+	void toggleEQPopup ()						{	volume.eq.triggerClick ();	}
+	void updatePopupPositions ()				{	volume.updatePopupPositions ();	}
 	void restoreVolumePreferences ()	{	volume.restorePreferences ();	}
 
-	// Keys the open quality selector doesn't handle itself
-	void onQualitySelectorKey ( std::function<bool ( const juce::KeyPress& )> handler )	{	volume.qualitySelector.unhandledKey = std::move ( handler );	}
+	void repaintPopups ()
+	{
+		volume.qualitySelector.repaint ();
+		volume.eqPopup.repaint ();
+	}
+
+	// Keys an open popup doesn't handle itself
+	void onPopupKey ( std::function<bool ( const juce::KeyPress& )> handler )
+	{
+		volume.qualitySelector.unhandledKey = handler;
+		volume.eqPopup.unhandledKey = std::move ( handler );
+	}
 
 	[[ nodiscard ]] auto getVolumeState () const	{	return volume.getState ();	}
 
-	// Hide the quality selector when a click lands outside it
-	void dismissQualityOnOutsideClick ( const juce::Component* clicked, const juce::Point<int> screenPos )
+	// A click outside a transient popup closes it, its own button toggles it
+	void dismissPopupsOnOutsideClick ( const juce::Component* clicked, const juce::Point<int> screenPos )
 	{
-		if ( ! volume.qualitySelector.isOpen () )
-			return;
+		dismissOnOutsideClick ( volume.qualitySelector, volume.quality, clicked, screenPos );
+		dismissOnOutsideClick ( volume.eqPopup, volume.eq, clicked, screenPos );
+	}
 
-		if ( clicked == &volume.quality )
-			return;
-
-		if ( volume.qualitySelector.getScreenBounds ().contains ( screenPos ) )
-			return;
+	// True if one was open
+	bool closePopups ()
+	{
+		const auto	wasOpen = volume.qualitySelector.isOpen () || volume.eqPopup.isOpen ();
 
 		volume.qualitySelector.close ();
+		volume.eqPopup.close ();
+
+		return wasOpen;
 	}
+
+	// The EQ popup's spectrum, fed only while it's open
+	void setFFTSources ( const FFTMeasurement& left, const FFTMeasurement& right )	{	volume.eqPopup.setFFTSources ( left, right );	}
+	void spectrumChanged ( const bool stereo )	{	if ( volume.eqPopup.isOpen () ) volume.eqPopup.spectrumChanged ( stereo );	}
 
 	// The peak meters live in the app (they are bound to the effects chain)
 	// but render inside the volume area
@@ -88,6 +104,14 @@ private:
 	GUI_Volume		volume;
 
 	static void keepFocusOnClick ( juce::Component& c );
+
+	static void dismissOnOutsideClick ( GUI_Popup& popup, const juce::Component& button, const juce::Component* clicked, const juce::Point<int> screenPos )
+	{
+		if ( ! popup.isOpen () || ! popup.closesOnOutsideClick () || clicked == &button || popup.getScreenBounds ().contains ( screenPos ) )
+			return;
+
+		popup.close ();
+	}
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_Footer )
 };

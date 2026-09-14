@@ -10,7 +10,6 @@
 #include "ultra-shared/UI/SharedComponentFactory.h"
 
 #include "Audio/FXTuning.h"
-#include "UI/Components/GUI_EQCurve.h"
 #include "UI/Components/GUI_SettingsInstall.h"
 #include "UI/Components/GUI_SettingsLocation.h"
 #include "UI/Components/GUI_SettingsText.h"
@@ -138,12 +137,6 @@ std::pair<juce::Component*, bool> componentFactory ( const juce::String& typeNam
 
 	if ( compType == "set-help" )
 		return { new GUI_DynamicLabel ( "settings/" + typeParts[ 0 ], UI::fonts::settings_help, UI::colors::textMuted ), false };
-
-	//
-	// The user EQ curve
-	//
-	if ( compType == "eq-curve" )
-		return { new GUI_EQCurve, false };
 
 	//
 	// The generic and CRT-settings types

@@ -20,12 +20,15 @@ GUI_Volume::GUI_Volume ()
 
 		quality.onClick = [ this ]
   		{
-			updateQualityPosition ();
+			updatePopupPositions ();
 
 			if ( qualitySelector.isOpen () )
 				qualitySelector.close ();
 			else
-				qualitySelector.open ();
+			{
+				eqPopup.close ();
+				qualitySelector.open ( *this );
+			}
 		};
 
 		qualitySelector.qualityChanged = [ this ] ( const int q )
@@ -41,6 +44,27 @@ GUI_Volume::GUI_Volume ()
 		};
 
 		qualitySelector.setVisible ( true );
+	}
+
+	// EQ button
+	{
+		eq.setTooltip ( "footer/eq" );
+		eq.margin = 6.0f;
+
+		eq.onClick = [ this ]
+		{
+			updatePopupPositions ();
+
+			if ( eqPopup.isOpen () )
+				eqPopup.close ();
+			else
+			{
+				qualitySelector.close ();
+				eqPopup.open ( *this );
+			}
+		};
+
+		eqPopup.setVisible ( true );
 	}
 
 	// Mute toggle
@@ -74,6 +98,7 @@ GUI_Volume::GUI_Volume ()
 	}
 
 	addAndMakeVisible ( quality );
+	addAndMakeVisible ( eq );
 	addAndMakeVisible ( mute );
 	addAndMakeVisible ( volume );
 
@@ -104,19 +129,24 @@ void GUI_Volume::restorePreferences ()
 	updateState ();
 
 	qualitySelector.setQuality ( quality.getStateInt () );
+	eqPopup.restorePreferences ();
 }
 //-----------------------------------------------------------------------------
 
 void GUI_Volume::resized ()
 {
-	updateQualityPosition ();
+	updatePopupPositions ();
 }
 //-----------------------------------------------------------------------------
 
 void GUI_Volume::lookAndFeelChanged ()
 {
+	// Desktop windows, outside the tree the theme change walks
 	qualitySelector.resized ();
-	qualitySelector.repaint ();
+	qualitySelector.sendLookAndFeelChange ();
+
+	eqPopup.resized ();
+	eqPopup.sendLookAndFeelChange ();
 }
 //-----------------------------------------------------------------------------
 
@@ -154,12 +184,18 @@ void GUI_Volume::changeVolume ( double delta )
 }
 //-----------------------------------------------------------------------------
 
-void GUI_Volume::updateQualityPosition ()
+void GUI_Volume::updatePopupPositions ()
 {
-	const auto	tl = quality.getScreenPosition ();
+	// Panel right edge on the button's left edge, bottom on its top
+	{
+		const auto	tl = quality.getScreenPosition ();
+		qualitySelector.setTopRightPosition ( tl.x + GUI_Popup::shadowMargin, tl.y - qualitySelector.getHeight () );
+	}
 
-	auto&	qs = qualitySelector;
-	qs.setTopRightPosition ( tl.x + 12, tl.y - qs.getHeight () );
+	{
+		const auto	tl = eq.getScreenPosition ();
+		eqPopup.setTopRightPosition ( tl.x + GUI_Popup::shadowMargin, tl.y - eqPopup.getHeight () );
+	}
 }
 //-----------------------------------------------------------------------------
 
