@@ -255,32 +255,35 @@ void GUI_Settings::resized ()
 		restorePreferences ();
 
 		// The tuning sliders exist in developer builds only
-		const auto sliderConnect = [ this ] ( const juce::String& sldName )
+		if constexpr ( buildinfo::isDeveloperMode () )
 		{
-			if ( auto slider = componentutils::findComponent<GUI_CRTSliderLabel> ( sldName, componentMap ) )
-				slider->onValueChange = []
-				{
-					msg::SettingChanged { "fx" }.send ();
-				};
-		};
+			const auto sliderConnect = [ this ] ( const juce::String& sldName )
+			{
+				if ( auto slider = componentutils::findComponent<GUI_CRTSliderLabel> ( sldName, componentMap ) )
+					slider->onValueChange = []
+					{
+						msg::SettingChanged { "fx" }.send ();
+					};
+			};
 
-		sliderConnect ( "fx/fx-hum-volume" );
-		sliderConnect ( "fx/fx-wide-mono-width" );
-		sliderConnect ( "fx/fx-splitter-freq" );
-		sliderConnect ( "fx/fx-splitter-low-gain" );
-		sliderConnect ( "fx/fx-delay-wet" );
-		sliderConnect ( "fx/fx-delay-feedback" );
-		sliderConnect ( "fx/fx-reverb-wet" );
-		sliderConnect ( "fx/fx-noise-volume" );
-		sliderConnect ( "fx/fx-noise-color" );
-		sliderConnect ( "fx/fx-epic-wide-mono-width" );
-		sliderConnect ( "fx/fx-epic-delay-wet" );
-		sliderConnect ( "fx/fx-epic-delay-feedback" );
-		sliderConnect ( "fx/fx-epic-reverb-wet" );
-		sliderConnect ( "fx/fx-mythic-wide-mono-width" );
-		sliderConnect ( "fx/fx-mythic-delay-wet" );
-		sliderConnect ( "fx/fx-mythic-delay-feedback" );
-		sliderConnect ( "fx/fx-mythic-reverb-wet" );
+			sliderConnect ( "fx/fx-hum-volume" );
+			sliderConnect ( "fx/fx-wide-mono-width" );
+			sliderConnect ( "fx/fx-splitter-freq" );
+			sliderConnect ( "fx/fx-splitter-low-gain" );
+			sliderConnect ( "fx/fx-delay-wet" );
+			sliderConnect ( "fx/fx-delay-feedback" );
+			sliderConnect ( "fx/fx-reverb-wet" );
+			sliderConnect ( "fx/fx-noise-volume" );
+			sliderConnect ( "fx/fx-noise-color" );
+			sliderConnect ( "fx/fx-epic-wide-mono-width" );
+			sliderConnect ( "fx/fx-epic-delay-wet" );
+			sliderConnect ( "fx/fx-epic-delay-feedback" );
+			sliderConnect ( "fx/fx-epic-reverb-wet" );
+			sliderConnect ( "fx/fx-mythic-wide-mono-width" );
+			sliderConnect ( "fx/fx-mythic-delay-wet" );
+			sliderConnect ( "fx/fx-mythic-delay-feedback" );
+			sliderConnect ( "fx/fx-mythic-reverb-wet" );
+		}
 	}
 }
 //-----------------------------------------------------------------------------
