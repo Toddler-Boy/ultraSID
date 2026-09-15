@@ -211,6 +211,17 @@ void GUI_HistoryItems::paintCell ( juce::Graphics& g, int rowNumber, int columnI
 }
 //-----------------------------------------------------------------------------
 
+juce::String GUI_HistoryItems::getNameForRow ( int rowNumber )
+{
+	auto	name = GUI_ListBox::getNameForRow ( rowNumber );
+
+	if ( juce::isPositiveAndBelow ( rowNumber, getNumRows () ) )
+		name += ", " + smartTime ( history->getEntries ()[ rowNumber ].time, juce::Time::getCurrentTime (), false );
+
+	return name;
+}
+//-----------------------------------------------------------------------------
+
 void GUI_HistoryItems::returnKeyPressed ( int lastRowSelected )
 {
 	// A row whose tune is gone stays listed, but there is nothing to play

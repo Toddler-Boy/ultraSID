@@ -12,6 +12,7 @@ GUI_ultraSID_Badge::GUI_ultraSID_Badge ()
 	addAndMakeVisible ( logoUltraSID );
 	addAndMakeVisible ( version );
 
+	logoUltraSID.setTitle ( juce::SharedResourcePointer<Strings> ()->get ( "badge/about" ) );
 	logoUltraSID.onClick = []	{	msg::ShowAbout {}.send ();	};
 }
 //-----------------------------------------------------------------------------

@@ -60,9 +60,20 @@ public:
 	int getNumRows () override;
 	void sortOrderChanged ( int newSortColumnId, bool isForwards ) override;
 	juce::var getDragSourceDescription ( const juce::SparseSet<int>& rowsToDescribe ) override;
+	void selectedRowsChanged ( int lastRowSelected ) override;
+
+	// juce::Component
+	void focusGained ( FocusChangeType cause ) override;
+
+	// juce::ListBoxModel: what a screen reader says for a row
+	juce::String getNameForRow ( int rowNumber ) override;
 
 	// this
+	void focusSelectedRow ();
 	void addHeaderColumn ( const int colId, bool sortable = false );
+
+	// A field for a screen reader: placeholder words ("<?>", "???") drop out, nothing left reads as the unknown string
+	[[ nodiscard ]] static juce::String spokenField ( const juce::String& text, const juce::String& unknownKey );
 
 	// Column <-> sort key; other columns and 0 map to SortKey::none
 	[[ nodiscard ]] static db::SortKey sortKeyForColumn ( const int colId );

@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 
 #include "ultra-shared/Resources/Icons.h"
+#include "ultra-shared/Resources/Strings.h"
 #include "ultra-shared/UI/Components/GUI_ListBoxMouseMoveHover.h"
 #include "ultra-shared/UI/Components/GUI_ViewportSmoothScroll.h"
 
@@ -38,8 +39,16 @@ public:
  	void paintCell ( juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected ) override;
 	juce::var getDragSourceDescription ( const juce::SparseSet<int>& rowsToDescribe ) override;
 	juce::String getCellTooltip ( int rowNumber, int columnId ) override;
+	void selectedRowsChanged ( int lastRowSelected ) override;
+
+	// juce::Component
+	void focusGained ( FocusChangeType cause ) override;
+
+	// juce::ListBoxModel: what a screen reader says for a row
+	juce::String getNameForRow ( int rowNumber ) override;
 
 	// this
+	void focusSelectedRow ();
 	void layout ();
 	void setTune ( const juce::String& name, const int mainTuneNo );
 	void setBlocks ( const GUI_STIL_blocks& blocks );
@@ -62,7 +71,8 @@ public:
 	GUI_ViewportSmoothScroll	smoothScroll;
 
 private:
-	juce::SharedResourcePointer<Icons>	icons;
+	juce::SharedResourcePointer<Icons>		icons;
+	juce::SharedResourcePointer<Strings>	strings;
 
 	int			tunePlaying = -1;
 	float		animState = -1.0f;

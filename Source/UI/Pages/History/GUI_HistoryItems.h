@@ -29,6 +29,7 @@ public:
 
 	// GUI_ListBox
 	[[ nodiscard ]] juce::String getMissingRowText ( const int rowNumber ) const override;
+	juce::String getNameForRow ( int rowNumber ) override;
 
 	// juce::Component
 	void visibilityChanged () override;

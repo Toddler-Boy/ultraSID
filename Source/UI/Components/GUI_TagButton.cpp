@@ -22,6 +22,7 @@ GUI_TagButton::GUI_TagButton ( const juce::String& name, const int _colorId, con
 {
 	// Clicks don't move the keyboard focus
 	setMouseClickGrabsKeyboardFocus ( false );
+	setTitle ( getTooltip () );
 	enablementChanged ();
 }
 //----------------------------------------------------------------------------------

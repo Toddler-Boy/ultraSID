@@ -10,6 +10,16 @@ main-menu:
   history:    History
   settings:   Settings
 
+badge:
+  about: About ultra sid
+
+# Screen reader row text
+accessibility:
+  playing:        playing
+  liked:          liked
+  unknown-author:  unknown author
+  unknown-release: unknown release
+
 # Chip
 chip:
   approved: Approved by {}
@@ -42,6 +52,7 @@ footer:
 
   quality_tip:  Audio quality settings
   eq_tip:       Equalizer
+  thumbnail_tip: Show the CRT screen
 
   play_tip:               Play
   pause_tip:              Pause

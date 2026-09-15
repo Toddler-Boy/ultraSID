@@ -19,6 +19,34 @@
 #include "UI/GUI_AppLookAndFeel.h"
 #include "UI/ui-colors.h"
 
+//-----------------------------------------------------------------------------
+
+// spoken = split for screen readers ("65 81" reads as sixty-five eighty-one)
+[[ nodiscard ]] static juce::String chipTypeText ( const Database::entry& ent, const bool spoken = false )
+{
+	static const juce::String	typeStr[ 4 ] = { "Unknown", "6581", "8580", "Both" };
+	static const juce::String	spokenStr[ 4 ] = { "Unknown", "65 81", "85 80", "Both" };
+
+	auto		sid1Type = ( ent.flags >> 4 ) & 3;
+	const auto	sid2Type = ( ent.flags >> 6 ) & 3;
+	const auto	sid3Type = ( ent.flags >> 8 ) & 3;
+
+	if ( ent.lowerFile.ends_with ( "_2sid.sid" ) || ent.lowerFile.ends_with ( "_3sid.sid" ) )
+		sid1Type |= sid2Type | sid3Type;
+	else if ( sid1Type == 3 )
+		sid1Type = 1;
+
+	return ( spoken ? spokenStr : typeStr )[ sid1Type ];
+}
+//-----------------------------------------------------------------------------
+
+[[ nodiscard ]] static juce::String videoStandardText ( const Database::entry& ent )
+{
+	static const juce::String	videoStr[ 4 ] = { "Unknown", "PAL", "NTSC", "Both" };
+
+	return videoStr[ ( ent.flags >> 2 ) & 3 ];
+}
+
 namespace
 {
 	// A third click on the sorted column clears the sort (column 0)
@@ -410,29 +438,13 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 				// Chip type
 				{
 					g.setFont ( UI::font ( UI::fonts::browser_text ) );
-
-					static const juce::String	typeStr[ 4 ] = { "Unknown", "6581", "8580", "Both" };
-
-					auto	sid1Type = ( ent.flags >> 4 ) & 3;
-					const auto	sid2Type = ( ent.flags >> 6 ) & 3;
-					const auto	sid3Type = ( ent.flags >> 8 ) & 3;
-
-					if ( ent.lowerFile.ends_with ( "_2sid.sid" ) || ent.lowerFile.ends_with ( "_3sid.sid" ) )
-						sid1Type |= sid2Type | sid3Type;
-					else if ( sid1Type == 3 )
-						sid1Type = 1;
-
-					g.drawText ( typeStr[ sid1Type ], b.removeFromTop ( b.getHeight () / 2.0f ), juce::Justification::centredLeft );
+					g.drawText ( chipTypeText ( ent ), b.removeFromTop ( b.getHeight () / 2.0f ), juce::Justification::centredLeft );
 				}
 
 				// Video standard
 				{
 					g.setFont ( UI::font ( UI::fonts::browser_small ) );
-
-					const auto	videoStandard = ( ent.flags >> 2 ) & 3;
-					static const juce::String	videoStr[ 4 ] = { "Unknown", "PAL", "NTSC", "Both" };
-
-					g.drawText ( videoStr[ videoStandard ], b, juce::Justification::centredLeft );
+					g.drawText ( videoStandardText ( ent ), b, juce::Justification::centredLeft );
 				}
 			}
 			break;
@@ -495,6 +507,99 @@ juce::String GUI_ListBox::getCellTooltip ( int rowNumber, int columnId )
 		return strings->get ( "search/no_exact_like_tip" );
 
 	return {};
+}
+//-----------------------------------------------------------------------------
+
+juce::String GUI_ListBox::spokenField ( const juce::String& text, const juce::String& unknownKey )
+{
+	// Words without a letter or digit are placeholders ("<?>", "???"), a
+	// field of nothing else is unknown
+	juce::StringArray	words;
+
+	for ( const auto& word : juce::StringArray::fromTokens ( text, false ) )
+		for ( const auto c : word )
+			if ( juce::CharacterFunctions::isLetterOrDigit ( c ) )
+			{
+				words.add ( word );
+				break;
+			}
+
+	if ( words.isEmpty () )
+		return juce::SharedResourcePointer<Strings> ()->get ( unknownKey );
+
+	return words.joinIntoString ( " " );
+}
+//-----------------------------------------------------------------------------
+
+juce::String GUI_ListBox::getNameForRow ( int rowNumber )
+{
+	if ( ! juce::isPositiveAndBelow ( rowNumber, getNumRows () ) )
+		return {};
+
+	if ( ! rowData[ rowNumber ] )
+		return getMissingRowText ( rowNumber );
+
+	const auto&	ent = *rowData[ rowNumber ];
+	const auto	subTune = getRealSubtune ( rowNumber );
+
+	juce::StringArray	parts;
+
+	if ( rowPlaying == rowNumber )
+		parts.add ( strings->get ( "accessibility/playing" ) );
+
+	auto	name = juce::String ( stringutils::extendedASCIItoUTF8 ( ent.name ) );
+	if ( subTune != ent.startTune )
+		name += " #" + juce::String ( subTune );
+	parts.add ( name );
+
+	parts.add ( spokenField ( stringutils::extendedASCIItoUTF8 ( ent.author ), "accessibility/unknown-author" ) );
+	parts.add ( spokenField ( stringutils::extendedASCIItoUTF8 ( ent.release ), "accessibility/unknown-release" ) );
+	parts.add ( chipTypeText ( ent, true ) );
+	parts.add ( videoStandardText ( ent ) );
+	parts.add ( SID::convertTimeToString ( SID::getTuneLength ( ent.file, subTune ) ) );
+
+	if ( likes->isLiked ( ent.file, subTune ? subTune : ent.startTune ) )
+		parts.add ( strings->get ( "accessibility/liked" ) );
+
+	parts.removeEmptyStrings ();
+
+	return parts.joinIntoString ( ", " );
+}
+//-----------------------------------------------------------------------------
+
+// Screen readers follow the accessibility focus, which stays on the list
+// unless the selected row takes it (rows want no keyboard focus, so the
+// list keeps the keys)
+void GUI_ListBox::focusSelectedRow ()
+{
+	if ( ! hasKeyboardFocus ( true ) )
+		return;
+
+	if ( auto row = getComponentForRowNumber ( getSelectedRow () ) )
+		if ( auto handler = row->getAccessibilityHandler () )
+			handler->grabFocus ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ListBox::selectedRowsChanged ( int lastRowSelected )
+{
+	juce::TableListBoxModel::selectedRowsChanged ( lastRowSelected );
+
+	focusSelectedRow ();
+}
+//-----------------------------------------------------------------------------
+
+// The list's own handler takes the accessibility focus right after this
+// returns, so the row's grab waits a message-loop pass
+void GUI_ListBox::focusGained ( FocusChangeType cause )
+{
+	juce::TableListBox::focusGained ( cause );
+
+	juce::MessageManager::callAsync ( [ safe = juce::Component::SafePointer<GUI_ListBox> ( this ) ]
+	{
+		if ( safe )
+			safe->focusSelectedRow ();
+	} );
 }
 //-----------------------------------------------------------------------------
 

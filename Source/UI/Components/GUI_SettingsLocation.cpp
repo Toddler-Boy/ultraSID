@@ -18,6 +18,9 @@ GUI_SettingsLocation::GUI_SettingsLocation ( const juce::String& setName, const 
 	path.setText ( settings->get<juce::String> ( "paths/" + settingName ) );
 	path.setName ( "path" );
 
+	browseButton.setTitle ( label.displayText () + ", " + strings->get ( "settings/browse" ) );
+	moveButton.setTitle ( label.displayText () + ", " + strings->get ( "settings/move" ) );
+
 	addAndMakeVisible ( label );
 	addAndMakeVisible ( path );
 	addChildComponent ( status );

@@ -23,6 +23,8 @@ GUI_SettingsText::GUI_SettingsText ( const juce::String& setSection, const juce:
 	text.setJustification ( juce::Justification::centredLeft );
 	text.setIndents ( 8, 0 );
 	text.setBorder ( {} );
+	text.setTitle ( label.displayText () );
+	text.setHelpText ( strings->get ( "settings/" + setSection + "/" + setName + "-help" ) );
 
 	text.onTextChange = [ this ] { refreshPreview (); };
 

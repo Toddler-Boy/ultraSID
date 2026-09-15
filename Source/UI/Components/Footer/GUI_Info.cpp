@@ -16,6 +16,7 @@ GUI_Info::GUI_Info ()
 	author.setName ( "author" );
 	released.setName ( "released" );
 
+	thumbnail.setTitle ( juce::SharedResourcePointer<Strings> ()->get ( "footer/thumbnail_tip" ) );
 	thumbnail.onClick = []
 	{
 		msg::ShowPage { "crt" }.send ();

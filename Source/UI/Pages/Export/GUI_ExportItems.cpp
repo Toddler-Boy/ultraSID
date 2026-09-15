@@ -166,6 +166,25 @@ void GUI_ExportItems::cellClicked ( int row, int columnId, const juce::MouseEven
 }
 //-----------------------------------------------------------------------------
 
+juce::String GUI_ExportItems::getNameForRow ( int rowNumber )
+{
+	auto	name = GUI_ListBox::getNameForRow ( rowNumber );
+
+	if ( ! juce::isPositiveAndBelow ( rowNumber, getNumRows () ) )
+		return name;
+
+	const auto	queueIndex = toQueueIndex ( rowNumber );
+	const auto	status = tuneExporter->getStatus ( queueIndex );
+
+	name += ", " + tuneExporter->getStatusString ( queueIndex );
+
+	if ( status == TuneExporter::RENDERING || status == TuneExporter::APPLYING_FX || status == TuneExporter::SAVING || status == TuneExporter::PAUSED )
+		name += " " + juce::String ( int ( renderProgress[ rowNumber ] * 100.0f ) ) + "%";
+
+	return name;
+}
+//-----------------------------------------------------------------------------
+
 void GUI_ExportItems::paintCell ( juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected )
 {
 	if ( ! juce::isPositiveAndBelow ( rowNumber, getNumRows () ) )

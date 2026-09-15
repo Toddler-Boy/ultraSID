@@ -22,6 +22,7 @@ GUI_PlaylistGridItem::GUI_PlaylistGridItem ( GUI_Pages& _pages, const juce::Stri
 
 	setToggleable ( mini );
 	setClickingTogglesState ( mini );
+	setTitle ( name );
 
 	// The play overlay is no tab stop
 	playButton.setWantsKeyboardFocus ( false );

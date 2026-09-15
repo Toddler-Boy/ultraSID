@@ -42,6 +42,7 @@ public:
 
 	// GUI_ListBox
 	[[ nodiscard ]] juce::String getMissingRowText ( const int rowNumber ) const override;
+	juce::String getNameForRow ( int rowNumber ) override;
 
 private:
 	// Rows display newest-first while the exporter queue runs oldest-first;

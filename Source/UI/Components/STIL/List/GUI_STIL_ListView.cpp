@@ -11,6 +11,7 @@
 #include "Database/TuneInfo.h"
 #include "Helpers/Messages.h"
 #include "Resources/STIL_Lookup.h"
+#include "UI/Components/GUI_ListBox.h"
 #include "UI/GUI_AppLookAndFeel.h"
 #include "UI/ui-colors.h"
 #include "UI/UI_Menus.h"
@@ -285,6 +286,71 @@ void GUI_STIL_ListView::paintCell ( juce::Graphics& g, int rowNumber, int column
 			}
 			break;
 	}
+}
+//-----------------------------------------------------------------------------
+
+juce::String GUI_STIL_ListView::getNameForRow ( int rowNumber )
+{
+	if ( ! juce::isPositiveAndBelow ( rowNumber, getNumRows () ) )
+		return {};
+
+	const auto&	ent = *rowData[ rowNumber ];
+
+	juce::StringArray	parts;
+
+	if ( tunePlaying == ent.no )
+		parts.add ( strings->get ( "accessibility/playing" ) );
+
+	parts.add ( "Tune " + juce::String ( ent.no + 1 ) );
+
+	if ( ent.timeStr.isNotEmpty () )
+		parts.add ( ent.tuneName.unquoted () );
+
+	parts.add ( GUI_ListBox::spokenField ( ent.authorName, "accessibility/unknown-author" ) );
+
+	if ( ent.timeStr.isNotEmpty () )
+		parts.add ( ent.timeStr );
+	else
+		parts.add ( SID::convertTimeToString ( juce::SharedResourcePointer<Preferences> ()->getClamped ( "songs/unknown" ) * 60 * 1000 ) );
+
+	if ( juce::SharedResourcePointer<Likes> ()->isLiked ( tuneName.toStdString (), ent.no + 1 ) )
+		parts.add ( strings->get ( "accessibility/liked" ) );
+
+	parts.removeEmptyStrings ();
+
+	return parts.joinIntoString ( ", " );
+}
+//-----------------------------------------------------------------------------
+
+// The selected row takes the accessibility focus, see GUI_ListBox
+void GUI_STIL_ListView::focusSelectedRow ()
+{
+	if ( ! hasKeyboardFocus ( true ) )
+		return;
+
+	if ( auto row = getComponentForRowNumber ( getSelectedRow () ) )
+		if ( auto handler = row->getAccessibilityHandler () )
+			handler->grabFocus ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_STIL_ListView::selectedRowsChanged ( int lastRowSelected )
+{
+	juce::TableListBoxModel::selectedRowsChanged ( lastRowSelected );
+
+	focusSelectedRow ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_STIL_ListView::focusGained ( FocusChangeType cause )
+{
+	juce::TableListBox::focusGained ( cause );
+
+	juce::MessageManager::callAsync ( [ safe = juce::Component::SafePointer<GUI_STIL_ListView> ( this ) ]
+	{
+		if ( safe )
+			safe->focusSelectedRow ();
+	} );
 }
 //-----------------------------------------------------------------------------
 
