@@ -531,6 +531,12 @@ juce::String GUI_ListBox::spokenField ( const juce::String& text, const juce::St
 }
 //-----------------------------------------------------------------------------
 
+juce::String GUI_ListBox::spokenChips ( const juce::String& text )
+{
+	return text.replace ( "6581", "65 81" ).replace ( "8580", "85 80" );
+}
+//-----------------------------------------------------------------------------
+
 juce::String GUI_ListBox::getNameForRow ( int rowNumber )
 {
 	if ( ! juce::isPositiveAndBelow ( rowNumber, getNumRows () ) )
@@ -547,7 +553,7 @@ juce::String GUI_ListBox::getNameForRow ( int rowNumber )
 	if ( rowPlaying == rowNumber )
 		parts.add ( strings->get ( "accessibility/playing" ) );
 
-	auto	name = juce::String ( stringutils::extendedASCIItoUTF8 ( ent.name ) );
+	auto	name = spokenChips ( stringutils::extendedASCIItoUTF8 ( ent.name ) );
 	if ( subTune != ent.startTune )
 		name += " #" + juce::String ( subTune );
 	parts.add ( name );

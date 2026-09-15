@@ -304,7 +304,7 @@ juce::String GUI_STIL_ListView::getNameForRow ( int rowNumber )
 	parts.add ( "Tune " + juce::String ( ent.no + 1 ) );
 
 	if ( ent.timeStr.isNotEmpty () )
-		parts.add ( ent.tuneName.unquoted () );
+		parts.add ( GUI_ListBox::spokenChips ( ent.tuneName.unquoted () ) );
 
 	parts.add ( GUI_ListBox::spokenField ( ent.authorName, "accessibility/unknown-author" ) );
 

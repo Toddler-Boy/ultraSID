@@ -25,6 +25,7 @@ GUI_Search::GUI_Search ( GUI_Pages& pages )
 	const auto	focusResults = [ this ]	{	results.grabKeyboardFocus ();	};
 	searchbar.getTextEditor ().onReturnPressed = focusResults;
 	searchbar.getTextEditor ().onEscapePressed = focusResults;
+	searchbar.getTextEditor ().setTitle ( juce::SharedResourcePointer<Strings> ()->get ( "main-menu/search" ) );
 
 	info.setName ( "info" );
 

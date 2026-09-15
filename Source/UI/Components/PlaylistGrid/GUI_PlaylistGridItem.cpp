@@ -368,6 +368,7 @@ void GUI_PlaylistGridItem::setTuneCount ( const int count )
 void GUI_PlaylistGridItem::setBasicInfo ( const juce::String& _info )
 {
 	info = _info;
+	setTitle ( getName () + ", " + info );
 }
 //-----------------------------------------------------------------------------
 

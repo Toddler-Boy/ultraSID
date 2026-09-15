@@ -75,6 +75,9 @@ public:
 	// A field for a screen reader: placeholder words ("<?>", "???") drop out, nothing left reads as the unknown string
 	[[ nodiscard ]] static juce::String spokenField ( const juce::String& text, const juce::String& unknownKey );
 
+	// Chip models in free text read as digit pairs ("65 81"), not as thousands
+	[[ nodiscard ]] static juce::String spokenChips ( const juce::String& text );
+
 	// Column <-> sort key; other columns and 0 map to SortKey::none
 	[[ nodiscard ]] static db::SortKey sortKeyForColumn ( const int colId );
 	[[ nodiscard ]] static int columnForSortKey ( const db::SortKey key );
