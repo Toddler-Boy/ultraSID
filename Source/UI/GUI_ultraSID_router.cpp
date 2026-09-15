@@ -194,6 +194,12 @@ void GUI_ultraSID::registerSettingsActions ()
 		}
 		else if ( e.section == "player" && e.key == "player-screen" )
 			mainScreen.pages.playerScreenPickChanged ();
+		else if ( e.section == "update" && e.key == "check-frequency" )
+		{
+			// A check, never an install
+			mainScreen.badge.version.startChecking ();
+			appUpdater.checkNow ();
+		}
 	} );
 
 	router.on<msg::VolumeChanged> ( [ this ]	{	updateVolume ();	} );

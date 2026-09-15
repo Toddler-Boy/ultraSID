@@ -297,6 +297,7 @@ settings:
     check-help:           Asks the website for a newer version when ultraSID starts.
     check-frequency:      Check frequency
     check-frequency-help: How often ultraSID asks the website for a newer version.
+    check-frequency-startup: Every start
     check-frequency-daily:   Daily
     check-frequency-weekly:  Weekly
     check-frequency-monthly: Monthly

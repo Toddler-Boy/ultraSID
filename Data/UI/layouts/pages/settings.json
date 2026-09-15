@@ -109,7 +109,7 @@
 								{ "id": "check", "factory": "set-toggle(update, check)", "x": 20, "y": 20, "r": "parW - 20", "h": 42 },
 								{ "id": "disabler", "factory": "disabler", "bounds": "20, prevB + 15, parW - 40, 0", "pH": "maxY",
 									"components": [
-										{ "id": "check-frequency", "factory": "set-choice(update, check-frequency, daily, weekly, monthly)", "x": 0, "y": 0, "r": "parW", "h": 42 }
+										{ "id": "check-frequency", "factory": "set-choice(update, check-frequency, startup, daily, weekly, monthly)", "x": 0, "y": 0, "r": "parW", "h": 42 }
 									]
 								}
 							]
