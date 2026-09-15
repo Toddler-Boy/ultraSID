@@ -116,9 +116,12 @@ void GUI_ultraSID::renderSong ()
 	const auto	isUserTune = lastFilename.starts_with ( filepaths::userMarker );
 	const auto	unknown = lufs >= -0.1f || lufs <= -95.9f;
 
+	auto	msg = "Playing " + juce::String ( lastFilename ) + ", subtune " + juce::String ( player.getCurrentSong () )
+				+ " of " + juce::String ( player.getNumberOfSongs () ) + ", ";
+
 	if ( unknown )
 	{
-		Z_INFO ( "Unknown loudness, measuring live" );
+		msg << "unknown loudness, measuring live";
 	}
 	else
 	{
@@ -129,12 +132,12 @@ void GUI_ultraSID::renderSong ()
 						: juce::SharedResourcePointer<Database> ()->getSongLoudness ( lastFilename, player.getCurrentSong () );
 		const auto	punishment = lufs - raw;
 
-		auto	msg = "Replay gain " + juce::String ( std::min ( 20.0f, SIDPlayer::targetLUFS - lufs ), 1 ) + " dB";
+		msg << "replay gain " << juce::String ( std::min ( 20.0f, SIDPlayer::targetLUFS - lufs ), 1 ) << " dB";
 		if ( punishment > 0.05f )
 			msg << " (midband punishment " << juce::String ( punishment, 1 ) << " dB)";
-
-		Z_INFO ( msg );
 	}
+
+	Z_INFO ( msg );
 
 	// A completed live measurement of a user tune goes into the cache, keyed
 	// to the tune this render was started for

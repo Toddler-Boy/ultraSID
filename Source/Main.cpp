@@ -19,6 +19,12 @@ public:
 	ultraSIDApp ()
 	{
 		juce::Logger::setCurrentLogger ( lime::Logger::getInstance () );
+
+		const auto	logFile = juce::File::getSpecialLocation ( juce::File::userApplicationDataDirectory )
+								.getChildFile ( ProjectInfo::projectName ).getChildFile ( "log.txt" );
+
+		lime::Logger::getInstance ()->setLogFile ( logFile, juce::String ( ProjectInfo::projectName ) + " " + ProjectInfo::versionString
+																	   + ", " + juce::SystemStats::getOperatingSystemName () );
 	}
 
 	~ultraSIDApp () override
