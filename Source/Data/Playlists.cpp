@@ -428,28 +428,7 @@ void playlist::setSort ( const db::SortKey key, const bool forwards )
 	sortKey = key;
 	sortForwards = forwards;
 
-	viewOrder.clear ();
-
-	if ( isSorted () )
-	{
-		const auto	size = entries.size ();
-
-		std::vector<db::SortItem>	items ( size );
-		for ( auto i = 0u; i < size; ++i )
-		{
-			const auto [ tuneName, subTune ] = SID::parseTuneName ( entries[ i ] );
-			items[ i ] = db::sortItem ( key, db::findDatabaseEntry ( tuneName ), subTune );
-		}
-
-		viewOrder.resize ( size );
-		std::iota ( viewOrder.begin (), viewOrder.end (), 0 );
-
-		// Ties keep the custom order
-		std::ranges::stable_sort ( viewOrder, [ & ] ( const int a, const int b )
-		{
-			return db::entryLess ( key, forwards, items[ size_t ( a ) ], items[ size_t ( b ) ] );
-		} );
-	}
+	computeViewOrder ();
 
 	for ( auto i = 0u; auto* row : playingRows () )
 	{
@@ -457,6 +436,62 @@ void playlist::setSort ( const db::SortKey key, const bool forwards )
 			*row = getViewIndex ( playingEntries[ i ] );
 		++i;
 	}
+}
+//-----------------------------------------------------------------------------
+
+void playlist::computeViewOrder ()
+{
+	viewOrder.clear ();
+
+	if ( ! isSorted () )
+		return;
+
+	const auto	size = entries.size ();
+
+	std::vector<db::SortItem>	items ( size );
+	for ( auto i = 0u; i < size; ++i )
+	{
+		const auto [ tuneName, subTune ] = SID::parseTuneName ( entries[ i ] );
+		items[ i ] = db::sortItem ( sortKey, db::findDatabaseEntry ( tuneName ), subTune );
+	}
+
+	viewOrder.resize ( size );
+	std::iota ( viewOrder.begin (), viewOrder.end (), 0 );
+
+	// Ties keep the custom order
+	std::ranges::stable_sort ( viewOrder, [ & ] ( const int a, const int b )
+	{
+		return db::entryLess ( sortKey, sortForwards, items[ size_t ( a ) ], items[ size_t ( b ) ] );
+	} );
+}
+//-----------------------------------------------------------------------------
+
+void playlist::keepOrder ()
+{
+	if ( ! isSorted () )
+		return;
+
+	std::vector<std::string>	ordered;
+	ordered.reserve ( entries.size () );
+
+	for ( const auto e : viewOrder )
+		ordered.push_back ( std::move ( entries[ size_t ( e ) ] ) );
+
+	entries = std::move ( ordered );
+
+	viewOrder.clear ();
+	sortKey = db::SortKey::none;
+}
+//-----------------------------------------------------------------------------
+
+void playlist::restoreOrder ( std::vector<std::string> oldEntries, const db::SortKey key, const bool forwards )
+{
+	entries = std::move ( oldEntries );
+
+	sortKey = key;
+	sortForwards = forwards;
+
+	computeViewOrder ();
 }
 //-----------------------------------------------------------------------------
 

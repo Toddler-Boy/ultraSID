@@ -351,6 +351,7 @@ void GUI_PlaylistItems::itemDragExit ( const SourceDetails& /*dragSourceDetails*
 void GUI_PlaylistItems::updateRowData ()
 {
 	realPlaylist->createRowData ( rowData, rowSubtune );
+	syncHeaderSort ();
 	updateContent ();
 	repaint ();
 }

@@ -422,6 +422,8 @@ void GUI_Playlist::showMenu ()
 
 	UI::menu_ExportPlaylist ( m, name );
 	m.addSeparator ();
+	UI::menu_KeepOrder ( m, name );
+	m.addSeparator ();
 	UI::menu_DeleteCover ( m, name );
 	m.addSeparator ();
 	UI::menu_DeletePlaylist ( m, name );

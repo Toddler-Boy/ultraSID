@@ -17,6 +17,7 @@ menu:
   delete:          font-awesome/trash-can-regular-full
   move_to_top:     font-awesome/arrow-up-solid-full
   move_to_bottom:  font-awesome/arrow-down-solid-full
+  keep_order:      font-awesome/check-solid-full
   go_to_folder:    font-awesome/folder-open-solid-full
   export_tune:     font-awesome/arrow-up-right-from-square-solid-full
   requeue_export:  font-awesome/arrow-down-solid-full

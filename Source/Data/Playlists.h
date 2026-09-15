@@ -50,6 +50,12 @@ public:
 	[[ nodiscard ]] int getEntryIndex ( const int row ) const	{	return isSorted () ? viewOrder[ size_t ( row ) ] : row;	}
 	[[ nodiscard ]] int getViewIndex ( const int entryIndex ) const;
 
+	// Writes the sorted view into the entries and clears the sort; view rows stay.
+	// restoreOrder is the undo: the old entries with the same sort re-derived
+	void keepOrder ();
+	void restoreOrder ( std::vector<std::string> oldEntries, const db::SortKey key, const bool forwards );
+	[[ nodiscard ]] const std::vector<std::string>& getEntries () const	{	return entries;	}
+
 	void clear ();
 	void removeItem ( const int index, const bool isFinal = false );
 	void removeItems ( const juce::SparseSet<int>& rows );
@@ -87,6 +93,9 @@ public:
 
 private:
 	[[ nodiscard ]] std::array<int*, 3> playingRows () const	{	return { rowPlaying, queuePosition, queuePlayPosition };	}
+
+	// viewOrder from the entries and the sort key; playing rows untouched
+	void computeViewOrder ();
 
 	juce::String	name;
 	juce::String	coverExtension;

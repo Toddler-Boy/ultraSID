@@ -161,6 +161,51 @@ void UI::menu_MoveItems ( juce::PopupMenu& m, const juce::String& plName, const 
 }
 //-----------------------------------------------------------------------------
 
+void UI::menu_KeepOrder ( juce::PopupMenu& m, const juce::String& plName )
+{
+	const juce::SharedResourcePointer<Playlists>	playlists;
+	const juce::SharedResourcePointer<Strings>		strings;
+	const juce::SharedResourcePointer<Icons>		icons;
+
+	auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
+
+	// The column sort becomes the playlist's own order
+	m.addItem ( UI::newMenuItem ( strings->get ( "menu/keep_order" ), icons->get ( "menu/keep_order" ), [ plName ]
+	{
+		const juce::SharedResourcePointer<Playlists>	playlists;
+
+		auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
+		if ( ! plItems || ! plItems->isSorted () )
+			return;
+
+		const auto	oldEntries = plItems->getEntries ();
+		const auto	key = plItems->getSortKey ();
+		const auto	forwards = plItems->isSortedForwards ();
+
+		plItems->keepOrder ();
+		plItems->saveAndNotify ();
+
+		const juce::SharedResourcePointer<Strings>		strings;
+		const juce::SharedResourcePointer<UndoManager>	undoManager;
+
+		undoManager->arm ( {
+			.text = strings->get ( "toast/order_kept" ),
+			.undo = [ plName, oldEntries, key, forwards ]
+			{
+				const juce::SharedResourcePointer<Playlists>	playlists;
+
+				if ( auto plItems = playlists->getPlaylistItems ( plName.toStdString () ) )
+				{
+					plItems->restoreOrder ( oldEntries, key, forwards );
+					plItems->saveAndNotify ();
+				}
+			},
+		} );
+
+	} ).setEnabled ( plItems && plItems->hasWriteAccess () && plItems->isSorted () ) );
+}
+//-----------------------------------------------------------------------------
+
 void UI::menu_GoToFolder ( juce::PopupMenu& m, const juce::String& folder )
 {
 	const juce::SharedResourcePointer<Strings>	strings;

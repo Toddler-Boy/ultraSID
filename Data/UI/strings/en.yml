@@ -77,6 +77,7 @@ menu:
   remove_from_playlist: Remove from this playlist
   move_to_top:          Move to top
   move_to_bottom:       Move to bottom
+  keep_order:           Keep this order
   new_playlist:         New playlist
   delete_playlist:      Delete playlist
   delete_cover:         Delete cover-image
@@ -106,6 +107,7 @@ toast:
   playlist_deleted: Playlist "{}" deleted
   tune_removed:     Tune removed
   tunes_removed:    "{} tunes removed"
+  order_kept:       Playlist order changed
   cover_deleted:    Cover-image deleted
 
 # Search
