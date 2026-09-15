@@ -53,11 +53,13 @@ GUI_PlaylistItems::GUI_PlaylistItems ( GUI_Pages& _browser, const juce::String& 
 	setName ( name );
 
 	addHeaderColumn ( columnId::number );
-	addHeaderColumn ( columnId::name );
-	addHeaderColumn ( columnId::release );
-	addHeaderColumn ( columnId::information );
-	addHeaderColumn ( columnId::length );
+	addHeaderColumn ( columnId::name, true );
+	addHeaderColumn ( columnId::release, true );
+	addHeaderColumn ( columnId::information, true );
+	addHeaderColumn ( columnId::length, true );
 	addHeaderColumn ( columnId::liked );
+
+	syncHeaderSort ();
 
 	placeholderKey = "playlist/empty";
 }
@@ -77,6 +79,52 @@ void GUI_PlaylistItems::setName ( const juce::String& name )
 
 	realPlaylist->setRowPlayingLocation ( &rowPlaying );
 	realPlaylist->createRowData ( rowData, rowSubtune );
+
+	// The constructor syncs itself once the columns exist
+	if ( getHeader ().getNumColumns ( false ) > 0 )
+		syncHeaderSort ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_PlaylistItems::syncHeaderSort ()
+{
+	if ( realPlaylist )
+		getHeader ().setSortColumnId ( columnForSortKey ( realPlaylist->getSortKey () ), realPlaylist->isSortedForwards () );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_PlaylistItems::sortOrderChanged ( int newSortColumnId, bool isForwards )
+{
+	if ( ! realPlaylist )
+		return;
+
+	// Already the playlist's state: a header sync
+	const auto	key = sortKeyForColumn ( newSortColumnId );
+	if ( key == realPlaylist->getSortKey () && isForwards == realPlaylist->isSortedForwards () )
+		return;
+
+	const auto	selected = getSelectedRows ();
+
+	std::vector<int>	selectedEntries;
+	selectedEntries.reserve ( size_t ( selected.size () ) );
+
+	for ( auto i = 0; i < selected.size (); ++i )
+		selectedEntries.push_back ( realPlaylist->getEntryIndex ( selected[ i ] ) );
+
+	realPlaylist->setSort ( key, isForwards );
+	updateRowData ();
+
+	juce::SparseSet<int>	rows;
+	for ( const auto entry : selectedEntries )
+	{
+		const auto	row = realPlaylist->getViewIndex ( entry );
+		rows.addRange ( { row, row + 1 } );
+	}
+
+	setSelectedRows ( rows, juce::dontSendNotification );
+
+	if ( ! rows.isEmpty () )
+		scrollToEnsureRowIsOnscreen ( rows[ 0 ] );
 }
 //-----------------------------------------------------------------------------
 
@@ -188,7 +236,12 @@ void GUI_PlaylistItems::paintRowBackground ( juce::Graphics& g, int rowNumber, i
 
 bool GUI_PlaylistItems::isInterestedInDragSource ( const SourceDetails& dragSourceDetails )
 {
-	const auto	source = dragSourceDetails.description.getProperty ( "source", {} ).toString ();
+	const auto&	desc = dragSourceDetails.description;
+	const auto	source = desc.getProperty ( "source", {} ).toString ();
+
+	// No reordering while sorted
+	if ( source == "playlist" && realPlaylist->isSorted () && desc.getProperty ( "playlist", {} ).toString () == getName () )
+		return false;
 
 	return source == "playlist" || source == "STIL" || source == "search";
 }
@@ -264,7 +317,7 @@ void GUI_PlaylistItems::itemDragEnter ( const SourceDetails& dragSourceDetails )
 {
 	beginDragAutoRepeat ( 50 );
 
-	dragOverRow = getInsertionIndexForPosition ( dragSourceDetails.localPosition.getX (), dragSourceDetails.localPosition.getY () );
+	dragOverRow = getDropRow ( dragSourceDetails );
 	repaint ();
 }
 //-------------------------------------------------------------------------------------------------
@@ -273,8 +326,18 @@ void GUI_PlaylistItems::itemDragMove ( const SourceDetails& dragSourceDetails )
 {
 	getViewport ()->autoScroll ( dragSourceDetails.localPosition.getX (), dragSourceDetails.localPosition.getY () - getHeader ().getHeight (), 30, 120 );
 
-	dragOverRow = getInsertionIndexForPosition ( dragSourceDetails.localPosition.getX (), dragSourceDetails.localPosition.getY () );
+	dragOverRow = getDropRow ( dragSourceDetails );
 	repaint ();
+}
+//-------------------------------------------------------------------------------------------------
+
+int GUI_PlaylistItems::getDropRow ( const SourceDetails& dragSourceDetails ) const
+{
+	// Sorted, drops append
+	if ( realPlaylist->isSorted () )
+		return -1;
+
+	return getInsertionIndexForPosition ( dragSourceDetails.localPosition.getX (), dragSourceDetails.localPosition.getY () );
 }
 //-------------------------------------------------------------------------------------------------
 

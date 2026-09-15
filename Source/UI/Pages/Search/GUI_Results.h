@@ -42,12 +42,16 @@ public:
 	// juce::TableListBoxModel
 	void cellClicked ( int row, int columnId, const juce::MouseEvent& e ) override;
 	void returnKeyPressed ( int lastRowSelected ) override;
+	void sortOrderChanged ( int newSortColumnId, bool isForwards ) override;
 
 private:
 	GUI_Pages&	pages;
 
 	std::vector<const Database::entry*>	database;
 	std::vector<const Database::entry*>	userDatabase;
+
+	// The results in search order, restored when the column sort clears
+	std::vector<const Database::entry*>	unsorted;
 
 	juce::String		searchPattern;
 	searchOptions		searchOpts;

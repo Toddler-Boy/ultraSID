@@ -5,6 +5,7 @@
 #include "std_lime/lime_string_utils.h"
 
 #include "Config/FilePaths.h"
+#include "Database/TuneInfo.h"
 #include "Database/TuneNames.h"
 
 //-----------------------------------------------------------------------------
@@ -560,5 +561,76 @@ const Database::entry* db::findDatabaseEntry ( const std::string& filename )
 
 	const juce::SharedResourcePointer<UserDatabase>	userDatabase;
 	return userDatabase->findEntry ( filename );
+}
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+db::SortItem db::sortItem ( const SortKey key, const Database::entry* entry, const int subtune )
+{
+	if ( key != SortKey::length || ! entry )
+		return { entry };
+
+	return { entry, SID::getTuneLength ( entry->file, subtune ? subtune : entry->startTune ) };
+}
+//-----------------------------------------------------------------------------
+
+bool db::entryLess ( const SortKey key, const bool forwards, const SortItem& ia, const SortItem& ib )
+{
+	if ( ! ia.entry || ! ib.entry )
+		return ia.entry && ! ib.entry;
+
+	const auto&	a = *ia.entry;
+	const auto&	b = *ib.entry;
+
+	const auto	nameLess = [ & ] { return lime::str::naturalCompare ( a.lowerName, b.lowerName ) < 0; };
+	const auto	yearCompare = [ & ] { return a.lowerRelease.substr ( 0, 4 ).compare ( b.lowerRelease.substr ( 0, 4 ) ); };
+
+	switch ( key )
+	{
+		case SortKey::name:
+		{
+			const auto	cmp = lime::str::naturalCompare ( a.lowerName, b.lowerName );
+			return forwards ? cmp < 0 : cmp > 0;
+		}
+
+		case SortKey::release:
+		{
+			const auto	cmp = yearCompare ();
+			if ( ! cmp )
+				return nameLess ();
+
+			return forwards ? cmp < 0 : cmp > 0;
+		}
+
+		case SortKey::chip:
+		{
+			const auto	fA = a.flags & 0x30;
+			const auto	fB = b.flags & 0x30;
+
+			if ( fA == fB )
+			{
+				const auto	cmp = yearCompare ();
+				if ( ! cmp )
+					return nameLess ();
+
+				return forwards ? cmp < 0 : cmp > 0;
+			}
+
+			return forwards ? fA < fB : fB < fA;
+		}
+
+		case SortKey::length:
+		{
+			if ( ia.lengthMs == ib.lengthMs )
+				return nameLess ();
+
+			return forwards ? ia.lengthMs < ib.lengthMs : ia.lengthMs > ib.lengthMs;
+		}
+
+		case SortKey::none:
+			break;
+	}
+
+	return false;
 }
 //-----------------------------------------------------------------------------

@@ -194,5 +194,27 @@ namespace db
 {
 	// Looks up filename in the HVSC database first, then the user database
 	[[ nodiscard ]] const Database::entry* findDatabaseEntry ( const std::string& filename );
+
+	// Column sorts of the tune lists
+	enum class SortKey : int8_t
+	{
+		none,		// the list's own order
+		name,
+		release,
+		chip,
+		length,
+	};
+
+	// One row of a column sort; lengthMs is resolved only for the length key
+	struct SortItem
+	{
+		const Database::entry*	entry = nullptr;
+		uint32_t				lengthMs = 0;
+	};
+	[[ nodiscard ]] SortItem sortItem ( const SortKey key, const Database::entry* entry, const int subtune );
+
+	// Strict weak ordering; ties fall through to year, then name, ascending in
+	// either direction. Null entries sink to the end
+	[[ nodiscard ]] bool entryLess ( const SortKey key, const bool forwards, const SortItem& a, const SortItem& b );
 }
 //-----------------------------------------------------------------------------

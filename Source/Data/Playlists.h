@@ -2,6 +2,8 @@
 
 #include <JuceHeader.h>
 
+#include <array>
+
 #include "Database/Database.h"
 
 //-----------------------------------------------------------------------------
@@ -35,13 +37,28 @@ public:
 	[[ nodiscard ]] Cover takeCover ();
 	void restoreCover ( const Cover& cover );
 
+	// Every index in this API is a VIEW row. Sorted, the view is a permutation
+	// over the entries, which keep the file's custom order; unsorted, the view
+	// row IS the entry index
+	void setSort ( const db::SortKey key, const bool forwards );
+	void resort ()	{	setSort ( sortKey, sortForwards );	}
+	[[ nodiscard ]] db::SortKey getSortKey () const	{	return sortKey;	}
+	[[ nodiscard ]] bool isSortedForwards () const	{	return sortForwards;	}
+	[[ nodiscard ]] bool isSorted () const			{	return sortKey != db::SortKey::none;	}
+
+	// View row <-> position in the custom order
+	[[ nodiscard ]] int getEntryIndex ( const int row ) const	{	return isSorted () ? viewOrder[ size_t ( row ) ] : row;	}
+	[[ nodiscard ]] int getViewIndex ( const int entryIndex ) const;
+
 	void clear ();
 	void removeItem ( const int index, const bool isFinal = false );
 	void removeItems ( const juce::SparseSet<int>& rows );
-	void addItem ( const std::string& tune, const int index = -1 );
+
+	// entryIndex = custom-order slot while sorted (-1 = end), ignored unsorted
+	void addItem ( const std::string& tune, const int index = -1, const int entryIndex = -1 );
 	void addItems ( const juce::StringArray& tunes );
 
-	[[ nodiscard ]] std::string& getEntry ( const int index )  { return entries[ index ]; }
+	[[ nodiscard ]] std::string& getEntry ( const int index )  { return entries[ size_t ( getEntryIndex ( index ) ) ]; }
 
 	// Same tunes in the same order
 	[[ nodiscard ]] bool hasEntries ( const juce::StringArray& tunes ) const;
@@ -60,19 +77,31 @@ public:
 
 	[[ nodiscard ]] int getNumItems () const { return static_cast<int> ( entries.size () ); }
 
-	// The view's highlight and the play queue both hold the playing row, an edit moves both
+	// All three hold view rows; edits and re-sorts move them
 	void setRowPlayingLocation ( int* row )			{ rowPlaying = row; }
-	void setQueuePositionLocation ( int* position )	{ queuePosition = position; }
+	void setQueuePositionLocation ( int* position, int* playPosition )
+	{
+		queuePosition = position;
+		queuePlayPosition = playPosition;
+	}
 
 private:
+	[[ nodiscard ]] std::array<int*, 3> playingRows () const	{	return { rowPlaying, queuePosition, queuePlayPosition };	}
+
 	juce::String	name;
 	juce::String	coverExtension;
 
 	std::vector<std::string>	entries;
 	std::vector<int>			shuffleOrder;
 
+	// Entry index per view row, empty without a sort
+	std::vector<int>			viewOrder;
+	db::SortKey					sortKey = db::SortKey::none;
+	bool						sortForwards = true;
+
 	int*	rowPlaying = nullptr;
 	int*	queuePosition = nullptr;
+	int*	queuePlayPosition = nullptr;
 
 	juce::Image		coverImage;
 };

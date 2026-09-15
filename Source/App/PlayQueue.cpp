@@ -5,12 +5,12 @@
 void PlayQueue::setPlaylist ( const std::string& name )
 {
 	if ( auto pl = resolve () )
-		pl->setQueuePositionLocation ( nullptr );
+		pl->setQueuePositionLocation ( nullptr, nullptr );
 
 	currentName = name;
 
 	if ( auto pl = resolve () )
-		pl->setQueuePositionLocation ( &position );
+		pl->setQueuePositionLocation ( &position, &playPosition );
 }
 //-----------------------------------------------------------------------------
 

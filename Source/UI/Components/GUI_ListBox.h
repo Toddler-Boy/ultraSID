@@ -64,6 +64,10 @@ public:
 	// this
 	void addHeaderColumn ( const int colId, bool sortable = false );
 
+	// Column <-> sort key; other columns and 0 map to SortKey::none
+	[[ nodiscard ]] static db::SortKey sortKeyForColumn ( const int colId );
+	[[ nodiscard ]] static int columnForSortKey ( const db::SortKey key );
+
 	void timerUpdate ( const float secondsPassed );
 	void setPlayingName ( const std::string& tuneName );
 	void setPlayingRow ( const int rowNumber );
@@ -103,6 +107,9 @@ protected:
 	// What the name column shows for a row whose tune the database no longer
 	// resolves (null rowData entry)
 	[[ nodiscard ]] virtual juce::String getMissingRowText ( const int /*rowNumber*/ ) const	{	return {};	}
+
+	// What the number column shows for a row
+	[[ nodiscard ]] virtual int getRowNumber ( const int rowNumber ) const	{	return rowNumber + 1;	}
 
 	// juce::ComponentMovementWatcher, watching this list itself: coming on
 	// screen takes the keyboard focus and defaults to the first row selected

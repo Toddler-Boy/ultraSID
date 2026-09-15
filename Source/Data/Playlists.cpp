@@ -1,3 +1,6 @@
+#include <array>
+#include <numeric>
+
 #include "Playlists.h"
 
 #include "ultra-shared/Helpers/FileUtils.h"
@@ -294,6 +297,7 @@ void playlist::load ()
 
 	coverImage = juce::ImageFileFormat::loadFrom ( getCoverFile () );
 
+	sortKey = db::SortKey::none;
 	clear ();
 	addItems ( m3u.entries );
 	createShuffle ();
@@ -406,15 +410,84 @@ void playlist::rename ( const juce::String& newName )
 void playlist::clear ()
 {
 	entries.clear ();
+	viewOrder.clear ();
+}
+//-----------------------------------------------------------------------------
+
+void playlist::setSort ( const db::SortKey key, const bool forwards )
+{
+	std::array<int, 3>	playingEntries { -1, -1, -1 };
+
+	for ( auto i = 0u; auto* row : playingRows () )
+	{
+		if ( row && juce::isPositiveAndBelow ( *row, getNumItems () ) )
+			playingEntries[ i ] = getEntryIndex ( *row );
+		++i;
+	}
+
+	sortKey = key;
+	sortForwards = forwards;
+
+	viewOrder.clear ();
+
+	if ( isSorted () )
+	{
+		const auto	size = entries.size ();
+
+		std::vector<db::SortItem>	items ( size );
+		for ( auto i = 0u; i < size; ++i )
+		{
+			const auto [ tuneName, subTune ] = SID::parseTuneName ( entries[ i ] );
+			items[ i ] = db::sortItem ( key, db::findDatabaseEntry ( tuneName ), subTune );
+		}
+
+		viewOrder.resize ( size );
+		std::iota ( viewOrder.begin (), viewOrder.end (), 0 );
+
+		// Ties keep the custom order
+		std::ranges::stable_sort ( viewOrder, [ & ] ( const int a, const int b )
+		{
+			return db::entryLess ( key, forwards, items[ size_t ( a ) ], items[ size_t ( b ) ] );
+		} );
+	}
+
+	for ( auto i = 0u; auto* row : playingRows () )
+	{
+		if ( row && playingEntries[ i ] >= 0 )
+			*row = getViewIndex ( playingEntries[ i ] );
+		++i;
+	}
+}
+//-----------------------------------------------------------------------------
+
+int playlist::getViewIndex ( const int entryIndex ) const
+{
+	if ( ! isSorted () )
+		return entryIndex;
+
+	const auto	it = std::ranges::find ( viewOrder, entryIndex );
+
+	return it == viewOrder.end () ? -1 : int ( it - viewOrder.begin () );
 }
 //-----------------------------------------------------------------------------
 
 void playlist::removeItem ( const int index, const bool isFinal )
 {
-	entries.erase ( entries.begin () + index );
+	const auto	entryIndex = getEntryIndex ( index );
+
+	entries.erase ( entries.begin () + entryIndex );
+
+	if ( isSorted () )
+	{
+		viewOrder.erase ( viewOrder.begin () + index );
+
+		for ( auto& e : viewOrder )
+			if ( e > entryIndex )
+				--e;
+	}
 
 	// The playing row on same location or below removal index
-	for ( auto* row : { rowPlaying, queuePosition } )
+	for ( auto* row : playingRows () )
 	{
 		if ( ! row )
 			continue;
@@ -435,21 +508,31 @@ void playlist::removeItems ( const juce::SparseSet<int>& rows )
 }
 //-----------------------------------------------------------------------------
 
-void playlist::addItem ( const std::string& tune, const int index )
+void playlist::addItem ( const std::string& tune, const int index, const int entryIndex )
 {
-	if ( index < 0 || index >= entries.size () )
-	{
-		entries.emplace_back ( tune );
-	}
-	else
-	{
-		entries.insert ( entries.begin () + index, tune );
+	const auto	size = getNumItems ();
 
-		// Playing row on same location or below insertion index
-		for ( auto* row : { rowPlaying, queuePosition } )
+	auto	slot = isSorted () ? entryIndex : index;
+	if ( slot < 0 || slot >= size )
+		slot = size;
+
+	entries.insert ( entries.begin () + slot, tune );
+
+	if ( isSorted () )
+	{
+		for ( auto& e : viewOrder )
+			if ( e >= slot )
+				++e;
+
+		const auto	row = index < 0 || index >= size ? size : index;
+		viewOrder.insert ( viewOrder.begin () + row, slot );
+	}
+
+	// Playing row on same location or below insertion row
+	if ( index >= 0 && index < size )
+		for ( auto* row : playingRows () )
 			if ( row && *row >= index )
 				++*row;
-	}
 }
 //-----------------------------------------------------------------------------
 
@@ -527,7 +610,7 @@ void playlist::createRowData ( std::vector<const Database::entry*>& rowData, std
 
 	for ( auto i = 0u; i < size; ++i )
 	{
-		const auto [ tuneName, subTune ] = SID::parseTuneName ( entries[ i ] );
+		const auto [ tuneName, subTune ] = SID::parseTuneName ( entries[ size_t ( getEntryIndex ( int ( i ) ) ) ] );
 
 		rowData[ i ] = db::findDatabaseEntry ( tuneName );
 		rowDataSubtunes[ i ] = subTune;
@@ -537,20 +620,35 @@ void playlist::createRowData ( std::vector<const Database::entry*>& rowData, std
 
 void playlist::moveItems ( const juce::SparseSet<int>& rows, int insertIndex )
 {
-	std::vector<std::string>	moved;
+	// Sorted, only the view permutation moves; the entries keep their order
+	std::vector<int>	order;
+
+	if ( isSorted () )
+	{
+		order = viewOrder;
+	}
+	else
+	{
+		order.resize ( entries.size () );
+		std::iota ( order.begin (), order.end (), 0 );
+	}
+
+	std::array<int, 3>	playingEntries { -1, -1, -1 };
+
+	for ( auto i = 0u; auto* row : playingRows () )
+	{
+		if ( row && juce::isPositiveAndBelow ( *row, getNumItems () ) )
+			playingEntries[ i ] = order[ size_t ( *row ) ];
+		++i;
+	}
+
+	std::vector<int>	moved;
 	moved.reserve ( size_t ( rows.size () ) );
 
 	for ( auto i = 0; i < rows.size (); ++i )
-		moved.push_back ( entries[ rows[ i ] ] );
+		moved.push_back ( order[ size_t ( rows[ i ] ) ] );
 
-	// Find if playing entry is one of the moved items
-	auto	playingIndex = -1;
-	if ( rowPlaying )
-		for ( auto i = 0; i < rows.size (); ++i )
-			if ( rows[ i ] == *rowPlaying )
-				playingIndex = i;
-
-	// Remove entries
+	// Back to front, removals don't shift the rows still to visit
 	for ( auto rowIndex = rows.size () - 1; rowIndex >= 0; --rowIndex )
 	{
 		const auto	row = rows[ rowIndex ];
@@ -558,25 +656,35 @@ void playlist::moveItems ( const juce::SparseSet<int>& rows, int insertIndex )
 		if ( row < insertIndex )
 			--insertIndex;
 
-		removeItem ( row );
+		order.erase ( order.begin () + row );
 	}
 
 	// Without a row to insert at, the block moves to the end
-	if ( insertIndex < 0 )
-		insertIndex = int ( entries.size () );
+	if ( insertIndex < 0 || insertIndex > int ( order.size () ) )
+		insertIndex = int ( order.size () );
 
-	// Add entries to insert-index
-	for ( const auto& tune : moved )
-		addItem ( tune, insertIndex++ );
+	order.insert ( order.begin () + insertIndex, moved.begin (), moved.end () );
 
-	// The playing row was one of the moved items, so update it to the new position
-	if ( playingIndex >= 0 )
+	if ( isSorted () )
 	{
-		const auto	movedTo = insertIndex - rows.size () + playingIndex;
+		viewOrder = std::move ( order );
+	}
+	else
+	{
+		std::vector<std::string>	reordered;
+		reordered.reserve ( entries.size () );
 
-		for ( auto* row : { rowPlaying, queuePosition } )
-			if ( row )
-				*row = movedTo;
+		for ( const auto e : order )
+			reordered.push_back ( std::move ( entries[ size_t ( e ) ] ) );
+
+		entries = std::move ( reordered );
+	}
+
+	for ( auto i = 0u; auto* row : playingRows () )
+	{
+		if ( row && playingEntries[ i ] >= 0 )
+			*row = getViewIndex ( playingEntries[ i ] );
+		++i;
 	}
 }
 //-------------------------------------------------------------------------------------------------

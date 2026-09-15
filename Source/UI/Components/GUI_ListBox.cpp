@@ -1,10 +1,9 @@
 #include <JuceHeader.h>
+#include <numeric>
 
 #include "GUI_ListBox.h"
 
 #include "libSidplayEZ/src/stringutils.h"
-
-#include "std_lime/lime_string_utils.h"
 
 #include "ultra-shared/Config/BuildInfo.h"
 #include "ultra-shared/Resources/Icons.h"
@@ -20,6 +19,20 @@
 #include "UI/GUI_AppLookAndFeel.h"
 #include "UI/ui-colors.h"
 
+namespace
+{
+	// A third click on the sorted column clears the sort (column 0)
+	class SortHeader final : public juce::TableHeaderComponent
+	{
+		void columnClicked ( int columnId, const juce::ModifierKeys& mods ) override
+		{
+			if ( columnId == getSortColumnId () && ! isSortedForwards () )
+				setSortColumnId ( 0, true );
+			else
+				juce::TableHeaderComponent::columnClicked ( columnId, mods );
+		}
+	};
+}
 //-----------------------------------------------------------------------------
 
 GUI_ListBox::GUI_ListBox ()
@@ -27,6 +40,8 @@ GUI_ListBox::GUI_ListBox ()
 	, hover ( *this )
 	, smoothScroll ( *this )
 {
+	setHeader ( std::make_unique<SortHeader> () );
+
 	hover.addChangeListener ( this );
 
 	setModel ( this );
@@ -53,52 +68,40 @@ GUI_ListBox::~GUI_ListBox ()
 
 void GUI_ListBox::sortOrderChanged ( int newSortColumnId, bool isForwards )
 {
-	switch ( newSortColumnId )
+	const auto	key = sortKeyForColumn ( newSortColumnId );
+	if ( key == db::SortKey::none )
+		return;
+
+	const auto	size = rowData.size ();
+
+	std::vector<db::SortItem>	items ( size );
+	for ( auto i = 0u; i < size; ++i )
+		items[ i ] = db::sortItem ( key, rowData[ i ], rowSubtune.empty () ? 0 : rowSubtune[ i ] );
+
+	std::vector<size_t>	order ( size );
+	std::iota ( order.begin (), order.end (), 0u );
+
+	std::ranges::sort ( order, [ & ] ( const size_t a, const size_t b )
 	{
-		case columnId::name:
-			// Sort only by name
-			std::ranges::sort ( rowData, [ isForwards ] ( const auto a, const auto b ) {
-				const auto	cmp = lime::str::naturalCompare ( a->lowerName, b->lowerName );
-				return isForwards ? cmp < 0 : cmp > 0;
-			} );
-			break;
+		return db::entryLess ( key, isForwards, items[ a ], items[ b ] );
+	} );
 
-		case columnId::release:
-			// Sort by release first and name second
-			std::ranges::sort ( rowData, [ isForwards ] ( const auto a, const auto b ) {
+	std::vector<const Database::entry*>	sortedRows;
+	sortedRows.reserve ( size );
 
-				const auto	cmp = a->lowerRelease.substr ( 0, 4 ).compare ( b->lowerRelease.substr ( 0, 4 ) );
+	std::vector<int16_t>	sortedSubtunes;
+	sortedSubtunes.reserve ( rowSubtune.size () );
 
-				// Same release year, sort alphabetical
-				if ( ! cmp )
-					return lime::str::naturalCompare ( a->lowerName, b->lowerName ) < 0;
+	for ( const auto o : order )
+	{
+		sortedRows.push_back ( rowData[ o ] );
 
-				return isForwards ? cmp < 0 : cmp > 0;
-			} );
-			break;
-
-		case columnId::information:
-			std::ranges::sort ( rowData, [ isForwards ] ( const auto a, const auto b ) {
-
-				const auto	fA = a->flags & 0x30;
-				const auto	fB = b->flags & 0x30;
-
-				// Same chip-type, sort by year
-				if ( fA == fB )
-				{
-					const auto	cmp = a->lowerRelease.substr ( 0, 4 ).compare ( b->lowerRelease.substr ( 0, 4 ) );
-
-					// Same release year, sort alphabetical
-					if ( ! cmp )
-						return lime::str::naturalCompare ( a->lowerName, b->lowerName ) < 0;
-
-					return isForwards ? cmp < 0 : cmp > 0;
-				}
-
-				return isForwards ? fA < fB : fB < fA;
-			} );
-			break;
+		if ( ! rowSubtune.empty () )
+			sortedSubtunes.push_back ( rowSubtune[ o ] );
 	}
+
+	rowData = std::move ( sortedRows );
+	rowSubtune = std::move ( sortedSubtunes );
 }
 //-----------------------------------------------------------------------------
 
@@ -231,7 +234,7 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 		g.setFont ( UI::font ( UI::fonts::browser_text ) );
 
 		if ( columnId == columnId::number )
-			g.drawText ( juce::String ( rowNumber + 1 ), b, juce::Justification::centred );
+			g.drawText ( juce::String ( getRowNumber ( rowNumber ) ), b, juce::Justification::centred );
 		else if ( columnId == columnId::name )
 			g.drawText ( getMissingRowText ( rowNumber ), b, juce::Justification::centredLeft );
 
@@ -252,7 +255,7 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 				else
 				{
 					g.setFont ( UI::font ( UI::fonts::browser_text ) );
-					g.drawText ( juce::String ( rowNumber + 1 ), b, juce::Justification::centred );
+					g.drawText ( juce::String ( getRowNumber ( rowNumber ) ), b, juce::Justification::centred );
 				}
 			}
 			break;
@@ -523,6 +526,32 @@ void GUI_ListBox::cellDoubleClicked ( int rowNumber, int columnId, const juce::M
 		return;
 
 	juce::TableListBox::returnKeyPressed ( rowNumber );
+}
+//-----------------------------------------------------------------------------
+
+db::SortKey GUI_ListBox::sortKeyForColumn ( const int colId )
+{
+	switch ( colId )
+	{
+		case columnId::name:		return db::SortKey::name;
+		case columnId::release:		return db::SortKey::release;
+		case columnId::information:	return db::SortKey::chip;
+		case columnId::length:		return db::SortKey::length;
+		default:					return db::SortKey::none;
+	}
+}
+//-----------------------------------------------------------------------------
+
+int GUI_ListBox::columnForSortKey ( const db::SortKey key )
+{
+	switch ( key )
+	{
+		case db::SortKey::name:		return columnId::name;
+		case db::SortKey::release:	return columnId::release;
+		case db::SortKey::chip:		return columnId::information;
+		case db::SortKey::length:	return columnId::length;
+		default:					return 0;
+	}
 }
 //-----------------------------------------------------------------------------
 

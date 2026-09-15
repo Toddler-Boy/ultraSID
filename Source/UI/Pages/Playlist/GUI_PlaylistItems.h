@@ -21,6 +21,7 @@ public:
 	void returnKeyPressed ( int lastRowSelected ) override;
 	void cellClicked ( int row, int columnId, const juce::MouseEvent& e ) override;
 	juce::var getDragSourceDescription ( const juce::SparseSet<int>& rowsToDescribe ) override;
+	void sortOrderChanged ( int newSortColumnId, bool isForwards ) override;
 
 	// juce::ListBox
 	void paintOverChildren ( juce::Graphics& g ) override;
@@ -28,6 +29,9 @@ public:
 	// GUI_ListBox
 	void paintRowBackground ( juce::Graphics& g, int rowNumber, int width, int height, bool rowIsSelected ) override;
 	[[ nodiscard ]] juce::String getMissingRowText ( const int rowNumber ) const override;
+
+	// The number column shows the custom-order position
+	[[ nodiscard ]] int getRowNumber ( const int rowNumber ) const override	{	return realPlaylist->getEntryIndex ( rowNumber ) + 1;	}
 
 	// this
 	[[ nodiscard ]] int getShuffled ( const int position ) const	{	return realPlaylist->getShuffled ( position );	}
@@ -51,6 +55,12 @@ public:
 	void itemDragExit ( const SourceDetails& dragSourceDetails ) override;
 
 private:
+	// The header arrow follows the playlist's own sort state
+	void syncHeaderSort ();
+
+	// Insert row under the drag, -1 = append
+	[[ nodiscard ]] int getDropRow ( const SourceDetails& dragSourceDetails ) const;
+
 	juce::SharedResourcePointer<Playlists>	playlists;
 
 	playlist*	realPlaylist = nullptr;

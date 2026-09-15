@@ -73,12 +73,22 @@ void UI::menu_RemoveFromPlaylist ( juce::PopupMenu& m, const juce::String& plNam
 		if ( ! plItems )
 			return;
 
-		// Row/entry pairs for undo re-insertion
-		std::vector<std::pair<int, std::string>>	removed;
+		// Row, custom-order slot and entry for undo re-insertion
+		struct Removed
+		{
+			int			row;
+			int			entryIndex;
+			std::string	entry;
+		};
+
+		std::vector<Removed>	removed;
 		removed.reserve ( size_t ( rows.size () ) );
 
 		for ( auto i = 0; i < rows.size (); ++i )
-			removed.emplace_back ( rows[ i ], plItems->getEntry ( rows[ i ] ) );
+			removed.push_back ( { rows[ i ], plItems->getEntryIndex ( rows[ i ] ), plItems->getEntry ( rows[ i ] ) } );
+
+		// Undo re-inserts ascending, every entry lands back at its old slot
+		std::ranges::sort ( removed, {}, &Removed::entryIndex );
 
 		for ( auto i = rows.size () - 1; i >= 0; --i )
 			plItems->removeItem ( rows[ i ], true );
@@ -102,9 +112,12 @@ void UI::menu_RemoveFromPlaylist ( juce::PopupMenu& m, const juce::String& plNam
 				if ( ! plItems )
 					return;
 
-				// Ascending order lands every row back at its old index
-				for ( const auto& [ row, entry ] : removed )
-					plItems->addItem ( entry, row );
+				for ( const auto& [ row, entryIndex, entry ] : removed )
+					plItems->addItem ( entry, row, entryIndex );
+
+				// Sorted, the view rows come from a re-sort
+				if ( plItems->isSorted () )
+					plItems->resort ();
 
 				plItems->saveAndNotify ();
 			},
@@ -132,7 +145,7 @@ void UI::menu_MoveItems ( juce::PopupMenu& m, const juce::String& plName, const 
 			plItems->moveItems ( rows, 0 );
 			plItems->saveAndNotify ();
 		}
-	} ).setEnabled ( plItems && plItems->hasWriteAccess () ) );
+	} ).setEnabled ( plItems && plItems->hasWriteAccess () && ! plItems->isSorted () ) );
 
 	// Move to bottom
 	m.addItem ( UI::newMenuItem ( strings->get ( "menu/move_to_bottom" ), icons->get ( "menu/move_to_bottom" ), [ plName, rows ]
@@ -144,7 +157,7 @@ void UI::menu_MoveItems ( juce::PopupMenu& m, const juce::String& plName, const 
 			plItems->moveItems ( rows, plItems->getNumItems () );
 			plItems->saveAndNotify ();
 		}
-	} ).setEnabled ( plItems && plItems->hasWriteAccess () ) );
+	} ).setEnabled ( plItems && plItems->hasWriteAccess () && ! plItems->isSorted () ) );
 }
 //-----------------------------------------------------------------------------
 

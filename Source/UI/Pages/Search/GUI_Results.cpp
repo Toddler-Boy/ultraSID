@@ -22,7 +22,7 @@ GUI_Results::GUI_Results ( GUI_Pages& _pages )
 	addHeaderColumn ( columnId::name, true );
 	addHeaderColumn ( columnId::release, true );
 	addHeaderColumn ( columnId::information, true );
-	addHeaderColumn ( columnId::length );
+	addHeaderColumn ( columnId::length, true );
 	addHeaderColumn ( columnId::liked );
 
 	filterExactMatch = false;
@@ -34,6 +34,7 @@ GUI_Results::GUI_Results ( GUI_Pages& _pages )
 void GUI_Results::setDatabase ( std::vector<const Database::entry*> db )
 {
 	rowData.clear ();
+	unsorted.clear ();
 	database = std::move ( db );
 }
 //-----------------------------------------------------------------------------
@@ -41,7 +42,23 @@ void GUI_Results::setDatabase ( std::vector<const Database::entry*> db )
 void GUI_Results::setUserDatabase ( std::vector<const Database::entry*> db )
 {
 	rowData.clear ();
+	unsorted.clear ();
 	userDatabase = std::move ( db );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_Results::sortOrderChanged ( int newSortColumnId, bool isForwards )
+{
+	// Column 0 = search order
+	if ( sortKeyForColumn ( newSortColumnId ) == db::SortKey::none )
+	{
+		if ( unsorted.size () == rowData.size () )
+			rowData = unsorted;
+
+		return;
+	}
+
+	GUI_ListBox::sortOrderChanged ( newSortColumnId, isForwards );
 }
 //-----------------------------------------------------------------------------
 
@@ -72,6 +89,7 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	{
 		rowData = database;
 		rowData.insert ( rowData.end (), userDatabase.begin (), userDatabase.end () );
+		unsorted = rowData;
 
 		updateContent ();
 		getHeader ().reSortTable ();
@@ -144,6 +162,8 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 			if ( matchesFilter ( entry ) && findAnyString ( entry->search ) )
 				rowData.push_back ( entry );
 	}
+
+	unsorted = rowData;
 	getHeader ().reSortTable ();
 
 	return int ( rowData.size () );

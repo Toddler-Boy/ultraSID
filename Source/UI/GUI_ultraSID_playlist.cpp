@@ -267,7 +267,7 @@ void GUI_ultraSID::loadTune ( const juce::String& name, const int subtune, const
 	// A queue advance already computed the logical position, which differs from
 	// the played row under shuffle; a hand-picked row defines both
 	if ( src != "playlist-next/prev" )
-		playQueue->position = _playlistPosition;
+		playQueue->position = playQueue->playPosition = _playlistPosition;
 
 	playQueue->subtune = subtune;
 
