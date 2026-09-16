@@ -2,6 +2,12 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.2.0 (2026-09-16)
+
+- Screen reader support: tune lists, the STIL subtune list, buttons, search results,
+  playlist cards, tags and chip names are announced properly.
+- The update check can run at every start.
+
 ## 85.1.2 (2026-09-14)
 
 - The equalizer moved from the settings page into a popup in the footer, next to the
