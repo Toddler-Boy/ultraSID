@@ -127,6 +127,18 @@ void GUI_STIL_ListView::cellDoubleClicked ( int row, int /*column*/, const juce:
 
 bool GUI_STIL_ListView::keyPressed ( const juce::KeyPress& key )
 {
+	// Ctrl+A selects all rows, Ctrl+Shift+A deselects
+	if ( key.getModifiers ().isCommandDown () && key.isKeyCode ( 'A' ) )
+	{
+		if ( key.getModifiers ().isShiftDown () )
+			deselectAllRows ();
+		else
+			selectRangeOfRows ( 0, getNumRows () - 1, true );
+
+		return true;
+	}
+
+	// Other Ctrl combinations are global hot-keys
 	if ( key.getModifiers ().isCommandDown () )
 		return false;
 
@@ -248,9 +260,8 @@ void GUI_STIL_ListView::paintCell ( juce::Graphics& g, int rowNumber, int column
 					}
 				}
 
-				const auto	name = ent.timeStr.isEmpty () ? ( "Tune " + juce::String ( ent.no + 1 ) ) : ent.tuneName.unquoted ();
 				g.setColour ( color );
-				g.drawText ( name, b, juce::Justification::centredLeft, true );
+				g.drawText ( ent.tuneName.unquoted (), b, juce::Justification::centredLeft, true );
 			}
 			break;
 
@@ -261,17 +272,7 @@ void GUI_STIL_ListView::paintCell ( juce::Graphics& g, int rowNumber, int column
 
 		case columnId::length:
 			g.setColour ( color );
-			if ( ent.timeStr.isEmpty () )
-			{
-				const juce::SharedResourcePointer<Preferences>	preferences;
-
-				const auto	lenMS = preferences->getClamped ( "songs/unknown" ) * 60 * 1000;
-				g.drawText ( SID::convertTimeToString ( lenMS ), b, juce::Justification::centredRight, false );
-			}
-			else
-			{
-				g.drawText ( ent.timeStr, b, juce::Justification::centredRight, false );
-			}
+			g.drawText ( ent.timeStr, b, juce::Justification::centredRight, false );
 			break;
 
 		case columnId::liked:
@@ -301,17 +302,19 @@ juce::String GUI_STIL_ListView::getNameForRow ( int rowNumber )
 	if ( tunePlaying == ent.no )
 		parts.add ( strings->get ( "accessibility/playing" ) );
 
-	parts.add ( "Tune " + juce::String ( ent.no + 1 ) );
+	// "Tune N", "FX N" or "Stinger N", followed by the name unless the tune
+	// has none (the generated name is the prefix itself)
+	const auto	prefix = ent.kindStr + " " + juce::String ( ent.no + 1 );
+	parts.add ( prefix );
 
-	if ( ent.timeStr.isNotEmpty () )
-		parts.add ( GUI_ListBox::spokenChips ( ent.tuneName.unquoted () ) );
+	if ( const auto name = ent.tuneName.unquoted (); name != prefix )
+		parts.add ( GUI_ListBox::spokenChips ( name ) );
 
-	parts.add ( GUI_ListBox::spokenField ( ent.authorName, "accessibility/unknown-author" ) );
+	// An empty author means the author of the .sid file itself
+	if ( ent.authorName.isNotEmpty () )
+		parts.add ( GUI_ListBox::spokenField ( ent.authorName, "accessibility/unknown-author" ) );
 
-	if ( ent.timeStr.isNotEmpty () )
-		parts.add ( ent.timeStr );
-	else
-		parts.add ( SID::convertTimeToString ( juce::SharedResourcePointer<Preferences> ()->getClamped ( "songs/unknown" ) * 60 * 1000 ) );
+	parts.add ( GUI_ListBox::spokenLength ( ent.lengthMS ) );
 
 	if ( juce::SharedResourcePointer<Likes> ()->isLiked ( tuneName.toStdString (), ent.no + 1 ) )
 		parts.add ( strings->get ( "accessibility/liked" ) );
@@ -516,22 +519,21 @@ void GUI_STIL_ListView::setTuneLength ( const int tune, int lengthMs )
 	if ( SID::isFX ( lengthMs ) && item.tuneName.isNotEmpty () )
 		lengthMs = SID::stingerMs;
 
-	auto	nameSub = juce::String ( "Tune" );
-
+	item.kindStr = "Tune";
 	item.categoryStr = "song";
 	if ( SID::isFX ( lengthMs ) )
 	{
 		item.categoryStr = "fx";
-		nameSub = "FX";
+		item.kindStr = "FX";
 	}
 	else if ( SID::isStinger ( lengthMs ) )
 	{
 		item.categoryStr = "stinger";
-		nameSub = "Stinger";
+		item.kindStr = "Stinger";
 	}
 
 	if ( item.tuneName.isEmpty () )
-		item.tuneName = nameSub + " " + juce::String ( item.no + 1 );
+		item.tuneName = item.kindStr + " " + juce::String ( item.no + 1 );
 	else if ( item.tuneName.startsWithChar ( '"' ) && item.tuneName.endsWithChar ( '"' ) )
 		item.categoryStr = "speech";
 }

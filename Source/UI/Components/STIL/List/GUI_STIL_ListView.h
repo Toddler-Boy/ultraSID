@@ -89,6 +89,7 @@ private:
 		int				lengthMS = 0;
 		juce::String	timeStr;
 		juce::String	categoryStr;
+		juce::String	kindStr = "Tune";	// "Tune", "FX" or "Stinger", the spoken prefix
 		bool			songFlag = false;
 	};
 

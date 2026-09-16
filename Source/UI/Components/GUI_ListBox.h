@@ -78,6 +78,9 @@ public:
 	// Chip models in free text read as digit pairs ("65 81"), not as thousands
 	[[ nodiscard ]] static juce::String spokenChips ( const juce::String& text );
 
+	// A tune length in words ("3 minutes 12 seconds"), "0:05" would read as a clock time
+	[[ nodiscard ]] static juce::String spokenLength ( const int lengthMS );
+
 	// Column <-> sort key; other columns and 0 map to SortKey::none
 	[[ nodiscard ]] static db::SortKey sortKeyForColumn ( const int colId );
 	[[ nodiscard ]] static int columnForSortKey ( const db::SortKey key );

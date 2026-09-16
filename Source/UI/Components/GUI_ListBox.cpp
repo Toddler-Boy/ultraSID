@@ -537,6 +537,33 @@ juce::String GUI_ListBox::spokenChips ( const juce::String& text )
 }
 //-----------------------------------------------------------------------------
 
+juce::String GUI_ListBox::spokenLength ( int lengthMS )
+{
+	// Round up by half a second, like convertTimeToString
+	lengthMS += 500;
+
+	const auto	hours = lengthMS / ( 1000 * 60 * 60 );	lengthMS -= hours * 1000 * 60 * 60;
+	const auto	min = lengthMS / ( 1000 * 60 );			lengthMS -= min * 1000 * 60;
+	const auto	sec = lengthMS / 1000;
+
+	const auto	unit = [] ( const int n, const juce::String& name )
+	{
+		return juce::String ( n ) + " " + name + ( n == 1 ? "" : "s" );
+	};
+
+	juce::StringArray	parts;
+
+	if ( hours )
+		parts.add ( unit ( hours, "hour" ) );
+	if ( min )
+		parts.add ( unit ( min, "minute" ) );
+	if ( sec || parts.isEmpty () )
+		parts.add ( unit ( sec, "second" ) );
+
+	return parts.joinIntoString ( " " );
+}
+//-----------------------------------------------------------------------------
+
 juce::String GUI_ListBox::getNameForRow ( int rowNumber )
 {
 	if ( ! juce::isPositiveAndBelow ( rowNumber, getNumRows () ) )
@@ -562,7 +589,7 @@ juce::String GUI_ListBox::getNameForRow ( int rowNumber )
 	parts.add ( spokenField ( stringutils::extendedASCIItoUTF8 ( ent.release ), "accessibility/unknown-release" ) );
 	parts.add ( chipTypeText ( ent, true ) );
 	parts.add ( videoStandardText ( ent ) );
-	parts.add ( SID::convertTimeToString ( SID::getTuneLength ( ent.file, subTune ) ) );
+	parts.add ( spokenLength ( SID::getTuneLength ( ent.file, subTune ) ) );
 
 	if ( likes->isLiked ( ent.file, subTune ? subTune : ent.startTune ) )
 		parts.add ( strings->get ( "accessibility/liked" ) );
