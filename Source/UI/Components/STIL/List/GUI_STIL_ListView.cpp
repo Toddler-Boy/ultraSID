@@ -72,6 +72,11 @@ GUI_STIL_ListView::GUI_STIL_ListView ()
 
 GUI_STIL_ListView::~GUI_STIL_ListView ()
 {
+	// The rows die in ~ListBox, after the TableListBox half of this object is
+	// gone: a row handing back accessibility focus asks the list's model (the
+	// TableListBox adapter) for its row count, a pure virtual call by then
+	juce::ListBox::setModel ( nullptr );
+
 	hover.removeChangeListener ( this );
 }
 //-----------------------------------------------------------------------------
