@@ -67,7 +67,8 @@ private:
 
 	GUI_Pages&	browser;
 
-	int dragOverRow = -1;
+	int		dragOverRow = -1;
+	bool	dragIsOver = false;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_PlaylistItems )
 };

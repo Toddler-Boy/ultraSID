@@ -3,6 +3,7 @@
 #include "GUI_PlaylistItems.h"
 
 #include "ultra-shared/Config/BuildInfo.h"
+#include "ultra-shared/Resources/Icons.h"
 #include "ultra-shared/UI/UI_Helpers.h"
 
 #include "Config/FilePaths.h"
@@ -202,13 +203,44 @@ void GUI_PlaylistItems::paintOverChildren ( juce::Graphics& g )
 {
 	GUI_ListBox::paintOverChildren ( g );
 
-	if ( dragOverRow < 0 )
+	if ( ! dragIsOver )
 		return;
 
-	const auto	insertRect = getRowPosition ( dragOverRow, true ).toFloat ().withHeight ( 3.0 ).reduced ( 4.0, 0.0f );
+	g.setColour ( findColour ( UI::colors::statusOk ) );
 
-	g.setColour ( juce::Colours::lime.withAlpha ( 0.5f ) );
-	g.fillRoundedRectangle ( insertRect, insertRect.getHeight () / 2.0f );
+	// The list's two ends get an arrow pointing at the line, from inside the list
+	auto drawLineWithArrow = [ &g ] ( const juce::Rectangle<float>& line, const bool pointsDown )
+	{
+		constexpr auto	arrowSize = 17.0f;
+		constexpr auto	gap = 5.0f;
+
+		const juce::SharedResourcePointer<Icons>	icons;
+
+		const auto	arrowRect = juce::Rectangle<float> ( arrowSize, arrowSize )
+									.withCentre ( { line.getCentreX (), pointsDown ? line.getY () - gap - arrowSize / 2.0f : line.getBottom () + gap + arrowSize / 2.0f } );
+
+		g.fillRoundedRectangle ( line, line.getHeight () / 2.0f );
+		g.fillPath ( UI::getScaledPath ( icons->get ( pointsDown ? "menu/move_to_bottom" : "menu/move_to_top" ), arrowRect ) );
+	};
+
+	if ( dragOverRow >= 0 )
+	{
+		const auto	insertRect = getRowPosition ( dragOverRow, true ).toFloat ().withHeight ( 3.0 ).reduced ( 4.0, 0.0f );
+
+		// The new top position
+		if ( dragOverRow == 0 )
+			return drawLineWithArrow ( insertRect, false );
+
+		// Below the last row of a full list the bar lands outside and gets clipped
+		if ( dragOverRow < getNumRows () || insertRect.getBottom () <= float ( getHeight () ) )
+		{
+			g.fillRoundedRectangle ( insertRect, insertRect.getHeight () / 2.0f );
+			return;
+		}
+	}
+
+	// Drops that append: a line along the bottom
+	drawLineWithArrow ( getLocalBounds ().toFloat ().removeFromBottom ( 7.0f ).withHeight ( 3.0f ).reduced ( 4.0f, 0.0f ), true );
 }
 //-----------------------------------------------------------------------------
 
@@ -309,6 +341,7 @@ void GUI_PlaylistItems::itemDropped ( const SourceDetails& dragSourceDetails )
 	if ( dragOverRow >= 0 )
 		selectRow ( std::clamp ( dragOverRow, 0, int ( rowData.size () ) - 1 ) );
 
+	dragIsOver = false;
 	dragOverRow = -1;
 }
 //-------------------------------------------------------------------------------------------------
@@ -317,6 +350,7 @@ void GUI_PlaylistItems::itemDragEnter ( const SourceDetails& dragSourceDetails )
 {
 	beginDragAutoRepeat ( 50 );
 
+	dragIsOver = true;
 	dragOverRow = getDropRow ( dragSourceDetails );
 	repaint ();
 }
@@ -343,6 +377,7 @@ int GUI_PlaylistItems::getDropRow ( const SourceDetails& dragSourceDetails ) con
 
 void GUI_PlaylistItems::itemDragExit ( const SourceDetails& /*dragSourceDetails*/ )
 {
+	dragIsOver = false;
 	dragOverRow = -1;
 	repaint ();
 }

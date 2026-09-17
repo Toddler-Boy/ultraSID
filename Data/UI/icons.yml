@@ -15,8 +15,8 @@ menu:
   add_to_playlist:   font-awesome/plus-solid-full
   playlist:          font-awesome/list-solid-full
   delete:            font-awesome/trash-can-regular-full
-  move_to_top:       font-awesome/arrow-up-solid-full
-  move_to_bottom:    font-awesome/arrow-down-solid-full
+  move_to_top:       tabler/arrow-big-up-filled
+  move_to_bottom:    tabler/arrow-big-down-filled
   keep_order:        font-awesome/thumbtack-solid-full
   remove_duplicates: tabler/copy-minus
   shuffle:           shuffle
