@@ -2,11 +2,14 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
-## 85.2.0 (2026-09-16)
+## 85.2.0 (2026-09-17)
 
+- Playlists sort by name, release, chip or length with a click on the column header.
+  "Keep this order" in the playlist menu makes the sorting permanent.
+- Playlists: the playlist menu can remove duplicates and shuffle the order.
+- The update check can run at every start.
 - Screen reader support: tune lists, the STIL subtune list, buttons, search results,
   playlist cards, tags and chip names are announced properly.
-- The update check can run at every start.
 
 ## 85.1.2 (2026-09-14)
 
