@@ -1,7 +1,7 @@
 {
-  "version": "85.2.0",
-  "url": "https://github.com/Toddler-Boy/ultraSID/releases/download/v85.2.0/ultraSID.dmg",
-  "sha256": "303a21da76e9a7bf522f7d97ed97948fb8136f952c221b19c4507c4e95da3386",
-  "bytes": 53944851,
-  "notes": "https://github.com/Toddler-Boy/ultraSID/releases/tag/v85.2.0"
+  "version": "85.2.1",
+  "url": "https://github.com/Toddler-Boy/ultraSID/releases/download/v85.2.1/ultraSID.dmg",
+  "sha256": "f6f26fa56acda64e80fdec0927b048ed16d234b7bb5223bd683699f0d8b9712e",
+  "bytes": 53942530,
+  "notes": "https://github.com/Toddler-Boy/ultraSID/releases/tag/v85.2.1"
 }
