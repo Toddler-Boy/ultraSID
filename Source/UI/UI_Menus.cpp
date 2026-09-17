@@ -161,6 +161,25 @@ void UI::menu_MoveItems ( juce::PopupMenu& m, const juce::String& plName, const 
 }
 //-----------------------------------------------------------------------------
 
+// Taken before an entry rewrite, puts entries and sort back
+static UndoManager::Op orderUndo ( const playlist& plItems, const juce::String& text )
+{
+	return {
+		.text = text,
+		.undo = [ plName = plItems.getName (), oldEntries = plItems.getEntries (), key = plItems.getSortKey (), forwards = plItems.isSortedForwards () ]
+		{
+			const juce::SharedResourcePointer<Playlists>	playlists;
+
+			if ( auto plItems = playlists->getPlaylistItems ( plName.toStdString () ) )
+			{
+				plItems->restoreOrder ( oldEntries, key, forwards );
+				plItems->saveAndNotify ();
+			}
+		},
+	};
+}
+//-----------------------------------------------------------------------------
+
 void UI::menu_KeepOrder ( juce::PopupMenu& m, const juce::String& plName )
 {
 	const juce::SharedResourcePointer<Playlists>	playlists;
@@ -170,7 +189,7 @@ void UI::menu_KeepOrder ( juce::PopupMenu& m, const juce::String& plName )
 	auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
 
 	// The column sort becomes the playlist's own order
-	m.addItem ( UI::newMenuItem ( strings->get ( "menu/keep_order" ), icons->get ( "menu/keep_order" ), [ plName ]
+	m.addItem ( UI::newDangerousMenuItem ( strings->get ( "menu/keep_order" ), icons->get ( "menu/keep_order" ), [ plName ]
 	{
 		const juce::SharedResourcePointer<Playlists>	playlists;
 
@@ -178,31 +197,79 @@ void UI::menu_KeepOrder ( juce::PopupMenu& m, const juce::String& plName )
 		if ( ! plItems || ! plItems->isSorted () )
 			return;
 
-		const auto	oldEntries = plItems->getEntries ();
-		const auto	key = plItems->getSortKey ();
-		const auto	forwards = plItems->isSortedForwards ();
+		const juce::SharedResourcePointer<Strings>	strings;
+		const auto	undo = orderUndo ( *plItems, strings->get ( "toast/order_kept" ) );
 
 		plItems->keepOrder ();
 		plItems->saveAndNotify ();
 
-		const juce::SharedResourcePointer<Strings>		strings;
-		const juce::SharedResourcePointer<UndoManager>	undoManager;
-
-		undoManager->arm ( {
-			.text = strings->get ( "toast/order_kept" ),
-			.undo = [ plName, oldEntries, key, forwards ]
-			{
-				const juce::SharedResourcePointer<Playlists>	playlists;
-
-				if ( auto plItems = playlists->getPlaylistItems ( plName.toStdString () ) )
-				{
-					plItems->restoreOrder ( oldEntries, key, forwards );
-					plItems->saveAndNotify ();
-				}
-			},
-		} );
+		juce::SharedResourcePointer<UndoManager> ()->arm ( undo );
 
 	} ).setEnabled ( plItems && plItems->hasWriteAccess () && plItems->isSorted () ) );
+}
+//-----------------------------------------------------------------------------
+
+void UI::menu_RemoveDuplicates ( juce::PopupMenu& m, const juce::String& plName )
+{
+	const juce::SharedResourcePointer<Playlists>	playlists;
+	const juce::SharedResourcePointer<Strings>		strings;
+	const juce::SharedResourcePointer<Icons>		icons;
+
+	auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
+
+	m.addItem ( UI::newDangerousMenuItem ( strings->get ( "menu/remove_duplicates" ), icons->get ( "menu/remove_duplicates" ), [ plName ]
+	{
+		const juce::SharedResourcePointer<Playlists>	playlists;
+
+		auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
+		if ( ! plItems )
+			return;
+
+		auto	undo = orderUndo ( *plItems, {} );
+
+		const auto	numRemoved = plItems->removeDuplicates ();
+		if ( numRemoved == 0 )
+			return;
+
+		plItems->saveAndNotify ();
+
+		const juce::SharedResourcePointer<Strings>	strings;
+
+		undo.text = numRemoved == 1
+				  ? strings->get ( "toast/duplicate_removed" )
+				  : strings->get ( "toast/duplicates_removed" ).replace ( "{}", juce::String ( numRemoved ) );
+
+		juce::SharedResourcePointer<UndoManager> ()->arm ( undo );
+
+	} ).setEnabled ( plItems && plItems->hasWriteAccess () && plItems->hasDuplicates () ) );
+}
+//-----------------------------------------------------------------------------
+
+void UI::menu_Shuffle ( juce::PopupMenu& m, const juce::String& plName )
+{
+	const juce::SharedResourcePointer<Playlists>	playlists;
+	const juce::SharedResourcePointer<Strings>		strings;
+	const juce::SharedResourcePointer<Icons>		icons;
+
+	auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
+
+	m.addItem ( UI::newDangerousMenuItem ( strings->get ( "menu/shuffle" ), icons->get ( "menu/shuffle" ), [ plName ]
+	{
+		const juce::SharedResourcePointer<Playlists>	playlists;
+
+		auto	plItems = playlists->getPlaylistItems ( plName.toStdString () );
+		if ( ! plItems )
+			return;
+
+		const juce::SharedResourcePointer<Strings>	strings;
+		const auto	undo = orderUndo ( *plItems, strings->get ( "toast/shuffled" ) );
+
+		plItems->shuffleEntries ();
+		plItems->saveAndNotify ();
+
+		juce::SharedResourcePointer<UndoManager> ()->arm ( undo );
+
+	} ).setEnabled ( plItems && plItems->hasWriteAccess () && plItems->getNumItems () > 1 ) );
 }
 //-----------------------------------------------------------------------------
 

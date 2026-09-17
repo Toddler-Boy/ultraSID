@@ -1,5 +1,6 @@
 #include <array>
 #include <numeric>
+#include <unordered_set>
 
 #include "Playlists.h"
 
@@ -15,6 +16,36 @@
 //-----------------------------------------------------------------------------
 
 static juce::File playlistFile ( const juce::String& name );
+
+// Strips a default subtune. Only an all-digit tail counts, a comma may belong to the file name
+static std::string bareDefault ( std::string entry )
+{
+	const auto	comma = entry.find_last_of ( ',' );
+	if ( comma == std::string::npos || comma + 1 == entry.size () )
+		return entry;
+
+	const auto	number = std::string_view ( entry ).substr ( comma + 1 );
+	if ( ! std::ranges::all_of ( number, [] ( const char c ) { return c >= '0' && c <= '9'; } ) )
+		return entry;
+
+	const auto	subTune = std::atoi ( number.data () );
+	const auto	dbEnt = db::findDatabaseEntry ( entry.substr ( 0, comma ) );
+
+	if ( subTune == 0 || ( dbEnt && dbEnt->startTune == subTune ) )
+		entry.resize ( comma );
+
+	return entry;
+}
+//-----------------------------------------------------------------------------
+
+// Equal for every spelling of one tune
+static std::string tuneId ( const std::string& entry )
+{
+	const auto [ tuneName, subTune ] = SID::parseTuneName ( entry );
+
+	return tuneName + "," + std::to_string ( db::realSubtune ( db::findDatabaseEntry ( tuneName ), subTune ) );
+}
+//-----------------------------------------------------------------------------
 
 // "Tunes" -> "Tunes 2" -> "Tunes 3"
 static juce::String bumpTrailingNumber ( juce::String name )
@@ -315,7 +346,7 @@ bool playlist::hasEntries ( const juce::StringArray& tunes ) const
 		return false;
 
 	for ( auto i = 0; i < tunes.size (); ++i )
-		if ( entries[ i ] != tunes[ i ].toStdString () )
+		if ( entries[ i ] != bareDefault ( tunes[ i ].toStdString () ) )
 			return false;
 
 	return true;
@@ -486,12 +517,105 @@ void playlist::keepOrder ()
 
 void playlist::restoreOrder ( std::vector<std::string> oldEntries, const db::SortKey key, const bool forwards )
 {
+	const auto	tunes = playingTunes ();
+
 	entries = std::move ( oldEntries );
 
 	sortKey = key;
 	sortForwards = forwards;
 
 	computeViewOrder ();
+	followPlayingTunes ( tunes );
+}
+//-----------------------------------------------------------------------------
+
+void playlist::shuffleEntries ()
+{
+	const auto	tunes = playingTunes ();
+
+	auto	rd = std::random_device {};
+	auto	rng = std::default_random_engine { rd () };
+
+	std::ranges::shuffle ( entries, rng );
+
+	viewOrder.clear ();
+	sortKey = db::SortKey::none;
+
+	followPlayingTunes ( tunes );
+}
+//-----------------------------------------------------------------------------
+
+bool playlist::hasDuplicates () const
+{
+	std::unordered_set<std::string>	seen;
+
+	for ( const auto& entry : entries )
+		if ( ! seen.insert ( tuneId ( entry ) ).second )
+			return true;
+
+	return false;
+}
+//-----------------------------------------------------------------------------
+
+int playlist::removeDuplicates ()
+{
+	const auto	tunes = playingTunes ();
+	const auto	oldSize = getNumItems ();
+
+	std::unordered_set<std::string>	seen;
+	std::vector<std::string>		unique;
+
+	for ( auto& entry : entries )
+		if ( seen.insert ( tuneId ( entry ) ).second )
+			unique.push_back ( std::move ( entry ) );
+
+	entries = std::move ( unique );
+
+	computeViewOrder ();
+	followPlayingTunes ( tunes );
+
+	return oldSize - getNumItems ();
+}
+//-----------------------------------------------------------------------------
+
+std::array<std::string, 3> playlist::playingTunes ()
+{
+	std::array<std::string, 3>	tunes;
+
+	for ( auto i = 0u; auto* row : playingRows () )
+	{
+		if ( row && juce::isPositiveAndBelow ( *row, getNumItems () ) )
+			tunes[ i ] = tuneId ( getEntry ( *row ) );
+		++i;
+	}
+
+	return tunes;
+}
+//-----------------------------------------------------------------------------
+
+void playlist::followPlayingTunes ( const std::array<std::string, 3>& tunes )
+{
+	for ( auto i = 0u; auto* row : playingRows () )
+	{
+		const auto&	tune = tunes[ i++ ];
+
+		if ( tune.empty () )
+			continue;
+
+		if ( juce::isPositiveAndBelow ( *row, getNumItems () ) && tuneId ( getEntry ( *row ) ) == tune )
+			continue;
+
+		*row = -1;
+
+		for ( auto r = 0; r < getNumItems (); ++r )
+		{
+			if ( tuneId ( getEntry ( r ) ) == tune )
+			{
+				*row = r;
+				break;
+			}
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 
@@ -551,7 +675,7 @@ void playlist::addItem ( const std::string& tune, const int index, const int ent
 	if ( slot < 0 || slot >= size )
 		slot = size;
 
-	entries.insert ( entries.begin () + slot, tune );
+	entries.insert ( entries.begin () + slot, bareDefault ( tune ) );
 
 	if ( isSorted () )
 	{

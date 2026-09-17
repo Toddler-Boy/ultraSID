@@ -570,7 +570,7 @@ db::SortItem db::sortItem ( const SortKey key, const Database::entry* entry, con
 	if ( key != SortKey::length || ! entry )
 		return { entry };
 
-	return { entry, SID::getTuneLength ( entry->file, subtune ? subtune : entry->startTune ) };
+	return { entry, SID::getTuneLength ( entry->file, realSubtune ( entry, subtune ) ) };
 }
 //-----------------------------------------------------------------------------
 

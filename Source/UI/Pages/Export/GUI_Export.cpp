@@ -66,7 +66,7 @@ void GUI_Export::update ()
 
 void GUI_Export::addItem ( const std::string& filename, const std::string& _tuneName )
 {
-	auto [ tuneName, subtune ] = SID::parseTuneName ( _tuneName );
+	const auto [ tuneName, fileSubtune ] = SID::parseTuneName ( _tuneName );
 
 	const juce::ScopedLock	sl ( exportLock );
 
@@ -77,9 +77,7 @@ void GUI_Export::addItem ( const std::string& filename, const std::string& _tune
 		return;
 	}
 
-	// If tune is default, find number of start-tune
-	if ( subtune == 0 )
-		subtune = ent->startTune;
+	const auto	subtune = db::realSubtune ( ent, fileSubtune );
 
 	const auto	quality = preferences->get<juce::String> ( "player/quality" );
 

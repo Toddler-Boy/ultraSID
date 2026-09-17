@@ -195,6 +195,12 @@ namespace db
 	// Looks up filename in the HVSC database first, then the user database
 	[[ nodiscard ]] const Database::entry* findDatabaseEntry ( const std::string& filename );
 
+	// Subtune 0 is the start tune
+	[[ nodiscard ]] inline int realSubtune ( const Database::entry* entry, const int subtune )
+	{
+		return subtune == 0 && entry ? entry->startTune : subtune;
+	}
+
 	// Column sorts of the tune lists
 	enum class SortKey : int8_t
 	{

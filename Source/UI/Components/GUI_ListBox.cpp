@@ -465,7 +465,7 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 
 		case columnId::liked:
 			{
-				auto		liked = likes->isLiked ( ent.file, subTune ? subTune : ent.startTune );
+				auto		liked = likes->isLiked ( ent.file, subTune );
 				const auto	isExact = liked;
 
 				if ( ! liked && ! filterExactMatch )
@@ -596,7 +596,7 @@ juce::String GUI_ListBox::getNameForRow ( int rowNumber )
 	parts.add ( videoStandardText ( ent ) );
 	parts.add ( spokenLength ( SID::getTuneLength ( ent.file, subTune ) ) );
 
-	if ( likes->isLiked ( ent.file, subTune ? subTune : ent.startTune ) )
+	if ( likes->isLiked ( ent.file, subTune ) )
 		parts.add ( strings->get ( "accessibility/liked" ) );
 
 	parts.removeEmptyStrings ();
@@ -881,17 +881,7 @@ void GUI_ListBox::changeListenerCallback ( juce::ChangeBroadcaster* source )
 
 int GUI_ListBox::getRealSubtune ( const int rowNumber ) const
 {
-	auto	ent = rowData[ rowNumber ];
-	if ( ! ent )
-		return rowSubtune.empty () ? 0 : rowSubtune[ rowNumber ];
-
-	if ( rowSubtune.empty () )
-		return ent->startTune;
-
-	if ( auto subTune = rowSubtune[ rowNumber ]; subTune != 0 )
-		return subTune;
-
-	return ent->startTune;
+	return db::realSubtune ( rowData[ rowNumber ], rowSubtune.empty () ? 0 : rowSubtune[ rowNumber ] );
 }
 //-----------------------------------------------------------------------------
 

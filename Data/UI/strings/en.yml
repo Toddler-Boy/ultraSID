@@ -89,6 +89,8 @@ menu:
   move_to_top:          Move to top
   move_to_bottom:       Move to bottom
   keep_order:           Keep this order
+  remove_duplicates:    Remove duplicates
+  shuffle:              Shuffle
   new_playlist:         New playlist
   delete_playlist:      Delete playlist
   delete_cover:         Delete cover-image
@@ -114,12 +116,15 @@ menu:
 
 # Undo toasts
 toast:
-  undo:             Undo
-  playlist_deleted: Playlist "{}" deleted
-  tune_removed:     Tune removed
-  tunes_removed:    "{} tunes removed"
-  order_kept:       Playlist order changed
-  cover_deleted:    Cover-image deleted
+  undo:               Undo
+  playlist_deleted:   Playlist "{}" deleted
+  tune_removed:       One tune removed
+  tunes_removed:      "{} tunes removed"
+  order_kept:         Playlist order changed
+  duplicate_removed:  One duplicate removed
+  duplicates_removed: "{} duplicates removed"
+  shuffled:           Playlist shuffled
+  cover_deleted:      Cover-image deleted
 
 # Search
 search:

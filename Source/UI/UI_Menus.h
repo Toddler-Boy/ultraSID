@@ -18,6 +18,8 @@ namespace UI
 	void menu_RemoveFromPlaylist ( juce::PopupMenu& m, const juce::String& plName, const juce::SparseSet<int>& rows );
 	void menu_MoveItems ( juce::PopupMenu& m, const juce::String& plName, const juce::SparseSet<int>& rows );
 	void menu_KeepOrder ( juce::PopupMenu& m, const juce::String& plName );
+	void menu_RemoveDuplicates ( juce::PopupMenu& m, const juce::String& plName );
+	void menu_Shuffle ( juce::PopupMenu& m, const juce::String& plName );
 
 	void menu_GoToFolder ( juce::PopupMenu& m, const juce::String& folder );
 	void menu_ExportTrack ( juce::PopupMenu& m, const juce::StringArray& tunes );

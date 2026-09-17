@@ -220,10 +220,7 @@ void GUI_PlaylistGridItem::mouseDown ( const juce::MouseEvent& e )
 
 	UI::menu_ExportPlaylist ( m, getName () );
 	m.addSeparator ();
-
-	// Delete cover image
 	UI::menu_DeleteCover ( m, getName () );
-	m.addSeparator ();
 	UI::menu_DeletePlaylist ( m, getName () );
 
 	UI::showMenuAtMouse ( m, *this );

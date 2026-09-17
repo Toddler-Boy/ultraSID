@@ -59,8 +59,7 @@ bool GUI_ultraSID::initSong ( unsigned int songNum, const bool subTuneOnly )
 
 	disableAudio ();
 
-	if ( ! songNum )
-		songNum = db::findDatabaseEntry ( lastFilename )->startTune;
+	songNum = unsigned ( db::realSubtune ( db::findDatabaseEntry ( lastFilename ), int ( songNum ) ) );
 
 	const auto	ready = player.init ( songNum, database->getSongFilterUsed ( lastFilename, songNum ) );
 
@@ -116,8 +115,7 @@ void GUI_ultraSID::renderSong ()
 	const auto	isUserTune = lastFilename.starts_with ( filepaths::userMarker );
 	const auto	unknown = lufs >= -0.1f || lufs <= -95.9f;
 
-	auto	msg = "Playing " + juce::String ( lastFilename ) + ", subtune " + juce::String ( player.getCurrentSong () )
-				+ " of " + juce::String ( player.getNumberOfSongs () ) + ", ";
+	auto	msg = "Playing " + juce::String ( lastFilename ) + " #" + juce::String ( player.getCurrentSong () ) + ", ";
 
 	if ( unknown )
 	{
@@ -157,8 +155,9 @@ void GUI_ultraSID::renderSong ()
 
 	// Without a render thread the tune neither plays nor ever finishes
 	if ( ! player.startRender ( len, songFade, lufs, skipMs ) )
-		Z_ERR ( "Could not start rendering " << lastFilename << " (song " << int ( player.getCurrentSong () ) << "): "
-				<< ( player.isReadyToPlay () ? "the render thread would not start" : "tune reports not ready to play" ) );
+	{
+		Z_ERR ( "Could not start rendering " << lastFilename << " (song " << int ( player.getCurrentSong () ) << "): " << ( player.isReadyToPlay () ? "the render thread would not start" : "tune reports not ready to play" ) );
+	}
 }
 //-----------------------------------------------------------------------------
 

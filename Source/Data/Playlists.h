@@ -56,6 +56,11 @@ public:
 	void restoreOrder ( std::vector<std::string> oldEntries, const db::SortKey key, const bool forwards );
 	[[ nodiscard ]] const std::vector<std::string>& getEntries () const	{	return entries;	}
 
+	// Entry rewrites, undone by restoreOrder. Of duplicates (same tune and subtune) the first stays
+	void shuffleEntries ();
+	[[ nodiscard ]] bool hasDuplicates () const;
+	int removeDuplicates ();
+
 	void clear ();
 	void removeItem ( const int index, const bool isFinal = false );
 	void removeItems ( const juce::SparseSet<int>& rows );
@@ -96,6 +101,10 @@ private:
 
 	// viewOrder from the entries and the sort key; playing rows untouched
 	void computeViewOrder ();
+
+	// A playing row that lost its tune moves to the tune's first row
+	[[ nodiscard ]] std::array<std::string, 3> playingTunes ();
+	void followPlayingTunes ( const std::array<std::string, 3>& tunes );
 
 	juce::String	name;
 	juce::String	coverExtension;

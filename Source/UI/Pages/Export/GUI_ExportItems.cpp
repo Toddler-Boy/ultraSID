@@ -530,9 +530,7 @@ void GUI_ExportItems::load ()
 
 		TuneExporter::entry	ent;
 
-		ent.subtune = fileSubtune;
-		if ( ent.subtune == 0 && dbEnt )
-			ent.subtune = dbEnt->startTune;
+		ent.subtune = db::realSubtune ( dbEnt, fileSubtune );
 		ent.date = juce::Time::fromISO8601 ( juce::String ( csv.get ( i, "date", "" ) ) ).toMilliseconds ();
 
 		// The render parameters always come fresh from the database, so an

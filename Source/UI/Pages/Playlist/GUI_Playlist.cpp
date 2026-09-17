@@ -387,11 +387,7 @@ void GUI_Playlist::updateInfo ()
 		if ( ! item )	// Missing tunes contribute no play time
 			continue;
 
-		auto	subTune = currentVisible->getSubtune ( i );
-		if ( subTune == 0 )
-			subTune = item->startTune;
-
-		playLength += SID::getTuneLength ( item->file, subTune );
+		playLength += SID::getTuneLength ( item->file, db::realSubtune ( item, currentVisible->getSubtune ( i ) ) );
 	}
 
 	auto	str = juce::String ( numItems ) + " TUNE";
@@ -423,9 +419,10 @@ void GUI_Playlist::showMenu ()
 	UI::menu_ExportPlaylist ( m, name );
 	m.addSeparator ();
 	UI::menu_KeepOrder ( m, name );
+	UI::menu_RemoveDuplicates ( m, name );
+	UI::menu_Shuffle ( m, name );
 	m.addSeparator ();
 	UI::menu_DeleteCover ( m, name );
-	m.addSeparator ();
 	UI::menu_DeletePlaylist ( m, name );
 
 	UI::showMenuAtButton ( m, *this, menuButton );
