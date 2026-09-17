@@ -2,6 +2,10 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.2.1 (2026-09-17)
+
+- Fixed a potential crash while closing ultraSID. The window now closes instantly.
+
 ## 85.2.0 (2026-09-17)
 
 - Playlists sort by name, release, chip or length with a click on the column header.
