@@ -277,10 +277,33 @@ foreach(_t liblzma libgnu archive_static fmt melatonin_inspector melatonin_blur)
   endif()
 endforeach()
 
+# PGO for the emulation core (Tools/pgo: profile-list.txt scopes it, train.sh
+# writes the profile, one per mangling; a present profile is always used)
+option (ULTRA_PGO_GENERATE "Instrument the emulation core for a PGO training run" OFF)
+set (pgo_list ${CMAKE_CURRENT_SOURCE_DIR}/Tools/pgo/profile-list.txt)
+if (WIN32)
+	set (pgo_profile ${CMAKE_CURRENT_SOURCE_DIR}/Tools/pgo/sidplayez-msvc.profdata)
+else ()
+	set (pgo_profile ${CMAKE_CURRENT_SOURCE_DIR}/Tools/pgo/sidplayez-itanium.profdata)
+endif ()
+set_property (DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${pgo_list} ${pgo_profile}.commit)
+
+# An engine that moved past the commit the profile was trained on has lost
+# part of it
+if (EXISTS ${pgo_profile}.commit)
+	file (READ ${pgo_profile}.commit pgo_trained)
+	string (STRIP "${pgo_trained}" pgo_trained)
+	execute_process (COMMAND git -C ${CMAKE_CURRENT_SOURCE_DIR}/Source/libSidplayEZ rev-parse HEAD
+					 OUTPUT_VARIABLE pgo_engine OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+	if (pgo_engine AND NOT pgo_engine STREQUAL pgo_trained)
+		message (WARNING "PGO profile trained on libSidplayEZ ${pgo_trained}, the engine is at ${pgo_engine}: run Tools/pgo/train.sh")
+	endif ()
+endif ()
+
 # Own targets: clang-cl on Windows, no module scanning, finite-math-only off
-# (same reasons as fmt above); DSP adds the fast-math set
+# (same reasons as fmt above); DSP adds the fast-math set, PGO the profile
 function (ultra_target target)
-	cmake_parse_arguments (arg "DSP" "" "" ${ARGN})
+	cmake_parse_arguments (arg "DSP;PGO" "" "" ${ARGN})
 	set_target_properties (${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
 	if (WIN32)
 		set_target_properties (${target} PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
@@ -292,25 +315,41 @@ function (ultra_target target)
 	elseif (WIN32)
 		target_compile_options (${target} PRIVATE -Wno-missing-braces /clang:-fno-finite-math-only)
 	endif ()
+	if (arg_PGO AND ULTRA_PGO_GENERATE)
+		set (pgo_flags -fprofile-instr-generate -fprofile-list=${pgo_list})
+		if (NOT WIN32)
+			target_link_options (${target} PRIVATE -fprofile-instr-generate)
+		endif ()
+	elseif (arg_PGO AND EXISTS ${pgo_profile})
+		set (pgo_flags -fprofile-instr-use=${pgo_profile} -fprofile-list=${pgo_list} -Wno-profile-instr-unprofiled)
+	endif ()
+	if (pgo_flags AND WIN32)
+		list (TRANSFORM pgo_flags PREPEND /clang:)
+	endif ()
+	if (pgo_flags)
+		target_compile_options (${target} PRIVATE ${pgo_flags})
+	endif ()
 endfunction ()
 
 # Framework-free test executable, never part of the normal build
 function (ultra_test target)
-	cmake_parse_arguments (arg "DSP" "" "" ${ARGN})
+	cmake_parse_arguments (arg "DSP;PGO" "" "" ${ARGN})
 	add_executable (${target} EXCLUDE_FROM_ALL ${arg_UNPARSED_ARGUMENTS})
 	target_include_directories (${target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 	target_compile_definitions (${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
 	set_target_properties (${target} PROPERTIES FOLDER Tests)
-	if (arg_DSP)
-		ultra_target (${target} DSP)
-	else ()
-		ultra_target (${target})
-	endif ()
+	set (opts)
+	foreach (opt DSP PGO)
+		if (arg_${opt})
+			list (APPEND opts ${opt})
+		endif ()
+	endforeach ()
+	ultra_target (${target} ${opts})
 endfunction ()
 
 # juce_core console app, never part of the normal build
 function (ultra_console_app target folder)
-	cmake_parse_arguments (arg "DSP" "" "" ${ARGN})
+	cmake_parse_arguments (arg "DSP;PGO" "" "" ${ARGN})
 	juce_add_console_app (${target} PRODUCT_NAME ${target})
 	target_sources (${target} PRIVATE ${arg_UNPARSED_ARGUMENTS})
 	target_include_directories (${target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
@@ -321,11 +360,13 @@ function (ultra_console_app target folder)
 	if (TARGET ${target}_rc_lib)
 		set_target_properties (${target}_rc_lib PROPERTIES FOLDER utility)
 	endif ()
-	if (arg_DSP)
-		ultra_target (${target} DSP)
-	else ()
-		ultra_target (${target})
-	endif ()
+	set (opts)
+	foreach (opt DSP PGO)
+		if (arg_${opt})
+			list (APPEND opts ${opt})
+		endif ()
+	endforeach ()
+	ultra_target (${target} ${opts})
 endfunction ()
 
 juce_add_gui_app (ultraSID
@@ -457,7 +498,7 @@ target_compile_definitions (ultraSID PRIVATE
 								$<$<NOT:$<CONFIG:Release>>:ULTRA_SHARED_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data">
 							)
 
-ultra_target (ultraSID DSP)
+ultra_target (ultraSID DSP PGO)
 
 if (APPLE)
 	set_target_properties(ultraSID PROPERTIES
@@ -538,7 +579,7 @@ endif()
 # merged emulation TU, and therefore app-equivalent performance numbers.
 set (sidplayez_test_sources ${source_files})
 list (FILTER sidplayez_test_sources INCLUDE REGEX "/libSidplayEZ/.*\\.(c|cpp)$")
-ultra_console_app (sidplay_ab_test Tests DSP Tests/sidplay_ab_test.cpp ${sidplayez_test_sources}
+ultra_console_app (sidplay_ab_test Tests DSP PGO Tests/sidplay_ab_test.cpp ${sidplayez_test_sources}
 	Source/Config/HVSCSource.cpp
 	Source/ultra-shared/Config/PakFile.cpp
 	Source/ultra-shared/Config/ZipFolder.cpp)
@@ -649,7 +690,7 @@ target_compile_definitions (sid_scanner PRIVATE
 							)
 
 set_target_properties (sid_scanner PROPERTIES EXCLUDE_FROM_ALL TRUE UNITY_BUILD ON UNITY_BUILD_MODE GROUP)
-ultra_target (sid_scanner DSP)
+ultra_target (sid_scanner DSP PGO)
 if (WIN32)
 	# Symbols for the optimized config, so crashes in real rendering speed stay debuggable
 	target_compile_options (sid_scanner PRIVATE $<$<CONFIG:Development>:/Z7>)

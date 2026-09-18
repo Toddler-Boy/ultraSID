@@ -1,0 +1,12 @@
+# The emulation core, the only code PGO instruments and profiles; everything
+# else compiles as it always did. Paths match the function's own source file,
+# headers included
+[clang]
+default:skip
+source:*libSidplayEZ*src*c64*
+source:*libSidplayEZ*src*residfp*
+source:*libSidplayEZ*src*mixer.*
+source:*libSidplayEZ*src*Event*
+source:*libSidplayEZ*src*sidemu.h
+source:*libSidplayEZ*src*EZ*player.*
+source:*libSidplayEZ*src*EZ*dsp-*
