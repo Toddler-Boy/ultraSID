@@ -68,11 +68,13 @@ public:
 		std::string_view	release;
 
 		// The folded search line "lowerFile NUL lowerName NUL lowerAuthor NUL
-		// lowerRelease"; the lower* views are subviews of it
+		// lowerPublisher" (the release minus its year), the lower* views are
+		// subviews of it
 		std::string_view	search;
 		std::string_view	lowerFile;
 		std::string_view	lowerName;
-		std::string_view	lowerRelease;
+		std::string_view	lowerAuthor;
+		std::string_view	lowerPublisher;
 
 		// Interleaved word pairs per subtune, layout in Database/uSIDFormat.h
 		static constexpr int	arraySlots = maxTunesArray * usid::wordsPerSubtune;

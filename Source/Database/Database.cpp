@@ -28,6 +28,23 @@ static void foldCorpus ( char* const data, const size_t len, const uint8_t* cons
 }
 //-----------------------------------------------------------------------------
 
+// The release after its "YYYY " year, the part that is searchable text
+static std::string_view releasePublisher ( const std::string_view release )
+{
+	const auto	isYearChar = [] ( const char c ) { return ( c >= '0' && c <= '9' ) || c == '?'; };
+
+	if ( release.size () < 4 || ! std::ranges::all_of ( release.substr ( 0, 4 ), isYearChar ) )
+		return release;
+
+	auto	rest = release.substr ( 4 );
+
+	if ( rest.starts_with ( ' ' ) )
+		rest.remove_prefix ( 1 );
+
+	return rest;
+}
+//-----------------------------------------------------------------------------
+
 int Database::load ( const juce::MemoryBlock& mb )
 {
 	db = {};
@@ -162,7 +179,8 @@ int Database::load ( const juce::MemoryBlock& mb )
 		const auto	textStart = cp;
 		put ( cp, name.first, name.second );		*cp++ = 0;
 		put ( cp, author.first, author.second );	*cp++ = 0;
-		put ( cp, release.first, release.second );
+		const auto	publisher = releasePublisher ( { release.first, size_t ( release.second ) } );
+		put ( cp, publisher.data (), publisher.size () );
 
 		foldCorpus ( lineStart, keyLen, asciiLowerLut.data () );
 		foldCorpus ( textStart, size_t ( cp - textStart ), sortingLut );
@@ -179,7 +197,8 @@ int Database::load ( const juce::MemoryBlock& mb )
 			.search = { lineStart, size_t ( cp - lineStart ) },
 			.lowerFile = { lineStart, keyLen },
 			.lowerName = { textStart, nameLen },
-			.lowerRelease = { textStart + nameLen + 1 + authorLen + 1, releaseLen },
+			.lowerAuthor = { textStart + nameLen + 1, authorLen },
+			.lowerPublisher = { textStart + nameLen + 1 + authorLen + 1, publisher.size () },
 
 			.numTunes = numTunes,
 			.flags = flags,
@@ -443,12 +462,14 @@ void UserDatabase::resolveNames ()
 		t.clear ();
 		t.reserve ( shown.size () + key.size () + shown.size () + bck.author.size () + bck.release.size () + 3 );
 
+		const auto	publisher = releasePublisher ( bck.release );
+
 		t += shown;
 		const auto	lineOff = t.size ();
 		t += key;			t += '\0';
 		t += shown;			t += '\0';
 		t += bck.author;	t += '\0';
-		t += bck.release;
+		t += publisher;
 
 		foldCorpus ( t.data () + lineOff, key.size (), asciiLowerLut.data () );
 		foldCorpus ( t.data () + lineOff + key.size () + 1, t.size () - lineOff - key.size () - 1, sortingLut );
@@ -467,7 +488,8 @@ void UserDatabase::resolveNames ()
 		ent.search = base.substr ( lineOff );
 		ent.lowerFile = base.substr ( lineOff, key.size () );
 		ent.lowerName = base.substr ( lineOff + key.size () + 1, shown.size () );
-		ent.lowerRelease = base.substr ( t.size () - bck.release.size () );
+		ent.lowerAuthor = base.substr ( lineOff + key.size () + 1 + shown.size () + 1, bck.author.size () );
+		ent.lowerPublisher = base.substr ( t.size () - publisher.size () );
 	}
 }
 //-----------------------------------------------------------------------------
@@ -583,7 +605,7 @@ bool db::entryLess ( const SortKey key, const bool forwards, const SortItem& ia,
 	const auto&	b = *ib.entry;
 
 	const auto	nameLess = [ & ] { return lime::str::naturalCompare ( a.lowerName, b.lowerName ) < 0; };
-	const auto	yearCompare = [ & ] { return a.lowerRelease.substr ( 0, 4 ).compare ( b.lowerRelease.substr ( 0, 4 ) ); };
+	const auto	yearCompare = [ & ] { return a.release.substr ( 0, 4 ).compare ( b.release.substr ( 0, 4 ) ); };
 
 	switch ( key )
 	{

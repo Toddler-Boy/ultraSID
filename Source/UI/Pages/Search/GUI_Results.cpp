@@ -62,6 +62,85 @@ void GUI_Results::sortOrderChanged ( int newSortColumnId, bool isForwards )
 }
 //-----------------------------------------------------------------------------
 
+struct yearRange
+{
+	int	from;
+	int	to;
+};
+
+// A 4-char year as the lowest and highest year its '?' wildcards allow
+static bool parseYear ( const std::string_view str, int& lo, int& hi )
+{
+	if ( str.size () != 4 )
+		return false;
+
+	lo = 0;
+	hi = 0;
+
+	for ( const auto c : str )
+	{
+		if ( c >= '0' && c <= '9' )
+		{
+			lo = lo * 10 + ( c - '0' );
+			hi = hi * 10 + ( c - '0' );
+		}
+		else if ( c == '?' )
+		{
+			lo = lo * 10;
+			hi = hi * 10 + 9;
+		}
+		else
+			return false;
+	}
+
+	return true;
+}
+//-----------------------------------------------------------------------------
+
+// "YYYY", "YYYY-", "-YYYY" or "YYYY-YYYY"; the ends may come in any order
+static std::optional<yearRange> parseYearRange ( const std::string_view word )
+{
+	auto	leftLo = 0;
+	auto	leftHi = 0;
+	auto	rightLo = 9999;
+	auto	rightHi = 9999;
+
+	const auto	dash = word.find ( '-' );
+
+	if ( dash == std::string_view::npos )
+	{
+		if ( ! parseYear ( word, leftLo, leftHi ) )
+			return std::nullopt;
+
+		return yearRange { leftLo, leftHi };
+	}
+
+	const auto	left = word.substr ( 0, dash );
+	const auto	right = word.substr ( dash + 1 );
+
+	if ( left.empty () && right.empty () )
+		return std::nullopt;
+
+	if ( ! left.empty () && ! parseYear ( left, leftLo, leftHi ) )
+		return std::nullopt;
+
+	if ( ! right.empty () && ! parseYear ( right, rightLo, rightHi ) )
+		return std::nullopt;
+
+	return yearRange { std::min ( leftLo, rightLo ), std::max ( leftHi, rightHi ) };
+}
+//-----------------------------------------------------------------------------
+
+// The release year must be known to lie inside the range, "198?" is not in "1987"
+static bool isInYearRange ( const std::string_view release, const yearRange range )
+{
+	auto	lo = 0;
+	auto	hi = 0;
+
+	return parseYear ( release.substr ( 0, 4 ), lo, hi ) && lo >= range.from && hi <= range.to;
+}
+//-----------------------------------------------------------------------------
+
 int GUI_Results::search ( const juce::String& str, const searchOptions options )
 {
 	if ( database.empty () && userDatabase.empty () )
@@ -70,13 +149,62 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	const auto	oldPattern = searchPattern;
 	const auto	oldOptions = searchOpts;
 
-	// Spaces separate words
-	auto	words = juce::StringArray::fromTokens ( str.toLowerCase (), " ", "" );
-	words.removeEmptyStrings ();
+	// Spaces separate words, quotes keep a phrase together
+	auto	words = juce::StringArray::fromTokens ( str.toLowerCase (), " ", "\"" );
 
-	// Convert words back into search pattern
+	for ( auto i = words.size (); --i >= 0; )
+		if ( words[ i ].unquoted ().isEmpty () )
+			words.remove ( i );
+
+	// The pattern keeps the year words so a year-only search has a non-empty key
 	searchPattern = words.joinIntoString ( " " );
 	searchOpts = options;
+
+	// A word matches the whole search line unless a prefix limits it to one field
+	struct searchTerm
+	{
+		std::string_view Database::entry::*	field;
+		std::string							text;
+	};
+
+	static constexpr std::pair<const char*, std::string_view Database::entry::*>	fields[] =
+	{
+		{ "name", &Database::entry::lowerName },
+		{ "author", &Database::entry::lowerAuthor },
+		{ "path", &Database::entry::lowerFile },
+		{ "publisher", &Database::entry::lowerPublisher },
+	};
+
+	std::vector<searchTerm>		terms;
+	std::optional<yearRange>	yearFilter;
+
+	for ( const auto& word : words )
+	{
+		const auto	quoted = word.startsWithChar ( '"' );
+		const auto	colon = quoted ? -1 : word.indexOfChar ( ':' );
+		const auto	prefix = colon > 0 ? word.substring ( 0, colon ) : juce::String ();
+		const auto	known = std::ranges::find_if ( fields, [ &prefix ] ( const auto& f ) { return prefix == f.first; } );
+		const auto	isYear = prefix == "year";
+		const auto	text = ( known != std::end ( fields ) || isYear ? word.substring ( colon + 1 ) : word ).unquoted ().toStdString ();
+
+		if ( text.empty () )
+			continue;
+
+		// A bare or "year:" range word is the year filter, the last one wins
+		if ( isYear || ( ! quoted && colon < 0 ) )
+		{
+			if ( const auto range = parseYearRange ( text ) )
+			{
+				yearFilter = range;
+				continue;
+			}
+
+			if ( isYear )
+				continue;
+		}
+
+		terms.push_back ( { known != std::end ( fields ) ? known->second : &Database::entry::search, text } );
+	}
 
 	// Check if all options are false
 	auto isAnyFilterUsed = [] ( const searchOptions& opts ) -> bool
@@ -107,8 +235,11 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	const juce::SharedResourcePointer<Likes>	likes;
 	const juce::SharedResourcePointer<Tags>		tags;
 
-	auto matchesFilter = [ &options, &likes, &tags ] ( const Database::entry* entry ) -> bool
+	auto matchesFilter = [ &options, &likes, &tags, yearFilter ] ( const Database::entry* entry ) -> bool
 	{
+		if ( yearFilter && ! isInYearRange ( entry->release, *yearFilter ) )
+			return false;
+
 		if ( options.mustBeLiked && ! likes->isLiked ( entry->file ) )
 			return false;
 
@@ -124,44 +255,24 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		return true;
 	};
 
-	// Search tunes by filter only
-	if ( words.isEmpty () && isAnyFilterUsed ( options ) )
+	auto matchesTerms = [ &terms ] ( const Database::entry* entry ) -> bool
 	{
-		// Search in HVSC database
-		for ( auto entry : database )
-			if ( matchesFilter ( entry ) )
-				rowData.push_back ( entry );
+		for ( const auto& term : terms )
+			if ( ( entry->*term.field ).find ( term.text ) == std::string_view::npos )
+				return false;
 
-		// Search in user database
-		for ( auto entry : userDatabase )
-			if ( matchesFilter ( entry ) )
-				rowData.push_back ( entry );
-	}
-	else
-	{
-		std::vector<std::string>	substrings;
-		for ( const auto& subStr : words )
-			substrings.push_back ( subStr.toStdString () );
+		return true;
+	};
 
-		auto findAnyString = [ &substrings ] ( const std::string_view searchStr )
-		{
-			for ( const auto& sub : substrings )
-				if ( searchStr.find ( sub ) == std::string::npos )
-					return false;
+	// Search in HVSC database
+	for ( auto entry : database )
+		if ( matchesFilter ( entry ) && matchesTerms ( entry ) )
+			rowData.push_back ( entry );
 
-			return true;
-		};
-
-		// Search in HVSC database
-		for ( auto entry : database )
-			if ( matchesFilter ( entry ) && findAnyString ( entry->search ) )
-				rowData.push_back ( entry );
-
-		// Search in user database
-		for ( auto entry : userDatabase )
-			if ( matchesFilter ( entry ) && findAnyString ( entry->search ) )
-				rowData.push_back ( entry );
-	}
+	// Search in user database
+	for ( auto entry : userDatabase )
+		if ( matchesFilter ( entry ) && matchesTerms ( entry ) )
+			rowData.push_back ( entry );
 
 	unsorted = rowData;
 	getHeader ().reSortTable ();
