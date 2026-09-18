@@ -512,3 +512,78 @@ a.stack-item:hover h3 {
     transition: none;
   }
 }
+
+/* Manual */
+
+.manual {
+  max-width: 46rem;
+  padding: 3.5rem 1.5rem 5rem;
+}
+
+.manual-page h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 1.5rem;
+}
+
+.manual-page h2 {
+  font-size: 1.5rem;
+  margin: 2.5rem 0 0.75rem;
+}
+
+.manual-page p,
+.manual-page ul,
+.manual-page ol {
+  margin-bottom: 1rem;
+}
+
+.manual-page ul,
+.manual-page ol {
+  padding-left: 1.4rem;
+}
+
+.manual-page li {
+  margin-bottom: 0.4rem;
+}
+
+.manual-page a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.manual-page code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: var(--surface);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.manual-page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.92rem;
+}
+
+.manual-page th,
+.manual-page td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--band);
+}
+
+.manual-page th {
+  font-weight: 700;
+  border-bottom: var(--border);
+}
+
+.manual-foot {
+  margin-top: 3rem;
+  font-size: 0.9rem;
+}
+
+.manual-foot a {
+  color: var(--accent);
+  font-weight: 600;
+}

@@ -1,2 +1,11 @@
 # The release manifests double as the page's data source
 data_dir: api
+
+exclude:
+  - manual/inventory.md
+
+defaults:
+  - scope:
+      path: manual
+    values:
+      layout: manual
