@@ -80,18 +80,12 @@ endmacro ()
 # JUCE
 set (JUCE_ENABLE_MODULE_SOURCE_GROUPS ON)
 
-# Soft pin on develop: the fixes land there months before a tagged release.
-# The Windows peer patch: title-bar clicks go straight to DefWindowProc (since
-# 8.0.2 JUCE defers them to the first mouse move, so a plain click activates
-# the window without raising it), and owned top-level windows (the footer
-# popups) keep screen coordinates instead of being offset like child peers.
+# Soft pin on develop: the fixes land there months before a tagged release
 FetchContent_Declare (JUCE
 					GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
 					GIT_TAG origin/develop
 					GIT_SHALLOW TRUE
-					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE
-					PATCH_COMMAND git checkout -- modules/juce_gui_basics/native/juce_Windowing_windows.cpp
-					COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/Tools/juce-windowing.patch)
+					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/JUCE)
 FetchContent_MakeAvailable (JUCE)
 
 # Binary Data (icons)
@@ -150,7 +144,7 @@ set_target_properties (fmt-c PROPERTIES EXCLUDE_FROM_ALL TRUE)
 # never runs; hard pin on a release, bumped deliberately
 FetchContent_Declare (boost_regex
 					GIT_REPOSITORY https://github.com/boostorg/regex.git
-					GIT_TAG boost-1.88.0
+					GIT_TAG boost-1.92.0
 					GIT_SHALLOW TRUE
 					SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/boost_regex
 					SOURCE_SUBDIR nonexistent)
@@ -283,6 +277,57 @@ foreach(_t liblzma libgnu archive_static fmt melatonin_inspector melatonin_blur)
   endif()
 endforeach()
 
+# Own targets: clang-cl on Windows, no module scanning, finite-math-only off
+# (same reasons as fmt above); DSP adds the fast-math set
+function (ultra_target target)
+	cmake_parse_arguments (arg "DSP" "" "" ${ARGN})
+	set_target_properties (${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+	if (WIN32)
+		set_target_properties (${target} PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
+	endif ()
+	if (arg_DSP AND WIN32)
+		target_compile_options (${target} PRIVATE -Wno-missing-braces $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations)
+	elseif (arg_DSP)
+		target_compile_options (${target} PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
+	elseif (WIN32)
+		target_compile_options (${target} PRIVATE -Wno-missing-braces /clang:-fno-finite-math-only)
+	endif ()
+endfunction ()
+
+# Framework-free test executable, never part of the normal build
+function (ultra_test target)
+	cmake_parse_arguments (arg "DSP" "" "" ${ARGN})
+	add_executable (${target} EXCLUDE_FROM_ALL ${arg_UNPARSED_ARGUMENTS})
+	target_include_directories (${target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
+	target_compile_definitions (${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
+	set_target_properties (${target} PROPERTIES FOLDER Tests)
+	if (arg_DSP)
+		ultra_target (${target} DSP)
+	else ()
+		ultra_target (${target})
+	endif ()
+endfunction ()
+
+# juce_core console app, never part of the normal build
+function (ultra_console_app target folder)
+	cmake_parse_arguments (arg "DSP" "" "" ${ARGN})
+	juce_add_console_app (${target} PRODUCT_NAME ${target})
+	target_sources (${target} PRIVATE ${arg_UNPARSED_ARGUMENTS})
+	target_include_directories (${target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
+	target_link_libraries (${target} PRIVATE juce::juce_core lime_Logger juce::juce_recommended_config_flags)
+	juce_generate_juce_header (${target})
+	target_compile_definitions (${target} PRIVATE DONT_SET_USING_JUCE_NAMESPACE=1 _CRT_SECURE_NO_WARNINGS JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_MODAL_LOOPS_PERMITTED=0)
+	set_target_properties (${target} PROPERTIES EXCLUDE_FROM_ALL TRUE FOLDER ${folder})
+	if (TARGET ${target}_rc_lib)
+		set_target_properties (${target}_rc_lib PROPERTIES FOLDER utility)
+	endif ()
+	if (arg_DSP)
+		ultra_target (${target} DSP)
+	else ()
+		ultra_target (${target})
+	endif ()
+endfunction ()
+
 juce_add_gui_app (ultraSID
 				  PRODUCT_NAME ultraSID
 				  CAMERA_PERMISSION_ENABLED YES
@@ -391,6 +436,7 @@ target_compile_definitions (ultraSID PRIVATE
 								JUCE_MODAL_LOOPS_PERMITTED=0
 								JUCE_WEB_BROWSER=0
 								JUCE_USE_FLAC=1
+								JUCE_USE_WEBP=0
 								JUCE_USE_CURL=1
 								JUCE_SILENCE_XCODE_15_LINKER_WARNING=1
 								JUCE_USE_MP3AUDIOFORMAT=0
@@ -411,6 +457,8 @@ target_compile_definitions (ultraSID PRIVATE
 								$<$<NOT:$<CONFIG:Release>>:ULTRA_SHARED_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Source/ultra-shared/Data">
 							)
 
+ultra_target (ultraSID DSP)
+
 if (APPLE)
 	set_target_properties(ultraSID PROPERTIES
 		XCODE_ATTRIBUTE_INFOPLIST_KEY_NSCameraUsageDescription "Add users face to CRT screen"
@@ -418,7 +466,6 @@ if (APPLE)
 		XCODE_ATTRIBUTE_DEPLOYMENT_POSTPROCESSING[variant=Release] ON
 		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] ON
 		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Development] ON)
-	target_compile_options(ultraSID PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
 	target_link_libraries(ultraSID PUBLIC "-framework AVFoundation" "-framework CoreMedia")
 
 	# The whole data set ships inside the bundle as Resources/Data.pak, where
@@ -448,11 +495,7 @@ if (APPLE)
 endif()
 
 if (WIN32)
-	target_compile_options(ultraSID PRIVATE -Wno-missing-braces $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations -showFilenames)
-endif()
-
-if (WIN32)
-	set_target_properties(ultraSID PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
+	target_compile_options(ultraSID PRIVATE -showFilenames)
 	# The debugger starts in the repo root, where the naked dev Data lives
 	set_target_properties(ultraSID PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 	set_property(TARGET ultraSID APPEND_STRING PROPERTY LINK_FLAGS_DEBUG " /INCREMENTAL:NO")
@@ -465,7 +508,7 @@ if (WIN32)
 endif()
 
 if(UNIX AND NOT APPLE)
-	target_compile_options(ultraSID PRIVATE -Wno-missing-braces -fno-math-errno -ffast-math -fno-finite-math-only -msse4.2 -ffp-contract=fast -funsafe-math-optimizations $<$<CONFIG:Debug>:-g -O0> $<$<CONFIG:Development>:-g>)
+	target_compile_options(ultraSID PRIVATE -fno-math-errno -msse4.2 $<$<CONFIG:Debug>:-g -O0> $<$<CONFIG:Development>:-g>)
 	# System libcurl via dlopen (a link-time -lcurl carries the builder's
 	# distro symbol versions). JUCE adds JUCE_USE_CURL=0 unless asked to link
 	# curl; drop it, the app's JUCE_USE_CURL=1 stands alone
@@ -495,120 +538,60 @@ endif()
 # merged emulation TU, and therefore app-equivalent performance numbers.
 set (sidplayez_test_sources ${source_files})
 list (FILTER sidplayez_test_sources INCLUDE REGEX "/libSidplayEZ/.*\\.(c|cpp)$")
-add_executable(sidplay_ab_test EXCLUDE_FROM_ALL Tests/sidplay_ab_test.cpp ${sidplayez_test_sources})
-target_include_directories(sidplay_ab_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-target_compile_definitions(sidplay_ab_test PRIVATE _CRT_SECURE_NO_WARNINGS SIDPLAY_TEST_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
-set_target_properties(sidplay_ab_test PROPERTIES CXX_SCAN_FOR_MODULES OFF UNITY_BUILD ON UNITY_BUILD_MODE GROUP)
-if (WIN32)
-	set_target_properties(sidplay_ab_test PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options(sidplay_ab_test PRIVATE -Wno-missing-braces $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations)
-else()
-	target_compile_options(sidplay_ab_test PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
-endif()
+ultra_console_app (sidplay_ab_test Tests DSP Tests/sidplay_ab_test.cpp ${sidplayez_test_sources}
+	Source/Config/HVSCSource.cpp
+	Source/ultra-shared/Config/PakFile.cpp
+	Source/ultra-shared/Config/ZipFolder.cpp)
+target_compile_definitions (sidplay_ab_test PRIVATE SIDPLAY_TEST_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
+set_target_properties (sidplay_ab_test PROPERTIES UNITY_BUILD ON UNITY_BUILD_MODE GROUP)
 
 # FX / EQ golden-output regression + performance test. The effects are
 # header-only and self-contained, so no library sources are needed.
-add_executable(fx_ab_test EXCLUDE_FROM_ALL Tests/fx_ab_test.cpp)
-target_include_directories(fx_ab_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-target_compile_definitions(fx_ab_test PRIVATE _CRT_SECURE_NO_WARNINGS FX_TEST_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
-set_target_properties(fx_ab_test PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties(fx_ab_test PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options(fx_ab_test PRIVATE -Wno-missing-braces $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations)
-else()
-	target_compile_options(fx_ab_test PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
-endif()
+ultra_test (fx_ab_test DSP Tests/fx_ab_test.cpp)
+target_compile_definitions (fx_ab_test PRIVATE FX_TEST_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
 
 # FX mode-loudness measurement (diagnostic, no golden reference): runs the
 # sidplay reference WAVs through all four SIDEffects chains and prints EBU
 # R128 integrated loudness per mode, the drift ruler for the fxGains trims.
-# Compiles SIDEffects.cpp directly (framework-free).
-add_executable(fx_mode_loudness EXCLUDE_FROM_ALL Tests/fx_mode_loudness.cpp
+ultra_test (fx_mode_loudness DSP Tests/fx_mode_loudness.cpp
 	Source/Audio/SIDEffects.cpp
 	Source/Audio/PerceivedLoudness.cpp)
-target_include_directories(fx_mode_loudness PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-target_compile_definitions(fx_mode_loudness PRIVATE _CRT_SECURE_NO_WARNINGS LOUDNESS_TEST_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
-set_target_properties(fx_mode_loudness PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties(fx_mode_loudness PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options(fx_mode_loudness PRIVATE -Wno-missing-braces $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations)
-else()
-	target_compile_options(fx_mode_loudness PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
-endif()
+target_compile_definitions (fx_mode_loudness PRIVATE LOUDNESS_TEST_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_executable(mverb_ab_test EXCLUDE_FROM_ALL Tests/mverb_ab_test.cpp)
-target_include_directories(mverb_ab_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-# no C++20 modules here, clang-cl has no /scanDependencies
-set_target_properties(mverb_ab_test PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties(mverb_ab_test PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options(mverb_ab_test PRIVATE $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations)
-else()
-	target_compile_options(mverb_ab_test PRIVATE -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
-endif()
+ultra_test (mverb_ab_test DSP Tests/mverb_ab_test.cpp)
 
 # STIL quote-detector scan (diagnostic + regression): runs splitCommentQuotes
-# over the real STIL.txt and reports quote statistics; fails when the detector
-# regresses. Framework-free, Tests/shim stands in for the generated JuceHeader.
-add_executable(stil_scan EXCLUDE_FROM_ALL Tests/stil_scan.cpp Source/ultra-shared/Helpers/Regex.cpp)
-target_include_directories(stil_scan PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Tests/shim ${CMAKE_CURRENT_SOURCE_DIR}/Source ${CMAKE_CURRENT_BINARY_DIR}/boost_regex/include)
-target_compile_definitions(stil_scan PRIVATE _CRT_SECURE_NO_WARNINGS BOOST_REGEX_STANDALONE STIL_TEST_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
-set_target_properties(stil_scan PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties(stil_scan PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options(stil_scan PRIVATE -Wno-missing-braces /clang:-fno-finite-math-only)
-endif()
+# over the real STIL.txt (loose folder or zip) and reports quote statistics;
+# fails when the detector regresses
+ultra_console_app (stil_scan Tests Tests/stil_scan.cpp
+	Source/Config/HVSCSource.cpp
+	Source/ultra-shared/Config/PakFile.cpp
+	Source/ultra-shared/Config/ZipFolder.cpp
+	Source/ultra-shared/Helpers/Regex.cpp)
+target_include_directories (stil_scan PRIVATE ${boost_regex_SOURCE_DIR}/include)
+target_compile_definitions (stil_scan PRIVATE BOOST_REGEX_STANDALONE STIL_TEST_ROOT="${CMAKE_CURRENT_SOURCE_DIR}")
 
 # PerceivedLoudness validation: EBU Tech 3341 minimum set, dual mono, chunk
 # invariance, progressive readout, silence.
-add_executable(perceived_loudness_test EXCLUDE_FROM_ALL Tests/perceived_loudness_test.cpp
+ultra_test (perceived_loudness_test DSP Tests/perceived_loudness_test.cpp
 	Source/Audio/PerceivedLoudness.cpp)
-target_include_directories(perceived_loudness_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-target_compile_definitions(perceived_loudness_test PRIVATE _CRT_SECURE_NO_WARNINGS)
-set_target_properties(perceived_loudness_test PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties(perceived_loudness_test PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options(perceived_loudness_test PRIVATE -Wno-missing-braces $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations)
-else()
-	target_compile_options(perceived_loudness_test PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
-endif()
 
 # ZipFolder round-trip: Writer-built archives, staged mutations, commit
 # rewrites and zip64 entry counts, cross-checked against juce::ZipFile and an
 # independent CRC implementation.
-juce_add_console_app (zipfolder_test PRODUCT_NAME zipfolder_test)
-target_sources (zipfolder_test PRIVATE Tests/zipfolder_test.cpp
+ultra_console_app (zipfolder_test Tests Tests/zipfolder_test.cpp
 	Source/ultra-shared/Config/PakFile.cpp
 	Source/ultra-shared/Config/ZipFolder.cpp)
-target_include_directories (zipfolder_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-target_link_libraries (zipfolder_test PRIVATE juce::juce_core lime_Logger juce::juce_recommended_config_flags)
-juce_generate_juce_header (zipfolder_test)
-target_compile_definitions (zipfolder_test PRIVATE DONT_SET_USING_JUCE_NAMESPACE=1 _CRT_SECURE_NO_WARNINGS JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_MODAL_LOOPS_PERMITTED=0)
-set_target_properties (zipfolder_test PROPERTIES EXCLUDE_FROM_ALL TRUE CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties (zipfolder_test PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options (zipfolder_test PRIVATE -Wno-missing-braces /clang:-fno-finite-math-only)
-endif()
 
 # HVSCUpdater dual-tree regression: one synthetic update script applied to a
 # loose folder and to a zip archive must produce identical collections; a
 # failing script must leave the zip on disk untouched.
-juce_add_console_app (hvscupdater_test PRODUCT_NAME hvscupdater_test)
-target_sources (hvscupdater_test PRIVATE Tests/hvscupdater_test.cpp
+ultra_console_app (hvscupdater_test Tests Tests/hvscupdater_test.cpp
 	Source/Database/HVSCUpdater/HVSCTree.cpp
 	Source/Database/HVSCUpdater/HVSCUpdater.cpp
 	Source/Database/HVSCUpdater/updater_sidtune.cpp
 	Source/ultra-shared/Config/PakFile.cpp
 	Source/ultra-shared/Config/ZipFolder.cpp)
-target_include_directories (hvscupdater_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-target_link_libraries (hvscupdater_test PRIVATE juce::juce_core lime_Logger juce::juce_recommended_config_flags)
-juce_generate_juce_header (hvscupdater_test)
-target_compile_definitions (hvscupdater_test PRIVATE DONT_SET_USING_JUCE_NAMESPACE=1 _CRT_SECURE_NO_WARNINGS JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_MODAL_LOOPS_PERMITTED=0)
-set_target_properties (hvscupdater_test PROPERTIES EXCLUDE_FROM_ALL TRUE CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties (hvscupdater_test PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options (hvscupdater_test PRIVATE -Wno-missing-braces /clang:-fno-finite-math-only)
-endif()
 
 #
 # Tools (see ultrasid_tools.md): the HVSC scanner and the database builder that
@@ -665,15 +648,12 @@ target_compile_definitions (sid_scanner PRIVATE
 								SID_TOOLS_ROOT="${CMAKE_CURRENT_SOURCE_DIR}"
 							)
 
-set_target_properties (sid_scanner PROPERTIES EXCLUDE_FROM_ALL TRUE CXX_SCAN_FOR_MODULES OFF UNITY_BUILD ON UNITY_BUILD_MODE GROUP)
+set_target_properties (sid_scanner PROPERTIES EXCLUDE_FROM_ALL TRUE UNITY_BUILD ON UNITY_BUILD_MODE GROUP)
+ultra_target (sid_scanner DSP)
 if (WIN32)
-	set_target_properties (sid_scanner PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options (sid_scanner PRIVATE -Wno-missing-braces $<$<CONFIG:Release,Development>:/clang:-O3> /clang:-fno-math-errno /clang:-ffast-math /clang:-fno-finite-math-only /clang:-msse4.2 /clang:-ffp-contract=fast /clang:-funsafe-math-optimizations)
 	# Symbols for the optimized config, so crashes in real rendering speed stay debuggable
 	target_compile_options (sid_scanner PRIVATE $<$<CONFIG:Development>:/Z7>)
 	target_link_options (sid_scanner PRIVATE $<$<CONFIG:Development>:/DEBUG>)
-else()
-	target_compile_options (sid_scanner PRIVATE -Wno-missing-braces -ffast-math -fno-finite-math-only -ffp-contract=fast -funsafe-math-optimizations)
 endif()
 
 # The database builder lives inside sid_scanner (DatabaseBuilder.cpp),
@@ -681,26 +661,14 @@ endif()
 
 # sidid_search finds every SID file a sidid signature matches (existing player
 # or an ad-hoc signature line), to vet new sidid.cfg entries, see the usage
-# comment in the source. A juce console app since it reads the zip-backed
-# HVSC through PakFile.
-juce_add_console_app (sidid_search PRODUCT_NAME sidid_search)
-target_sources (sidid_search PRIVATE Tools/sidid_search/sidid_search.cpp
+# comment in the source
+ultra_console_app (sidid_search Tools Tools/sidid_search/sidid_search.cpp
 	Source/libSidplayEZ/src/EZ/sidid.cpp
 	Source/ultra-shared/Config/PakFile.cpp)
-target_include_directories (sidid_search PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source)
-target_link_libraries (sidid_search PRIVATE juce::juce_core lime_Logger juce::juce_recommended_config_flags)
-juce_generate_juce_header (sidid_search)
-target_compile_definitions (sidid_search PRIVATE DONT_SET_USING_JUCE_NAMESPACE=1 _CRT_SECURE_NO_WARNINGS JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_MODAL_LOOPS_PERMITTED=0)
-set_target_properties (sidid_search PROPERTIES EXCLUDE_FROM_ALL TRUE CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties (sidid_search PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options (sidid_search PRIVATE -Wno-missing-braces /clang:-fno-finite-math-only)
-endif()
 
 # hvsc_update applies official HVSC update archives to the zip collection
 # through the app's own updater chain; Tools/update_hvsc.sh drives it
-juce_add_console_app (hvsc_update PRODUCT_NAME hvsc_update)
-target_sources (hvsc_update PRIVATE Tools/hvsc_update/hvsc_update.cpp
+ultra_console_app (hvsc_update Tools Tools/hvsc_update/hvsc_update.cpp
 	Source/Config/HVSCSource.cpp
 	Source/Database/HVSCUpdater/HVSCTree.cpp
 	Source/Database/HVSCUpdater/HVSCUpdater.cpp
@@ -708,15 +676,9 @@ target_sources (hvsc_update PRIVATE Tools/hvsc_update/hvsc_update.cpp
 	Source/Helpers/Unarchiver.cpp
 	Source/ultra-shared/Config/PakFile.cpp
 	Source/ultra-shared/Config/ZipFolder.cpp)
-target_include_directories (hvsc_update PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Source ${libarchive_SOURCE_DIR}/libarchive)
-target_link_libraries (hvsc_update PRIVATE juce::juce_core lime_Logger archive_static liblzma juce::juce_recommended_config_flags)
-juce_generate_juce_header (hvsc_update)
-target_compile_definitions (hvsc_update PRIVATE DONT_SET_USING_JUCE_NAMESPACE=1 _CRT_SECURE_NO_WARNINGS JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_MODAL_LOOPS_PERMITTED=0 LIBARCHIVE_STATIC)
-set_target_properties (hvsc_update PROPERTIES EXCLUDE_FROM_ALL TRUE CXX_SCAN_FOR_MODULES OFF)
-if (WIN32)
-	set_target_properties (hvsc_update PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
-	target_compile_options (hvsc_update PRIVATE -Wno-missing-braces /clang:-fno-finite-math-only)
-endif()
+target_include_directories (hvsc_update PRIVATE ${libarchive_SOURCE_DIR}/libarchive)
+target_link_libraries (hvsc_update PRIVATE archive_static liblzma)
+target_compile_definitions (hvsc_update PRIVATE LIBARCHIVE_STATIC)
 
 # Regenerates the psid driver hex dump (psiddrv.bin) when psiddrv.a65 changed,
 # a no-op otherwise so the target is safe to run every time. Requires cc65
@@ -733,8 +695,7 @@ add_custom_target(psiddrv DEPENDS ${psiddrv_stamp})
 
 # Solution folders, keeps the IDE's project tree tidy; the generated rc_libs
 # land in utility with the rest of the machinery nobody opens
-set_target_properties (fx_ab_test fx_mode_loudness mverb_ab_test sidplay_ab_test stil_scan PROPERTIES FOLDER Tests)
-set_target_properties (sid_scanner sidid_search psiddrv PROPERTIES FOLDER Tools)
+set_target_properties (sid_scanner psiddrv PROPERTIES FOLDER Tools)
 if (WIN32)
 	set_target_properties (ultraSID_rc_lib sid_scanner_rc_lib PROPERTIES FOLDER utility)
 endif()

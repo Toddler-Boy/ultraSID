@@ -6,7 +6,8 @@
 // overrides apply exactly as in the app (default subtune, 30 s @ 44.1 kHz,
 // full app config: sidid, chip/audio profiles, tune overrides, ROMs).
 // Tests/data-roots.txt (machine-specific, keep untracked) says where each
-// marker points, as "$HVSC$ = E:/documents/C64Music", the same markers
+// marker points, as "$HVSC$ = E:/documents/HVSC.zip" (the zip or a loose
+// C64Music folder, read through hvscsource like the app), the same markers
 // ultraSID uses in its stored keys. A relative root resolves against the repo,
 // so "$EXOT$ = Data/Exotic tunes" works on any checkout. The first
 // command-line argument, when given, overrides $HVSC$.
@@ -35,7 +36,9 @@
 // Tests/reference/sid/ (audio: <tune>.wav, performance: perf-baseline.txt lines).
 //
 //   cmake --build --preset vs --config Release --target sidplay_ab_test
-//   Builds/vs/Release/sidplay_ab_test.exe [dataRoot] [seconds]
+//   Builds/vs/sidplay_ab_test_artefacts/Release/sidplay_ab_test.exe [dataRoot] [seconds]
+
+#include <JuceHeader.h>
 
 #include <algorithm>
 #include <cctype>
@@ -52,6 +55,7 @@
 #include <string>
 #include <vector>
 
+#include "Config/HVSCSource.h"
 #include "libSidplayEZ/src/EZ/player.h"
 
 #include "test_common.h"
@@ -102,6 +106,10 @@ int main ( int argc, char** argv )
 	// A root passed on the command line stands in for the HVSC one
 	if ( argc > 1 )
 		dataRoots[ "$HVSC$" ] = argv[ 1 ];
+
+	const auto	hvscIt = dataRoots.find ( "$HVSC$" );
+	const auto	hvscOk = hvscIt != dataRoots.end () && hvscsource::setRoot ( juce::File ( hvscIt->second.string () ) );
+
 	const fs::path	refDir = root / "Tests" / "reference" / "sid";
 	const fs::path	baselinePath = refDir / "perf-baseline.txt";
 	const int	SR = 44100;
@@ -121,10 +129,13 @@ int main ( int argc, char** argv )
 	const auto	basic = slurpBytes ( root / "Data" / "Roms" / "basic.bin" );
 	const auto	character = slurpBytes ( root / "Data" / "Roms" / "character.bin" );
 
+	// Collection tunes reach the engine as "/MUSICIANS/..." through
+	// hvscsource, the rest as files on disk
 	struct TuneRef
 	{
-		fs::path	file;
+		std::string	enginePath;
 		std::string	name;
+		bool	collection;
 		bool	found;
 	};
 	std::vector<TuneRef>	tunes;
@@ -145,18 +156,19 @@ int main ( int argc, char** argv )
 				continue;
 
 			const auto	marker = line.substr ( 0, markerEnd + 1 );
+			const auto	rest = line.substr ( markerEnd + 1 );
+			const auto	name = fs::path ( rest ).stem ().string ();
 
-			auto	rest = line.substr ( markerEnd + 1 );
-			if ( ! rest.empty () && rest.front () == '/' )
-				rest.erase ( 0, 1 );
+			if ( marker == "$HVSC$" )
+			{
+				tunes.push_back ( { rest, name, true, hvscOk && hvscsource::exists ( rest ) } );
+				continue;
+			}
 
 			const auto	it = dataRoots.find ( marker );
+			const auto	file = it != dataRoots.end () ? it->second / rest.substr ( rest.starts_with ( '/' ) ? 1 : 0 ) : fs::path { rest };
 
-			auto	file = it != dataRoots.end () ? it->second / rest : fs::path { rest };
-			auto	name = file.stem ().string ();
-			auto	found = it != dataRoots.end () && fs::exists ( file );
-
-			tunes.push_back ( { std::move ( file ), std::move ( name ), found } );
+			tunes.push_back ( { file.string (), name, false, it != dataRoots.end () && fs::exists ( file ) } );
 		}
 	}
 
@@ -179,9 +191,9 @@ int main ( int argc, char** argv )
 			noFilter.push_back ( line );
 		}
 	}
-	const auto	usesFilter = [ & ] ( const fs::path& tunePath )
+	const auto	usesFilter = [ & ] ( const TuneRef& tune )
 	{
-		auto	stem = tunePath.stem ().string ();
+		auto	stem = tune.name;
 		std::transform ( stem.begin (), stem.end (), stem.begin (), [] ( unsigned char c ) { return char ( std::tolower ( c ) ); } );
 		return std::find ( noFilter.begin (), noFilter.end (), stem ) == noFilter.end ();
 	};
@@ -199,8 +211,7 @@ int main ( int argc, char** argv )
 
 	struct PerfInfo
 	{
-		fs::path	path;
-		std::string	name;
+		TuneRef	tune;
 		bool	filter;
 		double	delta;
 	};
@@ -214,7 +225,7 @@ int main ( int argc, char** argv )
 		std::vector<float>	L, R;
 	};
 
-	const auto	renderTune = [ & ] ( const fs::path& tunePath, const bool filter ) -> Render
+	const auto	renderTune = [ & ] ( const TuneRef& tune, const bool filter ) -> Render
 	{
 		Render	r;
 
@@ -227,7 +238,10 @@ int main ( int argc, char** argv )
 						 character.empty () ? nullptr : character.data () );
 		player.setSamplerate ( SR );
 
-		if ( !player.loadSidFile ( tunePath.string ().c_str () ) || !player.setTuneNumber ( 0, filter ) || !player.isReadyToPlay () )
+		const auto	loaded = tune.collection ? player.loadSidFile ( hvscsource::loadBytes, tune.enginePath.c_str () )
+												: player.loadSidFile ( tune.enginePath.c_str () );
+
+		if ( !loaded || !player.setTuneNumber ( 0, filter ) || !player.isReadyToPlay () )
 			return r;
 
 		r.stereo = player.getNumChips () >= 2;
@@ -274,9 +288,8 @@ int main ( int argc, char** argv )
 
 	for ( const auto& tune : tunes )
 	{
-		const auto&	tunePath = tune.file;
 		const auto&	name = tune.name;
-		const auto	filter = usesFilter ( tunePath );
+		const auto	filter = usesFilter ( tune );
 		printf ( "%-40s %-10s ", name.c_str (), filter ? "[filter]" : "[nofilter]" );
 
 		if ( ! tune.found )
@@ -286,7 +299,7 @@ int main ( int argc, char** argv )
 			continue;
 		}
 
-		const auto	rnd = renderTune ( tunePath, filter );
+		const auto	rnd = renderTune ( tune, filter );
 		if ( !rnd.ok )
 		{
 			printf ( "FAIL (could not load/init/render)\n" );
@@ -315,7 +328,7 @@ int main ( int argc, char** argv )
 
 			// a golden reference is only meaningful if the render reproduces:
 			// render again with a completely fresh Player and verify
-			const auto	rnd2 = renderTune ( tunePath, filter );
+			const auto	rnd2 = renderTune ( tune, filter );
 			auto	pd = 0.0, ps = 0.0;
 			if ( rnd2.ok && rnd2.stereo == stereo )
 			{
@@ -391,7 +404,7 @@ int main ( int argc, char** argv )
 		if ( it != baseline.end () && it->second.first == seconds )
 		{
 			const auto	delta = ( elapsed / it->second.second - 1.0 ) * 100.0;
-			perfInfos.push_back ( { tunePath, name, filter, delta } );
+			perfInfos.push_back ( { tune, filter, delta } );
 			snprintf ( perfTxt, sizeof ( perfTxt ), "%.1fx realtime, %+.1f%% vs baseline", speed, delta );
 		}
 		else
@@ -420,8 +433,8 @@ int main ( int argc, char** argv )
 				continue;
 
 			// suspected path-specific regression: confirm with a re-render
-			const auto	retry = renderTune ( p.path, p.filter );
-			const auto	it = baseline.find ( p.name );
+			const auto	retry = renderTune ( p.tune, p.filter );
+			const auto	it = baseline.find ( p.tune.name );
 			auto	confirmed = p.delta;
 			if ( retry.ok && it != baseline.end () )
 				confirmed = std::min ( confirmed, ( retry.elapsed / it->second.second - 1.0 ) * 100.0 );
@@ -429,7 +442,7 @@ int main ( int argc, char** argv )
 			{
 				perfFail = true;
 				printf ( "PERF REGRESSION: %s %+.1f%% vs baseline (%+.1f%% above machine factor, re-render confirmed)\n",
-						 p.name.c_str (), confirmed, confirmed - median );
+						 p.tune.name.c_str (), confirmed, confirmed - median );
 			}
 		}
 

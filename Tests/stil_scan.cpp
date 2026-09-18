@@ -3,9 +3,12 @@
 // merging, runs splitCommentQuotes over every COMMENT and reports statistics,
 // inner-quote cases and a few watched entries in full.
 // The merging MIRRORS HVSC_database::loadSTIL and mergeComment; keep in sync.
-// Tests/data-roots.txt says where $HVSC$ points (see sidplay_ab_test.cpp).
+// Tests/data-roots.txt says where $HVSC$ points (see sidplay_ab_test.cpp), a
+// loose C64Music folder or the zip, read through hvscsource like the app.
 // Exit 0: detector healthy. Exit 1: a quote kept its enclosing quote
 // characters, or the detected count collapsed.
+
+#include <JuceHeader.h>
 
 #include <algorithm>
 #include <filesystem>
@@ -13,15 +16,27 @@
 #include <iostream>
 #include <sstream>
 
+#include "Config/HVSCSource.h"
 #include "Database/STIL_Quotes.cpp"
 
 namespace fs = std::filesystem;
 
 //-----------------------------------------------------------------------------
 
-static std::vector<std::string> readLines ( const fs::path& path )
+static std::string slurp ( const fs::path& path )
 {
-	std::ifstream	f ( path, std::ios::binary );
+	std::ifstream	in ( path, std::ios::binary );
+	std::stringstream	s;
+
+	s << in.rdbuf ();
+	return s.str ();
+}
+//-----------------------------------------------------------------------------
+
+// Raw bytes, the STIL is Latin-1 and stays that way
+static std::vector<std::string> readLines ( const std::string& data )
+{
+	std::istringstream	f ( data );
 
 	std::vector<std::string>	lines;
 	std::string	line;
@@ -203,7 +218,7 @@ int main ()
 	// Machine-specific HVSC location, like the other Tests/ tools
 	fs::path	hvscRoot;
 	{
-		std::istringstream	f ( [ & ] { std::ifstream in ( root / "Tests" / "data-roots.txt" ); std::stringstream s; s << in.rdbuf (); return s.str (); } () );
+		std::istringstream	f ( slurp ( root / "Tests" / "data-roots.txt" ) );
 		std::string	line;
 
 		while ( std::getline ( f, line ) )
@@ -218,19 +233,22 @@ int main ()
 			}
 	}
 
-	if ( hvscRoot.empty () || ! fs::exists ( hvscRoot / "DOCUMENTS" / "STIL.txt" ) )
+	if ( hvscRoot.empty () || ! hvscsource::setRoot ( juce::File ( hvscRoot.string () ) ) || ! hvscsource::exists ( "DOCUMENTS/STIL.txt" ) )
 	{
-		std::cout << "No STIL.txt found; set $HVSC$ in Tests/data-roots.txt\n";
+		std::cout << "No STIL.txt found; set $HVSC$ in Tests/data-roots.txt (C64Music folder or HVSC zip)\n";
 		return 1;
 	}
 
 	std::vector<Comment>	comments;
-	parseStil ( readLines ( hvscRoot / "DOCUMENTS" / "STIL.txt" ), comments );
+	{
+		const auto	mb = hvscsource::loadData ( "DOCUMENTS/STIL.txt" );
+		parseStil ( readLines ( std::string ( static_cast<const char*> ( mb.getData () ), mb.getSize () ) ), comments );
+	}
 
 	// An addendum comment overrides the STIL comment of the same tune, like
 	// the app's merge does
 	std::vector<Comment>	addendum;
-	parseStil ( readLines ( root / "Data" / "Databases" / "STIL-addendum.txt" ), addendum );
+	parseStil ( readLines ( slurp ( root / "Data" / "Databases" / "STIL-addendum.txt" ) ), addendum );
 
 	for ( const auto& add : addendum )
 	{

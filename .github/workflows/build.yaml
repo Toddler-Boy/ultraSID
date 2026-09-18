@@ -212,10 +212,9 @@ jobs:
           ls -la assets
           [ -f "$exe" ] && [ -f "$dmg" ] && [ -f "$appimage" ] || { echo "Release assets missing"; exit 1; }
 
-          # Release notes = this version's CHANGELOG section; the generated
-          # notes only add the compare link underneath
+          # Release notes = this version's CHANGELOG section only
           awk -v ver="$ver" '/^## /{p = ($2 == ver)} p && !/^## /' CHANGELOG.md > notes.md
-          gh release view "$tag" > /dev/null 2>&1 || gh release create "$tag" --title "ultraSID $ver" --notes-file notes.md --generate-notes
+          gh release view "$tag" > /dev/null 2>&1 || gh release create "$tag" --title "ultraSID $ver" --notes-file notes.md
           gh release upload "$tag" "$exe" "$dmg" "$appimage" --clobber
 
           manifest() {
