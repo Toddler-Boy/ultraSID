@@ -282,6 +282,12 @@ if [[ "$OS_NAME" == MINGW* ]] || [[ "$OS_NAME" == MSYS* ]] || [[ "$OS_NAME" == C
   cmake --preset vs "${SEED_ARGS[@]}"
   cmake --build --preset vs --config Release --parallel
 
+  # Branch-push CI runs are compile checks only: the Release build with its
+  # PGO profile, no pak, no signing. RELEASE=1 (tag and manual runs) packages
+  if [ "${RELEASE:-}" != "1" ]; then
+    exit 0
+  fi
+
   STAGE="$ROOT/ci/bin/stage"
   rm -rf "$STAGE"
   mkdir -p "$STAGE"

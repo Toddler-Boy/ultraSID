@@ -3,10 +3,10 @@ on:
   push:
     tags:
       - "v*"
-    # Every push gets the macOS and Linux builds, clang catches what MSVC
-    # lets slide (the Windows job skips branch pushes). Site/manifest
-    # commits are excluded; tag pushes ignore path filters, so releases are
-    # unaffected
+    # Every push gets all three builds as compile checks; the Windows one
+    # matters because Release differs from the daily Development builds.
+    # Site/manifest commits are excluded; tag pushes ignore path filters, so
+    # releases are unaffected
     branches:
       - main
     paths-ignore:
@@ -64,7 +64,6 @@ jobs:
   windows:
     name: Build Windows
     needs: check
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     runs-on: windows-2025-vs2026
     steps:
       - uses: actions/checkout@v7
@@ -81,10 +80,14 @@ jobs:
           AZURE_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
           AZURE_ACCOUNT_NAME: ${{ secrets.AZURE_ACCOUNT_NAME }}
           AZURE_CERT_PROFILE: ${{ secrets.AZURE_CERT_PROFILE }}
+          # Branch pushes are compile checks only: no pak, no signing; tag
+          # and manual runs do the full packaging
+          RELEASE: ${{ (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch') && '1' || '' }}
 
       # archive: false serves the raw file instead of wrapping it in a zip;
       # the artifact then carries the file's own name
       - name: Upload exe
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v7
         with:
           name: ultraSID-windows
