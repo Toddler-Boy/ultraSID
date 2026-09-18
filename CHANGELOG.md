@@ -2,6 +2,13 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.2.2 (2026-09-18)
+
+- Search by year: "1987", "198?", "1985-1989", "-1990" or "1990-" narrows the results
+  to those release years.
+- A search word can be limited to one field with a prefix: name:, author:, path:,
+  publisher: or year:. Quotes keep a phrase together.
+
 ## 85.2.1 (2026-09-17)
 
 - Fixed a potential crash while closing ultraSID. The window now closes instantly.
