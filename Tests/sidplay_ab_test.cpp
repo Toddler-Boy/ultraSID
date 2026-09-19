@@ -51,9 +51,12 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <mutex>
+#include <optional>
 #include <span>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "Config/HVSCSource.h"
@@ -70,7 +73,20 @@ int main ( int argc, char** argv )
 {
 	const fs::path	root = SIDPLAY_TEST_ROOT;
 	const fs::path	tunesDir = root / "Tests" / "tunes";
-	const int	seconds = argc > 2 ? std::atoi ( argv[ 2 ] ) : 30;
+
+	// -jN picks the worker count (default: every core); only -j1 judges performance
+	auto	threads = int ( std::thread::hardware_concurrency () );
+	std::vector<const char*>	positional;
+	for ( auto i = 1; i < argc; ++i )
+	{
+		if ( std::strncmp ( argv[ i ], "-j", 2 ) == 0 )
+			threads = std::atoi ( argv[ i ] + 2 );
+		else
+			positional.push_back ( argv[ i ] );
+	}
+	threads = std::max ( threads, 1 );
+
+	const int	seconds = positional.size () > 1 ? std::atoi ( positional[ 1 ] ) : 30;
 
 	const auto	trimLine = [] ( std::string& line )
 	{
@@ -105,8 +121,8 @@ int main ( int argc, char** argv )
 	}
 
 	// A root passed on the command line stands in for the HVSC one
-	if ( argc > 1 )
-		dataRoots[ "$HVSC$" ] = argv[ 1 ];
+	if ( ! positional.empty () )
+		dataRoots[ "$HVSC$" ] = positional[ 0 ];
 
 	const auto	hvscIt = dataRoots.find ( "$HVSC$" );
 	const auto	hvscOk = hvscIt != dataRoots.end () && hvscsource::setRoot ( juce::File ( hvscIt->second.string () ) );
@@ -391,26 +407,43 @@ int main ( int argc, char** argv )
 		return r;
 	};
 
-	for ( const auto& tune : tunes )
+	// Everything a tune's worker hands back; the baseline map is only touched
+	// on the main thread afterwards, and timings only count single-threaded
+	struct TuneResult
 	{
+		std::string	line;
+		bool	audioFail = false;
+		bool	hasPerf = false;
+		double	perfDelta = 0.0;
+		bool	recordBaseline = false;
+		double	elapsed = 0.0;
+	};
+
+	const auto	judgePerf = threads == 1;
+
+	const auto	processTune = [ & ] ( const TuneRef& tune ) -> TuneResult
+	{
+		TuneResult	res;
 		const auto&	name = tune.name;
 		const auto	filter = usesFilter ( tune );
-		printf ( "%-40s %-10s ", name.c_str (), filter ? "[filter]" : "[nofilter]" );
+
+		char	txt[ 256 ];
+		snprintf ( txt, sizeof ( txt ), "%-40s %-10s ", name.c_str (), filter ? "[filter]" : "[nofilter]" );
+		res.line = txt;
+
+		const auto	fail = [ & ] ( const char* text )
+		{
+			res.line += text;
+			res.audioFail = true;
+			return res;
+		};
 
 		if ( ! tune.found )
-		{
-			printf ( "FAIL (not found - check its root in Tests/data-roots.txt)\n" );
-			audioFail = true;
-			continue;
-		}
+			return fail ( "FAIL (not found - check its root in Tests/data-roots.txt)" );
 
 		const auto	rnd = renderTune ( tune, filter );
 		if ( !rnd.ok )
-		{
-			printf ( "FAIL (could not load/init/render)\n" );
-			audioFail = true;
-			continue;
-		}
+			return fail ( "FAIL (could not load/init/render)" );
 
 		const auto	total = static_cast<uint32_t>( rnd.L.size () );
 		const auto	stereo = rnd.stereo;
@@ -419,13 +452,14 @@ int main ( int argc, char** argv )
 		const auto	elapsed = rnd.elapsed;
 		const auto	speed = seconds / elapsed;
 		const auto	refPath = refDir / ( name + ".wav" );
+		res.elapsed = elapsed;
 
 		char	stateTxt[ 64 ];
 		if ( const auto rt = roundTrip ( tune, filter, rnd ); rt.ok )
 			snprintf ( stateTxt, sizeof ( stateTxt ), "state ok %zu B", rt.stateBytes );
 		else
 		{
-			audioFail = true;
+			res.audioFail = true;
 			if ( rt.firstDiff >= 0.0 )
 				snprintf ( stateTxt, sizeof ( stateTxt ), "state FAIL (diff @%.3fs)", rt.firstDiff );
 			else
@@ -435,13 +469,9 @@ int main ( int argc, char** argv )
 		if ( !fs::exists ( refPath ) )
 		{
 			if ( !writeWavF32 ( refPath, outL.data (), stereo ? outR.data () : nullptr, total, SR ) )
-			{
-				printf ( "FAIL (could not write reference)\n" );
-				audioFail = true;
-				continue;
-			}
-			baseline[ name ] = { seconds, elapsed };
-			baselineDirty = true;
+				return fail ( "FAIL (could not write reference)" );
+
+			res.recordBaseline = judgePerf;
 
 			// a golden reference is only meaningful if the render reproduces:
 			// render again with a completely fresh Player and verify
@@ -461,25 +491,24 @@ int main ( int argc, char** argv )
 			else
 				snprintf ( repeatTxt, sizeof ( repeatTxt ), "REPEAT DIFFERS %.1f dB", 20.0 * std::log10 ( pd / std::max ( ps, 1e-30 ) ) );
 
-			printf ( "reference created  (%s, %.1fx realtime, %s)\n", stereo ? "stereo" : "mono", speed, repeatTxt );
-			continue;
+			snprintf ( txt, sizeof ( txt ), "reference created  (%s, %.1fx realtime, %s)  %s", stereo ? "stereo" : "mono", speed, repeatTxt, stateTxt );
+			res.line += txt;
+			return res;
 		}
 
 		// --- compare against the reference
 		Wav	ref;
 		if ( !readWavF32 ( refPath, ref ) )
 		{
-			printf ( "FAIL (unreadable reference %s)\n", refPath.string ().c_str () );
-			audioFail = true;
-			continue;
+			snprintf ( txt, sizeof ( txt ), "FAIL (unreadable reference %s)", refPath.string ().c_str () );
+			return fail ( txt );
 		}
 		const auto	channels = stereo ? 2 : 1;
 		if ( ref.channels != channels || ref.frames () != total )
 		{
-			printf ( "FAIL (layout changed: ref %dch/%u frames vs now %dch/%u - delete the reference to re-baseline)\n",
-					 ref.channels, ref.frames (), channels, total );
-			audioFail = true;
-			continue;
+			snprintf ( txt, sizeof ( txt ), "FAIL (layout changed: ref %dch/%u frames vs now %dch/%u - delete the reference to re-baseline)",
+					   ref.channels, ref.frames (), channels, total );
+			return fail ( txt );
 		}
 
 		auto	peakDiff = 0.0, peakSig = 0.0;
@@ -506,7 +535,7 @@ int main ( int argc, char** argv )
 		const auto	relDb = ( peakDiff > 0.0 && peakSig > 0.0 ) ? 20.0 * std::log10 ( peakDiff / peakSig ) : -999.0;
 		const auto	audioOK = relDb < -80.0;	// audibility bar
 		if ( !audioOK )
-			audioFail = true;
+			res.audioFail = true;
 
 		char	audioTxt[ 96 ];
 		if ( peakDiff == 0.0 )
@@ -518,21 +547,72 @@ int main ( int argc, char** argv )
 		// the median delta over all tunes, only computable after the loop)
 		char	perfTxt[ 96 ];
 		const auto	it = baseline.find ( name );
-		if ( it != baseline.end () && it->second.first == seconds )
+		if ( ! judgePerf )
+			snprintf ( perfTxt, sizeof ( perfTxt ), "%.1fx realtime", speed );
+		else if ( it != baseline.end () && it->second.first == seconds )
 		{
-			const auto	delta = ( elapsed / it->second.second - 1.0 ) * 100.0;
-			perfInfos.push_back ( { tune, filter, delta } );
-			snprintf ( perfTxt, sizeof ( perfTxt ), "%.1fx realtime, %+.1f%% vs baseline", speed, delta );
+			res.hasPerf = true;
+			res.perfDelta = ( elapsed / it->second.second - 1.0 ) * 100.0;
+			snprintf ( perfTxt, sizeof ( perfTxt ), "%.1fx realtime, %+.1f%% vs baseline", speed, res.perfDelta );
 		}
 		else
 		{
-			baseline[ name ] = { seconds, elapsed };
-			baselineDirty = true;
+			res.recordBaseline = true;
 			snprintf ( perfTxt, sizeof ( perfTxt ), "%.1fx realtime, baseline recorded", speed );
 		}
 
-		printf ( "%s  %-14s  %s  %s\n", audioOK ? "ok  " : "FAIL", audioTxt, perfTxt, stateTxt );
+		snprintf ( txt, sizeof ( txt ), "%s  %-14s  %s  %s", audioOK ? "ok  " : "FAIL", audioTxt, perfTxt, stateTxt );
+		res.line += txt;
+		return res;
+	};
+
+	// Tunes are independent: one job each on a low-priority pool, lines print
+	// in list order as soon as every earlier tune is done
+	std::vector<std::optional<TuneResult>>	results ( tunes.size () );
+	std::mutex	resultsLock;
+	size_t	nextToPrint = 0;
+
+	{
+		juce::ThreadPool	pool ( threads, juce::Thread::osDefaultStackSize, juce::Thread::Priority::low );
+
+		for ( size_t i = 0; i < tunes.size (); ++i )
+			pool.addJob ( [ &, i ]
+			{
+				auto	res = processTune ( tunes[ i ] );
+
+				const std::lock_guard	lock ( resultsLock );
+				results[ i ] = std::move ( res );
+
+				while ( nextToPrint < results.size () && results[ nextToPrint ] )
+				{
+					printf ( "%s\n", results[ nextToPrint ]->line.c_str () );
+					fflush ( stdout );
+					++nextToPrint;
+				}
+			} );
+
+		while ( pool.getNumJobs () > 0 )
+			juce::Thread::sleep ( 50 );
 	}
+
+	for ( size_t i = 0; i < tunes.size (); ++i )
+	{
+		const auto&	res = *results[ i ];
+
+		audioFail |= res.audioFail;
+
+		if ( res.hasPerf )
+			perfInfos.push_back ( { tunes[ i ], usesFilter ( tunes[ i ] ), res.perfDelta } );
+
+		if ( res.recordBaseline )
+		{
+			baseline[ tunes[ i ].name ] = { seconds, res.elapsed };
+			baselineDirty = true;
+		}
+	}
+
+	if ( ! judgePerf )
+		printf ( "\nperformance not judged with %d threads (run with -j1)\n", threads );
 
 	// --- performance verdict: median delta = machine factor (thermal/boost
 	// state moves all tunes together); flag per-tune deviations above it,

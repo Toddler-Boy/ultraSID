@@ -1,8 +1,9 @@
 #!/bin/bash -e
 # Build (on demand) and run the libSidplayEZ golden-output regression +
 # performance test from the repo root. Arguments are forwarded to the tool:
-#   ./Tests/test_sidplay.sh [hvscRoot] [seconds]
-# (roots live in Tests/data-roots.txt, machine-specific; the argument overrides $HVSC$)
+#   ./Tests/test_sidplay.sh [hvscRoot] [seconds] [-jN]
+# (roots live in Tests/data-roots.txt, machine-specific; the argument overrides $HVSC$;
+# -jN = worker threads, default every core; only -j1 judges performance)
 # Exit codes: 0 = PASS, 1 = audio mismatch / load failure, 2 = perf regression.
 
 source "$(dirname "$0")/../Source/ultra-shared/scripts/preamble.sh"
