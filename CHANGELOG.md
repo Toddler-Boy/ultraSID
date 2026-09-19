@@ -2,6 +2,10 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.2.4 (2026-09-19)
+
+- Fixed the menus showing up black on macOS.
+
 ## 85.2.3 (2026-09-19)
 
 - Fixed the auto-update on Windows. This version has to be downloaded and installed
