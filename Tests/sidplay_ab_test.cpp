@@ -51,6 +51,7 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <span>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -286,6 +287,110 @@ int main ( int argc, char** argv )
 		}
 	};
 
+	// Save-state round trip: one linear render saves a snapshot at every segment boundary,
+	// a fresh Player per snapshot renders just its segment, and the stitched result must
+	// match the straight render bit-exactly, as must the linear render itself
+	struct RoundTrip
+	{
+		bool	ok = false;
+		size_t	stateBytes = 0;
+		double	firstDiff = -1.0;	// seconds, -1 = save/restore itself failed
+	};
+
+	const auto	roundTrip = [ & ] ( const TuneRef& tune, const bool filter, const Render& straight ) -> RoundTrip
+	{
+		RoundTrip	r;
+		constexpr uint32_t	chunk = 735;
+
+		const auto	makePlayer = [ & ] () -> std::unique_ptr<libsidplayEZ::Player>
+		{
+			auto	p = std::make_unique<libsidplayEZ::Player> ();
+			p->setSharedConfig ( config );
+			p->setRoms ( kernal.empty () ? nullptr : kernal.data (),
+						 basic.empty () ? nullptr : basic.data (),
+						 character.empty () ? nullptr : character.data () );
+			p->setSamplerate ( SR );
+
+			const auto	loaded = tune.collection ? p->loadSidFile ( hvscsource::loadBytes, tune.enginePath.c_str () )
+													: p->loadSidFile ( tune.enginePath.c_str () );
+			if ( !loaded || !p->setTuneNumber ( 0, filter ) || !p->isReadyToPlay () )
+				return nullptr;
+
+			return p;
+		};
+
+		const auto	total = uint32_t ( straight.L.size () );
+		constexpr uint32_t	segments = 6;
+		const auto	segment = total / segments / chunk * chunk;
+
+		auto	first = makePlayer ();
+		if ( !first )
+			return r;
+
+		const auto	numChips = size_t ( first->getNumChips () );
+		std::vector<int8_t>				digi ( numChips * chunk );
+		std::vector<std::span<int8_t>>	digiPtrs ( numChips );
+		for ( size_t i = 0; i < numChips; ++i )
+			digiPtrs[ i ] = { digi.data () + i * chunk, chunk };
+
+		const auto	render = [ & ] ( libsidplayEZ::Player& p, std::vector<float>& L, std::vector<float>& R, uint32_t from, const uint32_t to )
+		{
+			while ( from < to )
+			{
+				const auto	want = std::min ( chunk, to - from );
+				const auto	got = p.runEmulation ( { L.data () + from, want },
+													straight.stereo ? std::span<float> { R.data () + from, want } : std::span<float> {},
+													digiPtrs );
+				if ( got != want )
+					return false;
+				from += got;
+			}
+			return true;
+		};
+
+		std::vector<float>	L ( total ), R ( straight.stereo ? total : 0 );		// stitched from the restored players
+		std::vector<float>	L2 ( total ), R2 ( straight.stereo ? total : 0 );	// the linear render that took the snapshots
+
+		// Segment 0 belongs to the linear player itself, every later one starts from a snapshot
+		if ( !render ( *first, L, R, 0, segment ) )
+			return r;
+		std::copy_n ( L.data (), segment, L2.data () );
+		if ( straight.stereo )
+			std::copy_n ( R.data (), segment, R2.data () );
+
+		std::vector<uint8_t>	state;
+		for ( uint32_t s = 1; s < segments; ++s )
+		{
+			const auto	from = s * segment;
+			const auto	to = s + 1 == segments ? total : from + segment;
+
+			if ( !first->saveState ( state ) )
+				return r;
+			r.stateBytes = std::max ( r.stateBytes, state.size () );
+
+			auto	restored = makePlayer ();
+			if ( !restored || !restored->restoreState ( state ) )
+				return r;
+
+			if ( !render ( *restored, L, R, from, to ) || !render ( *first, L2, R2, from, to ) )
+				return r;
+		}
+
+		r.ok = true;
+		for ( uint32_t i = 0; i < total; ++i)
+		{
+			if ( L[ i ] != straight.L[ i ] || L2[ i ] != straight.L[ i ]
+				|| ( straight.stereo && ( R[ i ] != straight.R[ i ] || R2[ i ] != straight.R[ i ] ) ) )
+			{
+				r.ok = false;
+				r.firstDiff = double ( i ) / SR;
+				break;
+			}
+		}
+
+		return r;
+	};
+
 	for ( const auto& tune : tunes )
 	{
 		const auto&	name = tune.name;
@@ -314,6 +419,18 @@ int main ( int argc, char** argv )
 		const auto	elapsed = rnd.elapsed;
 		const auto	speed = seconds / elapsed;
 		const auto	refPath = refDir / ( name + ".wav" );
+
+		char	stateTxt[ 64 ];
+		if ( const auto rt = roundTrip ( tune, filter, rnd ); rt.ok )
+			snprintf ( stateTxt, sizeof ( stateTxt ), "state ok %zu B", rt.stateBytes );
+		else
+		{
+			audioFail = true;
+			if ( rt.firstDiff >= 0.0 )
+				snprintf ( stateTxt, sizeof ( stateTxt ), "state FAIL (diff @%.3fs)", rt.firstDiff );
+			else
+				snprintf ( stateTxt, sizeof ( stateTxt ), "state FAIL (save/restore)" );
+		}
 
 		if ( !fs::exists ( refPath ) )
 		{
@@ -414,7 +531,7 @@ int main ( int argc, char** argv )
 			snprintf ( perfTxt, sizeof ( perfTxt ), "%.1fx realtime, baseline recorded", speed );
 		}
 
-		printf ( "%s  %-14s  %s\n", audioOK ? "ok  " : "FAIL", audioTxt, perfTxt );
+		printf ( "%s  %-14s  %s  %s\n", audioOK ? "ok  " : "FAIL", audioTxt, perfTxt, stateTxt );
 	}
 
 	// --- performance verdict: median delta = machine factor (thermal/boost

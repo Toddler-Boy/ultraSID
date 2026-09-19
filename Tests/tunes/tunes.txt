@@ -9,11 +9,14 @@ $HVSC$/MUSICIANS/G/Gray_Fred/Hysteria.sid
 $HVSC$/MUSICIANS/H/Hubbard_Rob/Arcade_Classics.sid
 $HVSC$/MUSICIANS/H/Hubbard_Rob/Commando.sid
 $HVSC$/MUSICIANS/H/Hubbard_Rob/Pandora.sid
+$HVSC$/MUSICIANS/J/Jammer/Drum_Fool.sid
+$HVSC$/MUSICIANS/K/Kawasaki_Ryo/Kawasaki_Synthesizer_Demo.sid
 $HVSC$/MUSICIANS/L/Lead/House_Designs.sid
 $HVSC$/MUSICIANS/L/Lead/No_Women_Allowed.sid
 $HVSC$/MUSICIANS/L/Lead/Paradise.sid
 $HVSC$/MUSICIANS/L/Lead/Poing.sid
 $HVSC$/MUSICIANS/L/Lft/Machine_Yearning_2SID.sid
+$HVSC$/MUSICIANS/L/Linus/64_Forever.sid
 $HVSC$/MUSICIANS/M/Mahoney/Kapla_Caves.sid
 $HVSC$/MUSICIANS/M/Mahoney/Stereophonik_6581_2SID.sid
 $HVSC$/MUSICIANS/N/Norman_Paul/Bowling_BASIC.sid

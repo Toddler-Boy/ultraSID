@@ -1,4 +1,5 @@
 50_Shades_of_Gradius	30	1.44037
+64_Forever	30	1.37934
 Arcade_Classics	30	0.96971
 Artillery	30	1.7231
 Bowling_BASIC	30	0.825501
@@ -7,11 +8,13 @@ Commando	30	0.936053
 Cybernoid	30	1.64573
 Cybernoid_II	30	1.62109
 Desole	30	1.28415
+Drum_Fool	30	1.31528
 Echofied_6581	30	1.64784
 Forbidden_Forest	30	0.942243
 House_Designs	30	0.936257
 Hysteria	30	0.92278
 Kapla_Caves	30	1.67532
+Kawasaki_Synthesizer_Demo	30	1.46616
 Kicks_Like_a_M_U_L_E	30	1.27778
 Machine_Yearning_2SID	30	2.64826
 No_Women_Allowed	30	0.851541
