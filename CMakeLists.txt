@@ -446,7 +446,6 @@ target_link_libraries (ultraSID PRIVATE
 						juce::juce_audio_basics
 						juce::juce_audio_devices
 						juce::juce_audio_formats
-						juce::juce_audio_plugin_client
 						juce::juce_audio_processors
 						juce::juce_audio_utils
 						juce::juce_core
@@ -484,6 +483,7 @@ target_compile_definitions (ultraSID PRIVATE
 								JUCE_USE_LAME_AUDIO_FORMAT=0
 								JUCE_USE_WINDOWS_MEDIA_FORMAT=0
 								JUCE_USE_CAMERA=0
+								JUCE_DIRECTSOUND=0
 								JUCE_DONT_ASSERT_ON_GLSL_COMPILE_ERROR=1
 								DONT_SET_USING_JUCE_NAMESPACE=1
 								_CRT_SECURE_NO_WARNINGS
