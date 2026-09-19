@@ -2,6 +2,11 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.2.3 (2026-09-19)
+
+- Fixed the auto-update on Windows. This version has to be downloaded and installed
+  by hand once.
+
 ## 85.2.2 (2026-09-18)
 
 - Search by year: "1987", "198?", "1985-1989", "-1990" or "1990-" narrows the results
