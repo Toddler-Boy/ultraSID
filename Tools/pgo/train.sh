@@ -30,9 +30,10 @@ rm -f Builds/pgo/*.profraw
 cmake -B "$tree" -DULTRA_PGO_GENERATE=ON > Builds/logs/pgo_configure.log 2>&1
 cmake --build "$tree" --config Release --target sidplay_ab_test --parallel > Builds/logs/pgo_build.log 2>&1
 
-# 2 = the instrumented binary tripped the performance check, expected
+# 2 = the instrumented binary tripped the performance check, expected.
+# Six threads: the profile counters are shared, more threads only fight over them
 rc=0
-LLVM_PROFILE_FILE="Builds/pgo/%p.profraw" "$exe" > Builds/logs/pgo_train.log 2>&1 || rc=$?
+LLVM_PROFILE_FILE="Builds/pgo/%p.profraw" "$exe" -j6 > Builds/logs/pgo_train.log 2>&1 || rc=$?
 [ "$rc" -eq 0 ] || [ "$rc" -eq 2 ] || { echo "training run failed ($rc), see Builds/logs/pgo_train.log"; exit 1; }
 
 "$profdata" merge -o "$profile" Builds/pgo/*.profraw
