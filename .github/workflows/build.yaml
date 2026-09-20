@@ -92,6 +92,7 @@ jobs:
         with:
           name: ultraSID-windows
           path: ${{ env.OUT }}/ultraSID.exe
+          if-no-files-found: error
           archive: false
 
   macos:
@@ -134,6 +135,7 @@ jobs:
         with:
           name: ultraSID-macos
           path: ${{ env.OUT }}/ultraSID.dmg
+          if-no-files-found: error
           archive: false
 
   # The prebuilt image (ci/linux/Dockerfile, built by linux_image.yaml)
@@ -168,6 +170,7 @@ jobs:
         with:
           name: ultraSID-linux
           path: ${{ env.OUT }}/ultraSID.AppImage
+          if-no-files-found: error
           archive: false
 
   # One release for all platforms, published only once every build exists,
