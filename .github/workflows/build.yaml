@@ -91,7 +91,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ultraSID-windows
-          path: ci/bin/ultraSID.exe
+          path: ${{ env.OUT }}/ultraSID.exe
           archive: false
 
   macos:
@@ -133,7 +133,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ultraSID-macos
-          path: ci/bin/ultraSID.dmg
+          path: ${{ env.OUT }}/ultraSID.dmg
           archive: false
 
   # The prebuilt image (ci/linux/Dockerfile, built by linux_image.yaml)
@@ -167,7 +167,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ultraSID-linux
-          path: ci/bin/ultraSID.AppImage
+          path: ${{ env.OUT }}/ultraSID.AppImage
           archive: false
 
   # One release for all platforms, published only once every build exists,
