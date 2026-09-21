@@ -126,7 +126,7 @@ bool GUI_ultraSID::keyPressed ( const juce::KeyPress& key )
 		outputMeter[ 0 ].setVisible ( visible );
 		outputMeter[ 1 ].setVisible ( visible );
 	}
-	else if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier, 0 ) && buildinfo::isDeveloperMode () )
+	else if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier, 0 ) )
 	{
 		// Toggle the CRT test screenshots
 		testArtwork = ! testArtwork;
