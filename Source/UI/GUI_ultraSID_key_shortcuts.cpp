@@ -4,10 +4,20 @@
 #include "ultra-shared/Config/BuildInfo.h"
 #include "ultra-shared/UI/GUI_LookAndFeel.h"
 
+#include "Config/FilePaths.h"
 #include "Helpers/Messages.h"
 
 #include "GUI_ultraSID.h"
 
+//-----------------------------------------------------------------------------
+
+// A tune key whose lookup lands on Screenshots/Tests/test_NN.png
+static const std::string	testArtworkKey = std::string ( filepaths::hvscMarker ) + "/Tests/test.sid";
+
+std::string GUI_ultraSID::artworkName () const
+{
+	return testArtwork ? testArtworkKey : lastFilename;
+}
 //-----------------------------------------------------------------------------
 
 // The user-facing keys are data (Data/UI/shortcuts.csv, verb per key) and
@@ -115,6 +125,12 @@ bool GUI_ultraSID::keyPressed ( const juce::KeyPress& key )
 		inputMeter[ 1 ].setVisible ( visible && player.getNumChips () > 1 );
 		outputMeter[ 0 ].setVisible ( visible );
 		outputMeter[ 1 ].setVisible ( visible );
+	}
+	else if ( key == juce::KeyPress ( juce::KeyPress::F11Key, juce::ModifierKeys::commandModifier | juce::ModifierKeys::shiftModifier, 0 ) && buildinfo::isDeveloperMode () )
+	{
+		// Toggle the CRT test screenshots
+		testArtwork = ! testArtwork;
+		mainScreen.pages.loadGameArtwork ( artworkName () );
 	}
 	else if ( const auto verb = shortcuts->find ( key ); verb.isNotEmpty () )
 	{

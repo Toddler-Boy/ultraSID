@@ -215,6 +215,11 @@ private:
 	unsigned int	lastSong = 0;
 	std::string		lastFilename;
 
+	// Developer toggle: the CRT shows the Screenshots/Tests set instead of
+	// the playing tune's artwork, until the next tune loads
+	bool			testArtwork = false;
+	[[ nodiscard ]] std::string artworkName () const;
+
 	// Source of the playing tune: the loadTune src tag, plus the playlist name
 	// when it came from one (the queue itself follows the visible playlist)
 	std::string		lastTuneSrc;

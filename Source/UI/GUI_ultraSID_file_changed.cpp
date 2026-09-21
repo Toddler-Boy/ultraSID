@@ -80,7 +80,7 @@ void GUI_ultraSID::fileChanged ( const juce::File& file, gin::FileSystemWatcher:
 
 			// Set CRT page to new artwork
 			if ( updateCRT )
-				mainScreen.pages.loadGameArtwork ( lastFilename, filename );
+				mainScreen.pages.loadGameArtwork ( artworkName (), filename );
 
 			return;
 		}
