@@ -124,6 +124,7 @@ private:
 	VIC2_Render		vicRender { true };
 	GUI_Overlay		overlay;
 	float			timePassed = 0.0f;
+	float			fieldTime = 0.0f;		// interlace field clock
 
 public:
 	// A hand-drawn Petmate screen from Data/C64 Screens: the base buffers plus

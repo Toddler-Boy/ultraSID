@@ -128,6 +128,8 @@ bool GUI_CRT::loadArtworkImage ()
 
 	const auto	mb = datasource::loadData ( "Screenshots/" + lastLoadedName );
 
+	fieldTime = 0.0f;
+
 	return vicRender.loadImage ( lastLoadedName.toRawUTF8 (), mb.getData (), mb.getSize () );
 }
 //-----------------------------------------------------------------------------
@@ -220,12 +222,28 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 	// Update OpenGL iFrame & iTime
 	overlay.setFrameAndTime ( 0, float ( juce::Time::highResolutionTicksToSeconds ( juce::Time::getHighResolutionTicks () ) ) );
 
+	// Interlaced artwork alternates its fields at the emulated refresh rate,
+	// off the real clock: the 60 Hz gate below would drop 50 Hz flips
+	auto	fieldFlipped = false;
+	if ( ! lastWasGenerated && vicRender.getNumFields () > 1 )
+	{
+		const auto	fieldPeriod = 1.0f / ( overlay.getSettings ().isNTSC ? VIC2::ntscRefreshHz : VIC2::palRefreshHz );
+
+		fieldTime += secondsPassed;
+		if ( fieldTime >= fieldPeriod )
+		{
+			fieldTime = std::fmod ( fieldTime, fieldPeriod );
+			vicRender.nextField ();
+			fieldFlipped = true;
+		}
+	}
+
 	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
 	constexpr auto	frameMS = 1.0f / 60.0f - 0.001f;
 
 	// Handle updates (skip if it happened faster than 65 Hz)
 	timePassed += secondsPassed;
-	if ( timePassed < frameMS )
+	if ( timePassed < frameMS && ! fieldFlipped )
 		return;
 
 	timePassed = 0.0f;
@@ -272,12 +290,13 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 		return;
 	}
 
-	if ( ! haveRaster )
+	if ( ! haveRaster && ! fieldFlipped )
 		return;
 
 	vicRender.restoreIndexBuffer ();
 
-	drawRasterBars ( vicRender.getIndexPixels (), cpuCycles );
+	if ( haveRaster )
+		drawRasterBars ( vicRender.getIndexPixels (), cpuCycles );
 
 	// The bars sit in the buffer unseen by renderScreen: without this, the
 	// cursor blink's render would bake them into the next backup
