@@ -7,7 +7,8 @@ source "$(dirname "$0")/../../Source/ultra-shared/scripts/preamble.sh"
 # trained on beside it, then a plain reconfigure so every later build picks
 # the profile up. Profiles are keyed by mangled name, so Windows (msvc) and the
 # mac (itanium, serves Linux too) each train their own: run this on both after
-# engine work, commit the four files.
+# engine work, commit the four files. Arguments go to sidplay_ab_test, so the
+# mac passes its HVSC root: bash Tools/pgo/train.sh /Users/michael/HVSC.zip
 
 case "$TOOLCHAIN" in
     vs)    profile=Tools/pgo/sidplayez-msvc.profdata
@@ -31,7 +32,7 @@ cmake --build "$BUILD_DIR" --config Release --target sidplay_ab_test --parallel 
 # 2 = the instrumented binary tripped the performance check, expected.
 # Six threads: the profile counters are shared, more threads only fight over them
 rc=0
-LLVM_PROFILE_FILE="$raw/%p.profraw" "$exe" -j6 > "$LOG_DIR/pgo_train.log" 2>&1 || rc=$?
+LLVM_PROFILE_FILE="$raw/%p.profraw" "$exe" -j6 "$@" >"$LOG_DIR/pgo_train.log" 2>&1 || rc=$?
 [ "$rc" -eq 0 ] || [ "$rc" -eq 2 ] || { echo "training run failed ($rc), see $LOG_DIR/pgo_train.log"; exit 1; }
 
 "$profdata" merge -o "$profile" "$raw"/*.profraw
