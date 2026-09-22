@@ -194,8 +194,8 @@ void GUI_CRT::loadGameArtwork ( const juce::String& sidName, const juce::String&
 {
 	tuneKey = sidName;
 
-	// Viewer mode keeps its picture, the tune's art comes back when the
-	// browser closes
+	// The open browser overrides the tune's art, closing it keeps the pick
+	// until the next tune change
 	if ( browserVisible )
 		return;
 
@@ -290,10 +290,6 @@ void GUI_CRT::showBrowser ( const bool visible )
 
 		if ( ! isDroppedPicture () )
 			browser.selectPicture ( lastLoadedName );
-	}
-	else
-	{
-		loadGameArtwork ( tuneKey );
 	}
 
 	resized ();
