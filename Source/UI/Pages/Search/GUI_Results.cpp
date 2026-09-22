@@ -97,19 +97,40 @@ static bool parseYear ( const std::string_view str, int& lo, int& hi )
 }
 //-----------------------------------------------------------------------------
 
+// No SID can be older than the C64 itself
+static constexpr auto	firstYear = 1982;
+
+static int currentYear ()
+{
+	static const auto	year = juce::Time::getCurrentTime ().getYear ();
+
+	return year;
+}
+//-----------------------------------------------------------------------------
+
+// A year a SID could be from, or a decade as "198?"; any other number is search text
+static bool parseSearchYear ( const std::string_view str, int& lo, int& hi )
+{
+	if ( str.find ( '?' ) < 3 || ! parseYear ( str, lo, hi ) )
+		return false;
+
+	return hi >= firstYear && lo <= currentYear ();
+}
+//-----------------------------------------------------------------------------
+
 // "YYYY", "YYYY-", "-YYYY" or "YYYY-YYYY"; the ends may come in any order
 static std::optional<yearRange> parseYearRange ( const std::string_view word )
 {
-	auto	leftLo = 0;
-	auto	leftHi = 0;
-	auto	rightLo = 9999;
-	auto	rightHi = 9999;
+	auto	leftLo = firstYear;
+	auto	leftHi = firstYear;
+	auto	rightLo = currentYear ();
+	auto	rightHi = currentYear ();
 
 	const auto	dash = word.find ( '-' );
 
 	if ( dash == std::string_view::npos )
 	{
-		if ( ! parseYear ( word, leftLo, leftHi ) )
+		if ( ! parseSearchYear ( word, leftLo, leftHi ) )
 			return std::nullopt;
 
 		return yearRange { leftLo, leftHi };
@@ -121,10 +142,10 @@ static std::optional<yearRange> parseYearRange ( const std::string_view word )
 	if ( left.empty () && right.empty () )
 		return std::nullopt;
 
-	if ( ! left.empty () && ! parseYear ( left, leftLo, leftHi ) )
+	if ( ! left.empty () && ! parseSearchYear ( left, leftLo, leftHi ) )
 		return std::nullopt;
 
-	if ( ! right.empty () && ! parseYear ( right, rightLo, rightHi ) )
+	if ( ! right.empty () && ! parseSearchYear ( right, rightLo, rightHi ) )
 		return std::nullopt;
 
 	return yearRange { std::min ( leftLo, rightLo ), std::max ( leftHi, rightHi ) };
