@@ -758,6 +758,10 @@ void GUI_ultraSID::setUserRoot ()
 		mainScreen.sidebarLeft.setPlaylists ( playlistNames );
 	}
 
+	// The user's screenshots merge over the factory tree
+	screenshots->reload ();
+	thumbnailCache->reset ();
+
 	// After the user tunes are scanned, entries resolve to the database's keys
 	history->setRoot ( roots.user );
 	mainScreen.pages.loadHistory ();
@@ -956,32 +960,81 @@ void GUI_ultraSID::addPlaylistFiles ( const juce::StringArray& filenames )
 }
 //-----------------------------------------------------------------------------
 
+// The shown picture as a name in the tree; empty for generated screens and
+// dropped files, which have no hints to edit
+static std::string shownArtName ( const juce::String& shown )
+{
+	return juce::File::isAbsolutePath ( shown ) ? std::string () : shown.toStdString ();
+}
+//-----------------------------------------------------------------------------
+
 void GUI_ultraSID::assignBorderColor ( const int index )
 {
-	assettools::setBorderColor ( mainScreen.pages.getLastLoadedArtwork (), index );
+	if ( const auto name = shownArtName ( mainScreen.pages.getLastLoadedArtwork () ); ! name.empty () )
+		assettools::setBorderColor ( name, index );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_ultraSID::toggleFirstLuma ()
 {
-	assettools::toggleFirstLuma ( mainScreen.pages.getLastLoadedArtwork () );
+	if ( const auto name = shownArtName ( mainScreen.pages.getLastLoadedArtwork () ); ! name.empty () )
+		assettools::toggleFirstLuma ( name );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_ultraSID::toggleFirstLumaAll ()
 {
-	assettools::toggleFirstLumaAll ( datasource::getDevFile (), screenshots->getScreenshots ( lastFilename ) );
+	assettools::toggleFirstLumaAll ( screenshots->getScreenshots ( lastFilename ) );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_ultraSID::toggleThumbnail ()
 {
-	assettools::toggleThumbnail ( mainScreen.pages.getLastLoadedArtwork () );
+	if ( const auto name = shownArtName ( mainScreen.pages.getLastLoadedArtwork () ); ! name.empty () )
+		assettools::cycleScreenKind ( name );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraSID::setScreenKind ( const int kind )
+{
+	if ( const auto name = shownArtName ( mainScreen.pages.getLastLoadedArtwork () ); ! name.empty () )
+		assettools::setScreenKind ( name, kind );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraSID::toggleNTSC ()
+{
+	if ( const auto name = shownArtName ( mainScreen.pages.getLastLoadedArtwork () ); ! name.empty () )
+		assettools::toggleNTSC ( name );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_ultraSID::deleteImage ()
 {
-	assettools::deleteImage ( mainScreen.pages.getLastLoadedArtwork () );
+	if ( const auto name = shownArtName ( mainScreen.pages.getLastLoadedArtwork () ); ! name.empty () )
+		assettools::deleteImage ( name );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraSID::keepForTune ()
+{
+	assettools::keepForTune ( mainScreen.pages.getLastLoadedArtwork (), lastFilename );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraSID::saveScreenshot ( const juce::String& folder )
+{
+	assettools::saveToFolder ( mainScreen.pages.getLastLoadedArtwork (), folder.toStdString () );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraSID::userScreenshotsChanged ()
+{
+	screenshots->reload ();
+	thumbnailCache->reset ();
+
+	updateFooterThumbnail ( lastFilename );
+	mainScreen.pages.userScreenshotsChanged ();
+	mainScreen.pages.repaint ();
 }
 //-----------------------------------------------------------------------------

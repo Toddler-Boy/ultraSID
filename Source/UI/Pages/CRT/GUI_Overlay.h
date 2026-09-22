@@ -25,10 +25,11 @@ public:
 
 	// this
 	void setNumCRTpages ( const int numPages )	{	pageControl.setNumberOfPages ( numPages );	}
-	void setCRTPage ( const int page )			{	pageControl.setCurrentPage ( page, true );	}
+	void setCRTPage ( const int page, const bool notify = true )	{	pageControl.setCurrentPage ( page, notify );	}
 	[[ nodiscard ]] int getCRTPage () const						{	return pageControl.getCurrentPage ();		}
 
 	GUI_SVG_Button	openSettings { "open", { "crt/settings_close", "crt/settings_open" } };
+	GUI_SVG_Button	openBrowser { "browse", { "crt/browser_close", "crt/browser_open" } };
 
 private:
 	//

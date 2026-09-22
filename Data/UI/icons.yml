@@ -62,6 +62,18 @@ about:
 crt:
   settings_open:  font-awesome/sliders-solid-full
   settings_close: font-awesome/sliders-solid-full
+  browser_open:   font-awesome/images-solid-full
+  browser_close:  font-awesome/images-solid-full
+  browser_folder: font-awesome/folder-open-solid-full
+
+crt-browser:
+  keep:      font-awesome/thumbtack-solid-full
+  save:      font-awesome/folder-open-solid-full
+  border:    crt/tint
+  luma:      crt/brightness
+  ntsc:      font-awesome/display-solid-full
+  thumbnail: font-awesome/images-solid-full
+  delete:    font-awesome/trash-can-regular-full
 
 crt:
   settings:

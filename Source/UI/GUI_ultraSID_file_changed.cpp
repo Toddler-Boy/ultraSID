@@ -78,9 +78,15 @@ void GUI_ultraSID::fileChanged ( const juce::File& file, gin::FileSystemWatcher:
 			thumbnailCache->removeCacheEntry ( lastFilename );
 			updateFooterThumbnail ( lastFilename );
 
-			// Set CRT page to new artwork
-			if ( updateCRT )
-				mainScreen.pages.loadGameArtwork ( artworkName (), filename );
+			// Set CRT page to new artwork; the viewer follows its own picture
+			// through renames instead
+			if ( ! updateCRT )
+				return;
+
+			if ( mainScreen.pages.isCRTBrowserVisible () || filename.empty () )
+				mainScreen.pages.userScreenshotsChanged ();
+			else
+				mainScreen.pages.loadGameArtwork ( lastFilename, filename );
 
 			return;
 		}
@@ -234,6 +240,15 @@ void GUI_ultraSID::fileChanged ( const juce::File& file, gin::FileSystemWatcher:
 		if ( parent.equalsIgnoreCase ( "chip-profiles.csv" ) )
 		{
 			loadSIDPlayerProfilesAndOverrides ();
+			return;
+		}
+
+		// User screenshots merge over the factory tree; any change re-merges
+		if ( parent.startsWithIgnoreCase ( "Screenshots/" ) )
+		{
+			if ( file.hasFileExtension ( ".png" ) )
+				userScreenshotsChanged ();
+
 			return;
 		}
 

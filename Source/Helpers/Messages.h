@@ -57,12 +57,14 @@ SIMPLE_MESSAGE ( UpdateExportBadge,		"updateExportBadge" );
 SIMPLE_MESSAGE ( UpdateExportBadgeUser,	"updateExportBadgeUser" );
 SIMPLE_MESSAGE ( HvscCheck,			"hvscCheck" );
 
-// Screenshot/artwork editing (developer mode)
+// Screenshot/artwork editing, acting on the picture the CRT shows
 SIMPLE_MESSAGE ( ToggleFirstLuma,	"toggleFirstLuma" );
 SIMPLE_MESSAGE ( ToggleFirstLumaAll,"toggleFirstLumaAll" );
 SIMPLE_MESSAGE ( ToggleThumbnail,	"toggleThumbnail" );
+SIMPLE_MESSAGE ( ToggleNTSC,		"toggleNTSC" );
 SIMPLE_MESSAGE ( DeleteImage,		"deleteImage" );
 SIMPLE_MESSAGE ( RemoveBorderColor,	"removeBorderColor" );
+SIMPLE_MESSAGE ( KeepForTune,		"keepForTune" );
 
 // The keyboard verbs (Data/UI/shortcuts.csv binds keys to these wire names)
 SIMPLE_MESSAGE ( TogglePlay,		"togglePlay" );
@@ -295,6 +297,19 @@ struct AssignBorderColor
 };
 //-----------------------------------------------------------------------------
 
+// What the shown screenshot is (imageutils::screenKind): none, title, game, loading
+struct SetScreenKind
+{
+	int	kind = 0;
+
+	static constexpr auto	verb = "setScreenKind";
+	[[ nodiscard ]] juce::String encode () const								{	return juce::String ( verb ) + " " + juce::String ( kind );	}
+	[[ nodiscard ]] static SetScreenKind decode ( const juce::StringArray& p )		{	return { p[ 0 ].getIntValue () };	}
+
+	void send () const	{	msg::send ( *this );	}
+};
+//-----------------------------------------------------------------------------
+
 // Export / downloads
 
 struct ExportTune
@@ -340,6 +355,19 @@ struct DownloadScreenshot
 	static constexpr auto	verb = "downloadScreenshot";
 	[[ nodiscard ]] juce::String encode () const								{	return juce::String ( verb ) + " " + quoted ( url );	}
 	[[ nodiscard ]] static DownloadScreenshot decode ( const juce::StringArray& p )	{	return { p[ 0 ] };	}
+
+	void send () const	{	msg::send ( *this );	}
+};
+//-----------------------------------------------------------------------------
+
+// Copy the shown picture into a folder of the user's Screenshots tree
+struct SaveScreenshot
+{
+	juce::String	folder;
+
+	static constexpr auto	verb = "saveScreenshot";
+	[[ nodiscard ]] juce::String encode () const								{	return juce::String ( verb ) + " " + quoted ( folder );	}
+	[[ nodiscard ]] static SaveScreenshot decode ( const juce::StringArray& p )		{	return { p[ 0 ] };	}
 
 	void send () const	{	msg::send ( *this );	}
 };

@@ -42,7 +42,6 @@ std::string GUI_ultraSID::getFullFilename ( const juce::String& filename )
 bool GUI_ultraSID::loadSong ( const juce::String& filename )
 {
 	lastFilename = "";
-	testArtwork = false;
 
 	auto	fullName = getFullFilename ( filename );
 	if ( fullName.empty () )

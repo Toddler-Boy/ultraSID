@@ -113,6 +113,30 @@ menu:
   show_in_explorer:     Show in Explorer
   show_in_finder:       Show in Finder
   show_in_file_manager: Show in file manager
+  keep_for_tune:        Keep for this tune
+  save_to_folder:       "Save to {}"
+  border_color:         Border color
+  border_none:          None
+  ntsc:                 NTSC
+  first_luma:           First luma (5 levels)
+  screen_kind:          Screenshot shows
+  screen_none:          Other
+  screen_title:         Title screen
+  screen_game:          Game screen
+  screen_loading:       Loading screen
+  delete_screenshot:    Delete screenshot
+
+crt-browser:
+  root:          Screenshots
+  browse_tip:    Browse screenshots
+  hint_border:   "#{}"
+  hint_pal:      PAL
+  hint_ntsc:     NTSC
+  hint_ifli:     IFLI
+  hint_hires:    Hires
+  hint_multicolor: Multi
+  hint_first_luma: 1st luma
+  vic2_colors:   "Black, White, Red, Cyan, Purple, Green, Blue, Yellow, Orange, Brown, Light red, Dark grey, Grey, Light green, Light blue, Light grey"
 
 # Undo toasts
 toast:
@@ -227,6 +251,7 @@ settings:
     tunes:       My tunes
     themes:      Themes
     crt:         CRT overlays, masks and presets
+    screenshots: Screenshots
     preferences: Preferences
     file:    "{} file"
     files:   "{} files"

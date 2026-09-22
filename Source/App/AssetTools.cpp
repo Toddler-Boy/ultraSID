@@ -2,9 +2,13 @@
 
 #include "AssetTools.h"
 
+#include "ultra-shared/Config/BuildInfo.h"
+#include "ultra-shared/Config/DataSource.h"
 #include "ultra-shared/Helpers/ImageUtils.h"
 #include "ultra-shared/Video/PNG_Loader.h"
 #include "ultra-shared/Video/VIC2_Render.h"
+
+#include "ScreenshotLookup.h"
 
 //-----------------------------------------------------------------------------
 
@@ -215,60 +219,199 @@ void assettools::addScreenshots ( const juce::File& dataRoot, const std::string&
 }
 //-----------------------------------------------------------------------------
 
-void assettools::setBorderColor ( const juce::File& imageFile, const int index )
+// Factory files move through git only where the naked repository is the data
+static bool isDeveloperTree ()
 {
-	auto	newName = imageFile.getFullPathName ();
-
-	auto	hint = imageutils::hintFromFilename ( newName );
-	hint.borderColor = int8_t ( index );
-	newName = imageutils::filenameFromHint ( hint );
-
-	executeCommand ( "mv", "/Screenshots/", { imageFile.getFullPathName (), newName } );
+	return buildinfo::isDeveloperMode () && ! datasource::isPak ();
 }
 //-----------------------------------------------------------------------------
 
-void assettools::toggleFirstLuma ( const juce::File& imageFile )
+// The file under its new name, whichever tree it lives in
+static void renameScreenshot ( const std::string& artName, const juce::String& newName )
 {
-	auto	newName = imageFile.getFullPathName ();
+	if ( newName == juce::String ( artName ) )
+		return;
 
-	auto	hint = imageutils::hintFromFilename ( newName );
-	hint.firstLuma = ! hint.firstLuma;
-	newName = imageutils::filenameFromHint ( hint );
+	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
 
-	executeCommand ( "mv", "/Screenshots/", { imageFile.getFullPathName (), newName } );
+	if ( lookup->isUserFile ( artName ) )
+	{
+		lookup->getUserFile ( artName ).moveFileTo ( lookup->getUserFile ( newName.toStdString () ) );
+		return;
+	}
+
+	if ( isDeveloperTree () )
+	{
+		executeCommand ( "mv", "/Screenshots/", { datasource::getDevFile ( "Screenshots/" + artName ).getFullPathName (),
+												  datasource::getDevFile ( "Screenshots/" + newName ).getFullPathName () } );
+		return;
+	}
+
+	// A user copy under the new name shadows the factory file
+	const auto	mb = datasource::loadData ( "Screenshots/" + artName );
+	const auto	target = lookup->getUserFile ( newName.toStdString () );
+
+	if ( mb.isEmpty () || target == juce::File () )
+		return;
+
+	target.getParentDirectory ().createDirectory ();
+
+	if ( ! target.replaceWithData ( mb.getData (), mb.getSize () ) )
+		Z_ERR ( "Could not write " << target.getFullPathName () );
 }
 //-----------------------------------------------------------------------------
 
-void assettools::toggleFirstLumaAll ( const juce::File& dataRoot, const std::vector<std::string>& artwork )
+template <typename F>
+static void changeHint ( const std::string& artName, F change )
+{
+	auto	hint = imageutils::hintFromFilename ( artName );
+	change ( hint );
+
+	renameScreenshot ( artName, imageutils::filenameFromHint ( hint ) );
+}
+//-----------------------------------------------------------------------------
+
+void assettools::setBorderColor ( const std::string& artName, const int index )
+{
+	changeHint ( artName, [ index ] ( imageutils::imageHint& hint ) { hint.borderColor = int8_t ( index ); } );
+}
+//-----------------------------------------------------------------------------
+
+void assettools::toggleFirstLuma ( const std::string& artName )
+{
+	changeHint ( artName, [] ( imageutils::imageHint& hint ) { hint.firstLuma = ! hint.firstLuma; } );
+}
+//-----------------------------------------------------------------------------
+
+void assettools::toggleFirstLumaAll ( const std::vector<std::string>& artwork )
 {
 	for ( const auto& art : artwork )
+		toggleFirstLuma ( art );
+}
+//-----------------------------------------------------------------------------
+
+void assettools::setScreenKind ( const std::string& artName, const int kind )
+{
+	changeHint ( artName, [ kind ] ( imageutils::imageHint& hint ) { hint.kind = imageutils::screenKind ( std::clamp ( kind, 0, 3 ) ); } );
+}
+//-----------------------------------------------------------------------------
+
+void assettools::cycleScreenKind ( const std::string& artName )
+{
+	changeHint ( artName, [] ( imageutils::imageHint& hint ) { hint.kind = imageutils::screenKind ( ( int ( hint.kind ) + 1 ) % 4 ); } );
+}
+//-----------------------------------------------------------------------------
+
+void assettools::toggleNTSC ( const std::string& artName )
+{
+	changeHint ( artName, [] ( imageutils::imageHint& hint ) { hint.forceNTSC = ! hint.forceNTSC; } );
+}
+//-----------------------------------------------------------------------------
+
+bool assettools::canDelete ( const std::string& artName )
+{
+	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
+
+	return lookup->isUserFile ( artName ) || isDeveloperTree ();
+}
+//-----------------------------------------------------------------------------
+
+void assettools::deleteImage ( const std::string& artName )
+{
+	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
+
+	if ( lookup->isUserFile ( artName ) )
 	{
-		auto	file = dataRoot.getChildFile ( "Screenshots/" ).getChildFile ( art );
-		auto	newName = file.getFullPathName ();
+		lookup->getUserFile ( artName ).deleteFile ();
+		return;
+	}
 
-		auto	hint = imageutils::hintFromFilename ( newName );
-		hint.firstLuma = ! hint.firstLuma;
-		newName = imageutils::filenameFromHint ( hint );
+	if ( isDeveloperTree () )
+		executeCommand ( "rm", "/Screenshots/", { datasource::getDevFile ( "Screenshots/" + artName ).getFullPathName () } );
+}
+//-----------------------------------------------------------------------------
 
-		executeCommand ( "mv", "/Screenshots/", { file.getFullPathName (), newName } );
+// The bytes of a shown picture: a dropped file by its path, otherwise a name
+// in the tree
+static juce::MemoryBlock pictureBytes ( const juce::String& picture )
+{
+	if ( juce::File::isAbsolutePath ( picture ) )
+	{
+		juce::MemoryBlock	mb;
+		juce::File ( picture ).loadFileAsData ( mb );
+		return mb;
+	}
+
+	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
+
+	return lookup->loadData ( picture.toStdString () );
+}
+//-----------------------------------------------------------------------------
+
+// A picture into the user tree under name. A uniform border shrinks to the
+// border-color hint, as on import; black is the default and gets no hint
+static void writeUserPicture ( const juce::String& name, const juce::MemoryBlock& mb )
+{
+	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
+
+	const auto	target = lookup->getUserFile ( name.toStdString () );
+	if ( target == juce::File () )
+		return;
+
+	target.getParentDirectory ().createDirectory ();
+
+	if ( ! target.replaceWithData ( mb.getData (), mb.getSize () ) )
+	{
+		Z_ERR ( "Could not write " << target.getFullPathName () );
+		return;
+	}
+
+	if ( const auto border = cropUniformBorder ( target ); border >= 0 )
+	{
+		auto	hint = imageutils::hintFromFilename ( name );
+		hint.borderColor = border;
+
+		target.moveFileTo ( lookup->getUserFile ( imageutils::filenameFromHint ( hint ).toStdString () ) );
 	}
 }
 //-----------------------------------------------------------------------------
 
-void assettools::toggleThumbnail ( const juce::File& imageFile )
+void assettools::keepForTune ( const juce::String& picture, const std::string& tuneKey )
 {
-	auto	newName = imageFile.getFullPathName ();
+	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
 
-	auto	hint = imageutils::hintFromFilename ( newName );
-	hint.isGameScreen = ! hint.isGameScreen;
-	newName = imageutils::filenameFromHint ( hint );
+	const auto	mb = pictureBytes ( picture );
+	if ( tuneKey.empty () || mb.isEmpty () )
+		return;
 
-	executeCommand ( "mv", "/Screenshots/", { imageFile.getFullPathName (), newName } );
+	// "$HVSC$/GAMES/A/B.sid" -> "GAMES/A/b_NN.png", the developer import's naming
+	const auto	dstDir = juce::String ( tuneKey ).fromFirstOccurrenceOf ( "/", false, false ).upToLastOccurrenceOf ( "/", true, false );
+	const auto	dstName = juce::String ( tuneKey ).fromLastOccurrenceOf ( "/", false, false ).upToLastOccurrenceOf ( ".", false, false ).toLowerCase ();
+	const auto	number = juce::String ( lookup->getLastNumber ( tuneKey ) + 1 ).paddedLeft ( '0', 2 );
+
+	const auto	plainName = dstDir + dstName + "_" + number + ".png";
+
+	writeUserPicture ( plainName, mb );
 }
 //-----------------------------------------------------------------------------
 
-void assettools::deleteImage ( const juce::File& imageFile )
+void assettools::saveToFolder ( const juce::String& picture, const std::string& folder )
 {
-	executeCommand ( "rm", "/Screenshots/", { imageFile.getFullPathName () } );
+	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
+
+	const auto	mb = pictureBytes ( picture );
+	if ( mb.isEmpty () )
+		return;
+
+	const auto	leaf = picture.replaceCharacter ( '\\', '/' ).fromLastOccurrenceOf ( "/", false, false );
+	const auto	name = ( folder.empty () ? juce::String () : juce::String ( folder ) + "/" ) + leaf;
+
+	if ( const auto target = lookup->getUserFile ( name.toStdString () ); target.existsAsFile () )
+	{
+		Z_ERR ( "Not overwriting " << target.getFullPathName () );
+		return;
+	}
+
+	writeUserPicture ( name, mb );
 }
 //-----------------------------------------------------------------------------

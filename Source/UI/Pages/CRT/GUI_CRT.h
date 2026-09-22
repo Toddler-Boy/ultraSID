@@ -13,6 +13,7 @@
 #include "UI/ComponentFactory.h"
 
 #include "GUI_Overlay.h"
+#include "GUI_ScreenshotBrowser.h"
 
 //-----------------------------------------------------------------------------
 
@@ -27,6 +28,7 @@ public:
 	// juce::Component
 	void resized () override;
 	void mouseWheelMove ( const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel ) override;
+	void mouseDown ( const juce::MouseEvent& event ) override;
 
 	// juce::FileDragAndDropTarget
 	bool isInterestedInFileDrag ( const juce::StringArray& files ) override;
@@ -50,12 +52,27 @@ public:
 	void loadGameArtwork ( const juce::String& sidname, const juce::String& index = "" );
 	void loadGameArtwork ( const int index );
 
-	// The naked file behind the shown artwork, for developer curation
-	[[ nodiscard ]] juce::File getLastLoadedFile ();
+	// A picture from the Screenshots tree, with its tune's set as pages
+	void showScreenshot ( const juce::String& artName );
+
+	// Dropped files, shown as they are; they stay until the next tune
+	void showPictures ( const juce::StringArray& files );
+
+	// The shown picture: a name in the tree, or the absolute path of a
+	// dropped file; empty on a generated screen
+	[[ nodiscard ]] juce::String getLastLoadedName () const	{	return lastLoadedName;	}
 	[[ nodiscard ]] int getGameArtworkIndex () const	{	return tuneArtIndex;	}
+
+	// The user's Screenshots folder changed
+	void userScreenshotsChanged ();
 
 	[[ nodiscard ]] bool areSettingsVisible () const	{ return settingsVisible;	}
 	void showSettings ( const bool visible );
+
+	// The open browser is viewer mode: tune changes leave the picture alone
+	[[ nodiscard ]] bool isBrowserVisible () const	{	return browserVisible;	}
+	void showBrowser ( const bool visible );
+	[[ nodiscard ]] juce::String getBrowserFolder () const	{	return browser.getFolder ();	}
 	void setBackgroundColour ( const juce::Colour& bckCol );
 
 	void timerUpdate ( const float secondsPassed, const uint16_t cpuCycles );
@@ -101,9 +118,20 @@ private:
 	// Feed the shown artwork to the VIC2 renderer; false when there is none
 	[[ nodiscard ]] bool loadArtworkImage ();
 
+	// Show tuneArtwork[ index ]: the picture, or the generated screen when it
+	// fails to load
+	void showArtworkIndex ( const int index );
+
+	// The right-click menu with the shown picture's file actions
+	void showPictureMenu ();
+
+	// A dropped file, shown from its own path rather than the tree
+	[[ nodiscard ]] bool isDroppedPicture () const	{	return juce::File::isAbsolutePath ( lastLoadedName );	}
+
 	SidTuneInfoEZ		sidInfoStr;
 	juce::String		sidname;
-	juce::String		lastLoadedName;		// Relative to Screenshots/
+	juce::String		tuneKey;			// The playing tune, whatever the CRT shows
+	juce::String		lastLoadedName;		// Relative to Screenshots/, or a dropped file's path
 
 	const colodore				colo;
 	colodore::shaderPalette		yuv_yiq;
@@ -111,6 +139,7 @@ private:
 
 	bool	lastWasGenerated = false;
 	bool	lastFirstLuma = false;
+	bool	lastForceNTSC = false;
 
 	bool	isBasicScreen = false;
 	bool	isPlayerUI = false;
@@ -277,10 +306,14 @@ private:
 
 	// Show hide/settings
 	bool	settingsVisible = false;
+	bool	browserVisible = false;
 
 	// The shared settings panel; the page layout positions it by its
 	// component name "settings"
 	GUI_CRTSettings	settingsPanel;
+
+	// The screenshot browser, positioned by its name "browser"
+	GUI_ScreenshotBrowser	browser;
 
 	gin::LayoutSupport	crtLayout { *this, [] ( const juce::String& typeName ) { return componentFactory ( typeName ); } };
 

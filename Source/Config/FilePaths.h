@@ -54,5 +54,8 @@ namespace filepaths
 	[[ nodiscard ]] juce::File getUserOverlaysPath ();
 	[[ nodiscard ]] juce::File getUserCRTMasksPath ();
 	[[ nodiscard ]] juce::File getUserCRTPresetsPath ();
+
+	// User screenshots, merged over the factory tree by ScreenshotLookup
+	[[ nodiscard ]] juce::File getUserScreenshotsPath ();
 }
 //-----------------------------------------------------------------------------
