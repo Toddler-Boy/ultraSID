@@ -1,3 +1,79 @@
+# Speech samples nobody bothered to type in
+
+/MUSICIANS/D/Dunn_Jonathan/RoboCop.sid
+(#6)
+   NAME: "RoboCop"
+(#7)
+   NAME: "Protect the innocent"
+
+/GAMES/0-9/221B_Baker_Street.sid
+(#3)
+   NAME: "Quick Watson, the game is afoot"
+(#4)
+   NAME: "Quite elementary"
+(#5)
+   NAME: "Good <?>"
+(#6)
+   NAME: "Splendid deduction"
+(#7)
+   NAME: "What's your pleasure?"
+(#9)
+   NAME: "Ha ha ha he he"
+
+/GAMES/A-F/Beach_Head_II.sid
+(#2)
+   NAME: "Follow me, men"
+(#3)
+   NAME: "Medic!"
+(#4)
+   NAME: "I'm hit"
+(#5)
+   NAME: "Waahhhhhhhh"
+(#6)
+   NAME: "Ahhh"
+(#7)
+   NAME: "Aahhhhhhhh"
+(#8)
+   NAME: "Hey! Don't shot me!"
+(#9)
+   NAME: "Ha Ha Ha Ha Ha Ha Ha Ha"
+(#10)
+   NAME: "You can't catch me"
+(#11)
+   NAME: "Ahhh"
+(#12)
+   NAME: "Ahhhhhhhhhhhhhhhhhhhhhhh"
+
+/MUSICIANS/L/Lieblich_Russell/Ghostbusters.sid
+(#2)
+   NAME: "Ghostbusters!"
+(#3)
+   NAME: "He slimed me"
+(#4)
+   NAME: "Ha Ha Ha Ha Ha Ha Ha Ha"
+(#5)
+   NAME: "Waahhhhhhhh"
+
+/MUSICIANS/B/Butler_Paul/Desert_Fox.sid
+(#1)
+   NAME: "Minefield"
+(#2)
+   NAME: "Stuka"
+(#3)
+   NAME: "Ambush"
+(#4)
+   NAME: "Rommel"
+(#5)
+   NAME: "Tiger"
+(#6)
+   NAME: "Depo"
+(#7)
+   NAME: "Convoy"
+(#8)
+   NAME: "Achtung"
+(#9)
+   NAME: "Mayday"
+
 /MUSICIANS/C/Crowther_Antony/Suicide_Express.sid
 (#1)
    NAME: "Welcome to Suicide Express"
@@ -1254,6 +1330,8 @@
 (#7)
    NAME: "Tripping"
 
+# Missing sub-tune names
+
 /MUSICIANS/H/Hubbard_Rob/Crazy_Comets.sid
 (#1)
    NAME: Main Theme
@@ -1362,74 +1440,6 @@
 (#9)
    NAME: Laboratory
 
-/GAMES/0-9/221B_Baker_Street.sid
-(#3)
-   NAME: "Quick Watson, the game is afoot"
-(#4)
-   NAME: "Quite elementary"
-(#5)
-   NAME: "Good <?>"
-(#6)
-   NAME: "Splendid deduction"
-(#7)
-   NAME: "What's your pleasure?"
-(#9)
-   NAME: "Ha ha ha he he"
-
-/GAMES/A-F/Beach_Head_II.sid
-(#2)
-   NAME: "Follow me, men"
-(#3)
-   NAME: "Medic!"
-(#4)
-   NAME: "I'm hit"
-(#5)
-   NAME: "Waahhhhhhhh"
-(#6)
-   NAME: "Ahhh"
-(#7)
-   NAME: "Aahhhhhhhh"
-(#8)
-   NAME: "Hey! Don't shot me!"
-(#9)
-   NAME: "Ha Ha Ha Ha Ha Ha Ha Ha"
-(#10)
-   NAME: "You can't catch me"
-(#11)
-   NAME: "Ahhh"
-(#12)
-   NAME: "Ahhhhhhhhhhhhhhhhhhhhhhh"
-
-/MUSICIANS/L/Lieblich_Russell/Ghostbusters.sid
-(#2)
-   NAME: "Ghostbusters!"
-(#3)
-   NAME: "He slimed me"
-(#4)
-   NAME: "Ha Ha Ha Ha Ha Ha Ha Ha"
-(#5)
-   NAME: "Waahhhhhhhh"
-
-/MUSICIANS/B/Butler_Paul/Desert_Fox.sid
-(#1)
-   NAME: "Minefield"
-(#2)
-   NAME: "Stuka"
-(#3)
-   NAME: "Ambush"
-(#4)
-   NAME: "Rommel"
-(#5)
-   NAME: "Tiger"
-(#6)
-   NAME: "Depo"
-(#7)
-   NAME: "Convoy"
-(#8)
-   NAME: "Achtung"
-(#9)
-   NAME: "Mayday"
-
 /MUSICIANS/B/Bjerregaard_Johannes/Tiger_Mission.sid
 (#1)
    NAME: Main Theme
@@ -1440,11 +1450,7 @@
 (#6)
    NAME: Game Over
 
-/MUSICIANS/D/Dunn_Jonathan/RoboCop.sid
-(#6)
-   NAME: "RoboCop"
-(#7)
-   NAME: "Protect the innocent"
+# Broken tunes fixed via our patch System
 
 /MUSICIANS/H/Huelsbeck_Chris/Madness.sid
 (#2)
@@ -1485,6 +1491,60 @@ COMMENT: In the original rip voice 2 plays sharp from 1:14 to the end, a stray
          byte in its pattern left a slide unfinished and every later note
          inherited the offset. The fixed version replaces that byte with the
          note the pattern's first half uses at the same spot.
+
+# Rips added by ultraSID
+
+/GAMES/G-L/H_E_R_O.sid
+(#1)
+   NAME: Laser
+(#2)
+   NAME: Propeller
+(#3)
+   NAME: Dynamite
+(#4)
+   NAME: Explosion
+(#5)
+   NAME: Wall cracking
+(#6)
+   NAME: Death
+(#7)
+   NAME: Level bonus
+
+/GAMES/A-F/B_Cs_Quest_for_Tires.sid
+(#1)
+   NAME: Rolling
+(#2)
+   NAME: Jump
+(#3)
+   NAME: Duck
+(#5)
+   NAME: Crash
+(#8)
+   NAME: Falling into a pit
+(#9)
+   NAME: Charge!
+(#10)
+   NAME: Level start
+
+/GAMES/M-R/River_Raid.sid
+(#1)
+   NAME: Engine
+(#2)
+   NAME: Missile
+(#3)
+   NAME: Enemy explosion
+(#4)
+   NAME: Crash
+(#5)
+   NAME: Refuelling
+(#6)
+   NAME: Low fuel
+(#7)
+   NAME: Extra life
+(#8)
+   NAME: Helicopter
+(#9)
+   NAME: Tank shell
 
 # Overlong STIL comments re-flowed into paragraphs; the text is identical,
 # only the whitespace differs. These replace the original comments.

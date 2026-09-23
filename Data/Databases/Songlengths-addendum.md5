@@ -1,8 +1,14 @@
 [Database]
 ; /DEMOS/M-R/Nutcracker_10SID.sid
 b130a79a87368a128ba2ca84e6b83e7e=1:29
+; /GAMES/A-F/B_Cs_Quest_for_Tires.sid
+3de3c48cfcac04b7eddabda955659cf6=0:02 0:01 0:01 0:03 0:03 0:01 0:03 0:02 0:02 0:09
+; /GAMES/G-L/H_E_R_O.sid
+1dc9e974bd40cf44c406f433f36cc610=0:02 0:02 0:02 0:02 0:02 0:03 0:05
 ; /GAMES/M-R/Mega_Chase_Theme_4SID.sid
 372a5adf4acccd8540f2a4ca71ebeb08=3:08
+; /GAMES/M-R/River_Raid.sid
+c36473721d7286ebd973f89deecf68f2=0:11 0:02 0:02 0:01 0:04 0:10 0:02 0:02 0:03
 ; /MUSICIANS/A/Ames_John/Teen_Spirit_4SID.sid
 0188205715509fdd62be1ebd0c38d4a1=4:29
 ; /MUSICIANS/L/LMan/The_Tuneful_Eight_8SID.sid
