@@ -1546,6 +1546,21 @@ COMMENT: In the original rip voice 2 plays sharp from 1:14 to the end, a stray
 (#9)
    NAME: Tank shell
 
+/GAMES/S-Z/Star_Wars-The_Arcade_Game.sid
+(#1)
+  TITLE: Main Title [from all the Star Wars movies]
+ ARTIST: John Williams
+(#2)
+   NAME: Unused
+(#3)
+   NAME: Laser fire
+(#4)
+   NAME: Explosion
+(#5)
+   NAME: Fireball hit
+(#6)
+   NAME: Death Star explosion
+
 /MUSICIANS/D/DeMeo_Alex/Crossbow.sid
 (#1)
    NAME: Title

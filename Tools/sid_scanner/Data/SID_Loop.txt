@@ -4330,6 +4330,7 @@
 /GAMES/S-Z/Star_Storm=11101
 /GAMES/S-Z/Star_Trader=1
 /GAMES/S-Z/Star_Trooper=1
+/GAMES/S-Z/Star_Wars-The_Arcade_Game=000000
 /GAMES/S-Z/Starflight=1
 /GAMES/S-Z/Starquake=00000
 /GAMES/S-Z/Starsat=11000
