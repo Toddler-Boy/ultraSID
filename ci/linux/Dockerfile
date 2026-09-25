@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 LC_ALL=C.UTF-8
 RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
         git curl wget ca-certificates gnupg lsb-release software-properties-common \
         ninja-build pkg-config p7zip-full file binutils \
-        libasound2-dev libjack-jackd2-dev libcurl4-openssl-dev \
+        libasound2-dev libjack-jackd2-dev libcurl4-openssl-dev libusb-1.0-0-dev \
         libfreetype-dev libfontconfig1-dev \
         libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxi-dev \
         libxinerama-dev libxrandr-dev libxrender-dev \

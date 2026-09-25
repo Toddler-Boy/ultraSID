@@ -170,6 +170,62 @@ jobs:
           path: ci/bin/ultraSID.AppImage
           archive: false
 
+  # The USBSID-Pico hardware output (ULTRASID_HARDWARE_OUTPUT, Linux only)
+  # is off in every build above, this job is its compile check plus the
+  # board-free HardwareOutput logic test. It ships nothing and the release
+  # does not wait for it. The option needs the libSidplayEZ write sink; an
+  # engine without it gets a notice instead of a red run
+  linux-hardware:
+    name: Build Linux (hardware output)
+    needs: check
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/toddler-boy/ultrasid-linux:22.04
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
+      packages: read
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Check for the write sink
+        id: sink
+        shell: bash
+        run: |
+          if grep -q SIDPLAYEZ_WRITE_SINK Source/libSidplayEZ/src/sidemu.h; then
+            echo "present=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::libSidplayEZ has no write sink, hardware output build skipped"
+          fi
+
+      # An image built before libusb joined the Dockerfile lacks it
+      - name: Install libusb
+        if: steps.sink.outputs.present == '1'
+        shell: bash
+        run: |
+          pkg-config --exists libusb-1.0 || {
+            apt-get update -qq
+            apt-get install -y -qq --no-install-recommends libusb-1.0-0-dev
+          }
+
+      # Seconds, runs before the long app build
+      - name: HardwareOutput test
+        if: steps.sink.outputs.present == '1'
+        shell: bash
+        run: CXX=clang++ ./Tests/hardwareoutput_test.sh
+
+      - name: Build
+        if: steps.sink.outputs.present == '1'
+        shell: bash
+        run: |
+          cmake --preset ninja-clang -DULTRASID_HARDWARE_OUTPUT=ON
+          cmake --build --preset ninja-clang --config Release --parallel --target ultraSID
+
   # One release for all platforms, published only once every build exists,
   # and all update manifests in a single commit: the app never sees a
   # manifest pointing at an asset that isn't there

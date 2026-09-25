@@ -1,12 +1,12 @@
 #!/bin/bash
 # Build and run writesink_test against libSidplayEZ. Usage: Tests/writesink_test.sh <tune.sid>...
-# BUILD_DIR overrides the object directory (default: ./build-writesink), CXX the compiler (default: clang++, gcc rejects the unnamed-enum aliases upstream uses).
+# BUILD_DIR overrides the object directory (default: Builds/writesink), CXX the compiler (default: clang++, gcc rejects the unnamed-enum aliases upstream uses).
 set -e
 CXX="${CXX:-clang++}"
 EXTRA="${EXTRA:-}"
 here="$(cd "$(dirname "$0")" && pwd)"
 src="$here/../Source/libSidplayEZ/src"
-out="${BUILD_DIR:-$here/../build-writesink}"
+out="${BUILD_DIR:-$here/../Builds/writesink}"
 mkdir -p "$out"
 
 flags="$EXTRA -std=c++2b -O2 -fno-math-errno -msse4.2 -I$src"

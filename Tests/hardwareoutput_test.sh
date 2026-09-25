@@ -1,10 +1,10 @@
 #!/bin/bash
-# Build and run hardwareoutput_test. BUILD_DIR overrides the object directory (default: ./build-hwout).
+# Build and run hardwareoutput_test. BUILD_DIR overrides the object directory (default: Builds/hwout).
 set -e
 CXX="${CXX:-g++}"
 here="$(cd "$(dirname "$0")" && pwd)"
 aud="$here/../Source/Audio"
-out="${BUILD_DIR:-$here/../build-hwout}"
+out="${BUILD_DIR:-$here/../Builds/hwout}"
 mkdir -p "$out"
 
 flags="-std=c++20 -O1 -g $(pkg-config --cflags libusb-1.0) -I$aud"
