@@ -22,6 +22,9 @@
 #include "App/UndoManager.h"
 #include "Audio/SIDEffects.h"
 #include "Audio/SIDPlayer.h"
+#if ULTRASID_HARDWARE_OUTPUT
+	#include "Audio/HardwareOutput.h"
+#endif
 #include "Config/Preferences.h"
 #include "Config/Settings.h"
 #include "Data/History.h"
@@ -204,6 +207,7 @@ private:
 	void updateUserEQ ();
 
 	void applyPreferences ();
+	void applyHardwareSettings ();		// opens or closes the USBSID-Pico output from the preferences
 
 	juce::CriticalSection	inAudio;
 	std::atomic<int>		muted = 0;
@@ -284,6 +288,12 @@ private:
 
 	juce::SharedResourcePointer<SharedProfiles>		profiles;
 	juce::SharedResourcePointer<STILLookup>			stilLookup;
+
+#if ULTRASID_HARDWARE_OUTPUT
+	// Declared before the player, which points at it until its own destructor has run
+	juce::SharedResourcePointer<HardwareOutput>	hardware;
+	juce::String	hardwareBoards;		// The board list the output was opened with
+#endif
 
 	SIDPlayer		player;
 	SIDEffects		dspEffects;

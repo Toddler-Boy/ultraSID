@@ -46,6 +46,11 @@ footer:
     epic:   Heavy stereo widening, deep delay & reverb and bold bass. Not for the faint-hearted.
     mythic: Everything cranked to 11. Maximum width, endless echoes, cavernous reverb.
 
+  hardware:
+    playing:  "Playing through {} USBSID-Pico board(s)"
+    idle:     "USBSID-Pico output on, {} board(s) ready"
+    detached: USBSID-Pico output muted until the next tune, the boards cannot follow a seek
+
   volume:
     mute_tip:   Mute
     unmute_tip: Unmute
@@ -196,6 +201,7 @@ settings:
     playback: Playback
     song-lengths: Song Lengths
     emulation: SID Emulation
+    hardware: Hardware Output
     audio-fx: Audio Enhancements
     export: Export
     user-interface: User Interface
@@ -285,6 +291,32 @@ settings:
   emulation:
     dac-leakage:      6581 DAC leakage
     dac-leakage-help: Emulates how 6581 voices never fall completely silent.
+
+  hardware:
+    enabled:      Play through USBSID-Pico
+    enabled-help: Also sends every SID write to real boards, in step with the audio.
+    advance:      Hardware advance
+    advance-help: Milliseconds the boards are driven ahead of the audio, to make up for cable and board latency.
+    boards:      Boards
+    boards-help: Tick the boards to use, the order sets the SID numbering. None ticked uses every board.
+    refresh: Refresh
+    up:      Move up
+    down:    Move down
+    not-connected: not connected
+    status-off:      Hardware output is off
+    status-none:     No board could be opened
+    status-boards:   "Boards / SIDs: {}"
+    status-idle:     Waiting for a tune
+    status-playing:  "{released} writes sent, {dropped} dropped, lag {lag} ms"
+    status-detached: Muted until the next tune, the boards cannot follow a seek
+    status-unmapped: "{} chips have no SID on the boards"
+    disclosure-title: "While hardware output is active:"
+    disclosure-1: "Chip profiles. Hardware plays on whatever chip is in the socket."
+    disclosure-2: "Consistent loudness. The level of every tune is measured before playback."
+    disclosure-3: "Scrubbing. Tunes are rendered ahead of the playhead, which is why you can jump anywhere instantly. Hardware can only fast-forward by playing faster."
+    disclosure-4: "Exports. WAV, FLAC and OGG come from the same render."
+    disclosure-5: "Audio enhancements. The stereo placement, the equalizer and the Magic, Epic and Mythic modes all act on the rendered audio."
+    disclosure-6: "Any number of chips. Ten-SID tunes play as written. Hardware has one chip, or two with luck."
 
   fx:
     stereo-processing:      Stereo placement

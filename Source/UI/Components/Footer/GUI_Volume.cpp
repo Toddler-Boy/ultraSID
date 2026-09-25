@@ -98,6 +98,9 @@ GUI_Volume::GUI_Volume ()
 	}
 
 	addAndMakeVisible ( quality );
+#if ULTRASID_HARDWARE_OUTPUT
+	addChildComponent ( hardwareBadge );	// shown by the badge itself while the output is open
+#endif
 	addAndMakeVisible ( eq );
 	addAndMakeVisible ( mute );
 	addAndMakeVisible ( volume );

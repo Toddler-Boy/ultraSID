@@ -129,6 +129,9 @@ void GUI_Settings::resized ()
 	// The audio-enhancement tuning sliders exist in developer builds only
 	layout.setConstant ( "dev", buildinfo::isDeveloperMode () ? 1 : 0 );
 
+	// The hardware output section exists in builds with ULTRASID_HARDWARE_OUTPUT only
+	layout.setConstant ( "hardware", ULTRASID_HARDWARE_OUTPUT );
+
 	UI::setLayout ( layout, {	"UI/layouts/constants.json",
 							"UI/layouts/pages/settings.json" } );
 

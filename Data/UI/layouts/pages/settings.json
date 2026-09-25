@@ -46,6 +46,16 @@
 								{ "id": "emulation-dac-leakage", "factory": "set-toggle(emulation, dac-leakage)", "x": 20, "y": 20, "r": "parW - 20", "h": 42 }
 							]
 						},
+						{ "id": "label-hardware", "if": "hardware", "factory": "header2(hardware)", "x": "prevX + 10", "y": "prevB + sectionPadding", "w": "prevW", "h": 30 },
+						{ "id": "hardware", "if": "hardware", "factory": "bento", "x": "prevX - 10", "y": "prevB + 10", "w": "prevW", "pH": "maxY + 20",
+							"components": [
+								{ "id": "hardware-enabled", "factory": "set-toggle(hardware, enabled)", "x": 20, "y": 20, "r": "parW - 20", "h": 42 },
+								{ "id": "line1", "yd": 16, "h": 1, "factory": "line" },
+								{ "id": "hardware-advance", "factory": "set-number(hardware, advance)", "x": 20, "y": "prevB + 20", "r": "parW - 20", "h": 42 },
+								{ "id": "line2", "yd": 16, "h": 1, "factory": "line" },
+								{ "id": "hardware-boards", "factory": "set-hardware", "x": 20, "y": "prevB + 20", "r": "parW - 20", "h": 400 }
+							]
+						},
 						{ "id": "label-fx", "factory": "header2(audio-fx)", "x": "prevX + 10", "y": "prevB + sectionPadding", "w": "prevW", "h": 30 },
 						{ "id": "fx", "factory": "bento", "x": "prevX - 10", "y": "prevB + 10", "w": "prevW", "pH": "maxY + 20",
 							"components": [

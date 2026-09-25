@@ -11,6 +11,9 @@
 
 #include "Audio/FXTuning.h"
 #include "UI/Components/GUI_SettingsInstall.h"
+#if ULTRASID_HARDWARE_OUTPUT
+	#include "UI/Components/GUI_SettingsHardware.h"
+#endif
 #include "UI/Components/GUI_SettingsLocation.h"
 #include "UI/Components/GUI_SettingsText.h"
 #include "UI/Components/GUI_SettingsUserData.h"
@@ -60,6 +63,14 @@ std::pair<juce::Component*, bool> componentFactory ( const juce::String& typeNam
 	//
 	if ( compType == "set-location" )
 		return { new GUI_SettingsLocation ( typeParts[ 0 ], typeParts.size () > 1 && typeParts[ 1 ].equalsIgnoreCase ( "move" ) ), false };
+
+#if ULTRASID_HARDWARE_OUTPUT
+	//
+	// Hardware output boards, order and status
+	//
+	if ( compType == "set-hardware" )
+		return { new GUI_SettingsHardware, false };
+#endif
 
 	//
 	// User data export/import block

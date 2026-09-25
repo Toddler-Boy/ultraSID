@@ -8,6 +8,10 @@
 #include "Config/Preferences.h"
 #include "UI/Components/GUI_QualitySelectorButton.h"
 
+#if ULTRASID_HARDWARE_OUTPUT
+	#include "UI/Components/GUI_HardwareBadge.h"
+#endif
+
 #include "GUI_EQPopup.h"
 #include "GUI_QualitySelector.h"
 
@@ -37,6 +41,9 @@ public:
 	GUI_QualitySelectorButton	quality { "quality", "REAL,PURE,MAGIC,EPIC,MYTHIC" };
 	GUI_SVG_Button		eq { "eq", { "footer/eq" } };
 	GUI_SVG_Button		mute { "mute", { "footer/volume/high" } };
+#if ULTRASID_HARDWARE_OUTPUT
+	GUI_HardwareBadge	hardwareBadge;
+#endif
 	GUI_QualitySelector	qualitySelector;
 	GUI_EQPopup			eqPopup;
 

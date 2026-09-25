@@ -125,6 +125,10 @@ GUI_ultraSID::GUI_ultraSID ()
 	// Handle transport seek
 	mainScreen.footer.onSeek ( [ this ] ( int newPosition )
 	{
+		// The boards cannot jump, scrubbing is off while they play along
+		if ( player.isHardwareEnabled () )
+			return;
+
 		player.seek ( newPosition );
 	} );
 
@@ -610,6 +614,58 @@ void GUI_ultraSID::applyPreferences ()
 	updateFooterThumbnail ( lastFilename );
 
 	juce::Desktop::setScreenSaverEnabled ( ! preferences->get<bool> ( "ui/keep-screen-awake" ) );
+
+	applyHardwareSettings ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraSID::applyHardwareSettings ()
+{
+#if ULTRASID_HARDWARE_OUTPUT
+	auto&	output = hardware.get ();
+
+	player.setHardwareOutput ( &output );
+
+	// A positive advance drives the boards earlier than the audio
+	output.setSyncOffsetMs ( -preferences->getClamped ( "hardware/advance" ) );
+
+	if ( ! preferences->get<bool> ( "hardware/enabled" ) )
+	{
+		if ( output.isOpen () )
+		{
+			player.silenceHardware ();
+			output.close ();
+		}
+
+		return;
+	}
+
+	const auto	boards = preferences->get<juce::String> ( "hardware/boards" );
+
+	if ( output.isOpen () && boards == hardwareBoards )
+		return;
+
+	output.close ();
+
+	std::vector<std::string>	serials;
+
+	for ( const auto& serial : juce::StringArray::fromTokens ( boards, ",", "" ) )
+		if ( serial.isNotEmpty () )
+			serials.push_back ( serial.toStdString () );
+
+	hardwareBoards = boards;
+
+	if ( ! output.open ( serials ) )
+	{
+		Z_ERR ( "Hardware output: no USBSID-Pico board could be opened" );
+		return;
+	}
+
+	Z_INFO ( "Hardware output: " << output.status ().boards << " board(s), " << output.status ().sids << " SID(s)" );
+
+	// The playing tune starts over so the boards follow it from the beginning
+	restartTweakRender ( 0 );
+#endif
 }
 //-----------------------------------------------------------------------------
 

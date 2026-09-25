@@ -33,6 +33,9 @@ void GUI_Footer::keepFocusOnClick ( juce::Component& c )
 
 void GUI_Footer::resized ()
 {
+	// The USBSID-Pico badge exists in builds with ULTRASID_HARDWARE_OUTPUT only
+	layout.setConstant ( "hardware", ULTRASID_HARDWARE_OUTPUT );
+
 	UI::setLayout ( layout, {	"UI/layouts/constants.json",
 								"UI/layouts/footer.json",
 							} );

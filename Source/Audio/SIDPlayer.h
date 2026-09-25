@@ -10,6 +10,10 @@
 
 #include "Audio/PerceivedLoudness.h"
 
+#if ULTRASID_HARDWARE_OUTPUT
+	#include "Audio/HardwareOutput.h"
+#endif
+
 #include "Effects/FX_Helpers.h"
 #include "sid-constants.h"
 #include "SIDEffects.h"
@@ -107,6 +111,35 @@ public:
 	// Message thread -> render thread; applied between emulation chunks
 	void pushLiveProfile ( const ChipSettings& s );
 
+#if ULTRASID_HARDWARE_OUTPUT
+	//
+	// Hardware output: while the output is open every tune's register writes also reach
+	// real USBSID-Pico boards. The player keeps the boards in step with the audio
+	// playhead, so the render stays close behind it and scrubbing is refused
+	//
+
+	// The output must outlive the player, pass nullptr to detach
+	void setHardwareOutput ( HardwareOutput* output );
+#endif
+
+	// True while an open output plays every tune along
+	[[ nodiscard ]] bool isHardwareEnabled () const
+	{
+	#if ULTRASID_HARDWARE_OUTPUT
+		return hardware != nullptr && hardware->isOpen ();
+	#else
+		return false;
+	#endif
+	}
+
+	// Silences the boards and stops forwarding, the next init () starts over
+	void silenceHardware ()
+	{
+	#if ULTRASID_HARDWARE_OUTPUT
+		releaseHardware ();
+	#endif
+	}
+
 private:
 	// Set from the message thread, read by the audio callback and the render thread
 	std::atomic<bool>	useReplayGain = true;
@@ -134,6 +167,10 @@ private:
 	// Live-tweak: how far the render may run ahead of the playhead
 	static constexpr auto	liveAheadSamples = 4410;	// 100 ms
 
+	// Hardware output: the boards are fed 100 ms ahead of the playhead, and the playhead
+	// trails the play cursor by the output latency
+	static constexpr auto	hardwareAheadSamples = 6615;	// 150 ms
+
 	std::atomic<bool>	liveTweak = false;
 	std::atomic<bool>	liveProfileDirty = false;
 	juce::SpinLock		liveProfileLock;
@@ -144,6 +181,22 @@ private:
 	std::optional<ChipSettings>	lastAppliedProfile;
 
 	void applyLiveProfile ();							// render thread, between chunks
+
+#if ULTRASID_HARDWARE_OUTPUT
+	HardwareOutput*	hardware = nullptr;
+
+	void releaseHardware ();							// stops forwarding and silences the boards, any thread
+	void detachSink ();									// removes the engine's write sink, only with the render stopped
+#endif
+
+	[[ nodiscard ]] bool hardwareArmed () const
+	{
+	#if ULTRASID_HARDWARE_OUTPUT
+		return hardware != nullptr && hardware->isArmed ();
+	#else
+		return false;
+	#endif
+	}
 
 	std::atomic<bool>	rendered = false;
 	bool	renderStarted = false;		// Buffers allocated; a resumed render skips that

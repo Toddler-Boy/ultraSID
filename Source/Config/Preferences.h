@@ -38,6 +38,8 @@ public:
 		if ( key == "songs/max-loops" )	return { 0, 99 };
 		if ( key == "songs/fade-out" )	return { 0, 60 };	// seconds
 
+		if ( key == "hardware/advance" )	return { 0, 200 };	// milliseconds
+
 		return {};
 	}
 
@@ -78,6 +80,11 @@ private:
 			{ "songs",		"fade-out",				10 },
 
 			{ "emulation",	"dac-leakage",			false },
+
+			// USBSID-Pico output, only acted on by builds with ULTRASID_HARDWARE_OUTPUT
+			{ "hardware",	"enabled",				false },
+			{ "hardware",	"boards",				"" },			// Serials in logical order, empty uses every attached board
+			{ "hardware",	"advance",				0 },
 
 			{ "fx",			"stereo-processing",	true },
 			{ "fx",			"transition-time",		0.3f },

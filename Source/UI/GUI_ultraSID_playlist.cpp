@@ -195,12 +195,19 @@ void GUI_ultraSID::updatePlaylistPosition ()
 	// one, so "repeat all" loops it just like "repeat one"
 	if ( repeat == PlayQueue::Repeat::one || ( repeat == PlayQueue::Repeat::all && ! inPlaylist ) )
 	{
-		player.seek ( 0 );
+		// The boards cannot rewind, a hardware run starts the tune over instead
+		if ( player.isHardwareEnabled () )
+			restartTweakRender ( 0 );
+		else
+			player.seek ( 0 );
+
 		return;
 	}
 
 	if ( ! inPlaylist )
 	{
+		player.silenceHardware ();
+
 		mainScreen.pages.setPlaying ( "", -1 );
 		mainScreen.sidebarRight.setTunePlaying ( -1 );
 		return;
@@ -412,7 +419,11 @@ void GUI_ultraSID::playSubtune ( const int subtune )
 
 	if ( playQueue->subtune == subtune )
 	{
-		player.seek ( 0 );
+		if ( player.isHardwareEnabled () )
+			restartTweakRender ( 0 );
+		else
+			player.seek ( 0 );
+
 		return;
 	}
 

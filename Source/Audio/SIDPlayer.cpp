@@ -35,6 +35,10 @@ SIDPlayer::SIDPlayer ()
 SIDPlayer::~SIDPlayer ()
 {
 	stopRender ();
+
+#if ULTRASID_HARDWARE_OUTPUT
+	setHardwareOutput ( nullptr );
+#endif
 }
 //-----------------------------------------------------------------------------
 
@@ -70,8 +74,48 @@ bool SIDPlayer::loadTune ( const std::string& name )
 }
 //-----------------------------------------------------------------------------
 
+#if ULTRASID_HARDWARE_OUTPUT
+void SIDPlayer::setHardwareOutput ( HardwareOutput* output )
+{
+	if ( hardware == output )
+		return;
+
+	detachSink ();
+	releaseHardware ();
+
+	if ( hardware != nullptr )
+		hardware->setPlayheadSource ( {} );
+
+	hardware = output;
+
+	// The audible position: what the audio callback consumed minus the device latency
+	if ( hardware != nullptr )
+		hardware->setPlayheadSource ( [ this ] { return int64_t ( renderPlayOffset.load () ) - outputLatency; } );
+}
+//-----------------------------------------------------------------------------
+
+void SIDPlayer::releaseHardware ()
+{
+	if ( hardware != nullptr )
+		hardware->endTune ();
+}
+//-----------------------------------------------------------------------------
+
+void SIDPlayer::detachSink ()
+{
+	engineEZ.setWriteSink ( {} );
+}
+//-----------------------------------------------------------------------------
+#endif
+
 bool SIDPlayer::init ( const unsigned int songNo, const bool useFilter )
 {
+#if ULTRASID_HARDWARE_OUTPUT
+	// A sink left over from the previous song would forward this song's init routine
+	detachSink ();
+	releaseHardware ();
+#endif
+
 	// A real machine powers up with an arbitrary TOD clock; roll a fresh one per
 	// (re)init so TOD-reading tunes vary between plays like on hardware
 	engineEZ.setTodPowerOnSeed ( uint32_t ( juce::Random::getSystemRandom ().nextInt () ) | 1u );
@@ -198,19 +242,39 @@ bool SIDPlayer::startRender ( uint32_t _lengthMS, uint32_t _fadeOutLenMS, float 
 void SIDPlayer::stopRender ()
 {
 	stopThread ( -1 );
+
+#if ULTRASID_HARDWARE_OUTPUT
+	detachSink ();
+	releaseHardware ();
+#endif
 }
 //-----------------------------------------------------------------------------
 
 void SIDPlayer::togglePlayPause ()
 {
-	if ( readyToPlay )
-		paused = ! paused;
+	if ( ! readyToPlay )
+		return;
+
+	paused = ! paused;
+
+#if ULTRASID_HARDWARE_OUTPUT
+	if ( hardware != nullptr )
+		hardware->setPaused ( paused );
+#endif
 }
 //-----------------------------------------------------------------------------
 
 void SIDPlayer::seek ( uint32_t positionMS )
 {
-	renderPlayOffset = int ( positionMS * 44.1f );
+	const auto	target = int ( positionMS * 44.1f );
+
+#if ULTRASID_HARDWARE_OUTPUT
+	// The boards cannot follow a jump, they stay muted for the rest of the tune
+	if ( hardware != nullptr && target != renderPlayOffset.load () )
+		hardware->detach ();
+#endif
+
+	renderPlayOffset = target;
 }
 //-----------------------------------------------------------------------------
 
@@ -488,6 +552,24 @@ bool SIDPlayer::renderCore ( const std::function<bool ()>& shouldAbort )
 		}
 	}
 
+#if ULTRASID_HARDWARE_OUTPUT
+	// Bring the boards to the tune's state, then forward every register write from here on
+	if ( freshRender && hardware != nullptr && hardware->isOpen () )
+	{
+		std::vector<std::array<uint8_t, 32>>	snapshot ( static_cast<size_t> ( numSids ) );
+
+		for ( auto i = 0; i < numSids; ++i )
+			engineEZ.getSidStatus ( i, snapshot[ size_t ( i ) ].data () );
+
+		static_assert ( sizeof ( std::array<uint8_t, 32> ) == 32 );
+
+		if ( hardware->arm ( reinterpret_cast<const uint8_t ( * )[ 32 ]> ( snapshot.data () ), numSids, engineEZ.getCycleTime (), engineEZ.getCpuFrequency () ) )
+			engineEZ.setWriteSink ( { &HardwareOutput::onWrite, hardware } );
+		else
+			Z_ERR ( "Hardware output could not start for " << juce::String ( engineEZ.getFileInfo ().filename ) );
+	}
+#endif
+
 	// Render output into final buffers, continuing from renderProgress on resume
 	{
 		float	outBuffer[ 2 ][ sixtyHzLength ];
@@ -511,25 +593,32 @@ bool SIDPlayer::renderCore ( const std::function<bool ()>& shouldAbort )
 			if ( shouldAbort () )
 				return false;
 
-			// Live-tweak mode: apply pending profile changes, then hold the
-			// render close to the playhead instead of racing ahead
+			// Live-tweak mode: apply pending profile changes
 			if ( liveTweak.load ( std::memory_order_relaxed ) )
-			{
 				applyLiveProfile ();
 
-				while ( liveTweak && progress - renderPlayOffset.load () > liveAheadSamples )
-				{
-					if ( shouldAbort () )
-						return false;
+			// Live-tweak and hardware output hold the render close to the playhead
+			// instead of racing ahead
+			const auto	aheadLimit = hardwareArmed () ? hardwareAheadSamples : liveAheadSamples;
 
-					juce::Thread::sleep ( 2 );
-				}
+			while ( ( liveTweak || hardwareArmed () ) && progress - renderPlayOffset.load () > aheadLimit )
+			{
+				if ( shouldAbort () )
+					return false;
+
+				juce::Thread::sleep ( 2 );
 			}
 
 			const auto	requestLength = std::min ( lengthWanted, sixtyHzLength );		// generate only up to 60Hz worth of data
 			const auto	wordsWritten = engineEZ.runEmulation ( { outBuffer[ 0 ], requestLength },
 																isStereo ? std::span<float> { outBuffer[ 1 ], requestLength } : std::span<float> {},
 																digiPtrs );
+
+#if ULTRASID_HARDWARE_OUTPUT
+			// Every write up to this cycle has been forwarded
+			if ( hardware != nullptr )
+				hardware->setEmulatedCycle ( engineEZ.getCycleTime () );
+#endif
 
 			// The tune's play routine runs here and can hit an illegal opcode
 			if ( engineEZ.isJammed () )

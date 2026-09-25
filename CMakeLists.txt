@@ -39,6 +39,20 @@ set_property (DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 
 Include (FetchContent)
 
+# Hardware output: also forwards every emulated SID register write, with its cycle timing,
+# to USBSID-Pico boards. Off compiles the hardware code and the libSidplayEZ write sink out
+option (ULTRASID_HARDWARE_OUTPUT "Forward SID register writes to USBSID-Pico boards (Linux only)" OFF)
+if (ULTRASID_HARDWARE_OUTPUT)
+	if (NOT (UNIX AND NOT APPLE))
+		message (FATAL_ERROR "ULTRASID_HARDWARE_OUTPUT is only supported on Linux")
+	endif ()
+	find_package (PkgConfig REQUIRED)
+	pkg_check_modules (libusb REQUIRED IMPORTED_TARGET libusb-1.0)
+	set (ultra_hardware_value 1)
+else ()
+	set (ultra_hardware_value 0)
+endif ()
+
 # Development = Release plus dev-only features (naked Data folder, inspector);
 # custom configs start with empty flags, so inherit the Release set wholesale
 set (CMAKE_C_FLAGS_DEVELOPMENT "${CMAKE_C_FLAGS_RELEASE}")
@@ -305,6 +319,7 @@ endif ()
 function (ultra_target target)
 	cmake_parse_arguments (arg "DSP;PGO" "" "" ${ARGN})
 	set_target_properties (${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+	target_compile_definitions (${target} PRIVATE ULTRASID_HARDWARE_OUTPUT=${ultra_hardware_value} SIDPLAYEZ_WRITE_SINK=${ultra_hardware_value})
 	if (WIN32)
 		set_target_properties (${target} PROPERTIES VS_PLATFORM_TOOLSET ClangCL)
 	endif ()
@@ -399,6 +414,14 @@ file (GLOB_RECURSE source_files CONFIGURE_DEPENDS
 # ultra-shared/Network is ultraView-only (C64u streaming); ultraSID has no consumer
 list (FILTER source_files EXCLUDE REGEX "/ultra-shared/Network/")
 
+if (ULTRASID_HARDWARE_OUTPUT)
+	# Vendored driver (driver-repo/src), its warnings are not ours to fix
+	file (GLOB_RECURSE vendored_usbsid CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Source/Audio/USBSID/*.cpp)
+	set_source_files_properties (${vendored_usbsid} PROPERTIES COMPILE_OPTIONS "-w")
+else ()
+	list (FILTER source_files EXCLUDE REGEX "/(Audio/(HardwareOutput\\.(cpp|h)|USBSID/)|UI/Components/(GUI_SettingsHardware|GUI_HardwareBadge)\\.(cpp|h))")
+endif ()
+
 target_sources (ultraSID PRIVATE ${source_files})
 source_group (TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX Source FILES ${source_files})
 
@@ -469,6 +492,10 @@ target_link_libraries (ultraSID PRIVATE
 					)
 
 juce_generate_juce_header (ultraSID)
+
+if (ULTRASID_HARDWARE_OUTPUT)
+	target_link_libraries (ultraSID PRIVATE PkgConfig::libusb)
+endif ()
 
 target_compile_definitions (ultraSID PRIVATE
 								JUCE_COREGRAPHICS_DRAW_ASYNC=1
