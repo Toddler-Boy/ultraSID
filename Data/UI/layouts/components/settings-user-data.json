@@ -15,6 +15,8 @@
 		{ "id": "themes-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
 		{ "id": "crt", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
 		{ "id": "crt-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
+		{ "id": "screenshots", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
+		{ "id": "screenshots-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
 		{ "id": "preferences", "x": 0, "y": "prevB + 8", "w": 22, "h": 22 },
 		{ "id": "preferences-label", "x": "prevR + 10", "y": "prevY", "r": "parW - 150", "h": "prevH" },
 

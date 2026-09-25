@@ -4,6 +4,7 @@
 #include "ultra-shared/Config/BuildInfo.h"
 #include "ultra-shared/UI/GUI_LookAndFeel.h"
 
+#include "Config/FilePaths.h"
 #include "Helpers/Messages.h"
 
 #include "GUI_ultraSID.h"

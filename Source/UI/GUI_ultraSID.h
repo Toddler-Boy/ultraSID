@@ -339,11 +339,19 @@ private:
 	// Each M3U becomes a new playlist, a .jpg/.png beside it its cover
 	void addPlaylistFiles ( const juce::StringArray& filenames );
 
+	// Curation of the picture the CRT shows
 	void assignBorderColor ( const int index );
 	void toggleFirstLuma ();
 	void toggleFirstLumaAll ();
 	void toggleThumbnail ();
+	void setScreenKind ( const int kind );
+	void toggleNTSC ();
 	void deleteImage ();
+	void keepForTune ();
+	void saveScreenshot ( const juce::String& folder );
+
+	// The user's Screenshots folder changed: merged tree, thumbnails, the CRT
+	void userScreenshotsChanged ();
 
 	#if ULTRA_INSPECTOR
 		std::unique_ptr<melatonin::Inspector>	inspector;

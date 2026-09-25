@@ -69,13 +69,13 @@ folder,name,status,fltCap,flt0Dac,fltGain,fltSat,resonance,waveDC,extInDC,bias,c
 /MUSICIANS/S/Sonic_Graffiti/Gourley_Gerard/,Gerard Gourley,,,,,,,,,,,,
 /MUSICIANS/S/Southern_Shaun/,Shaun Southern,,old,0.7,,,,,,,,,
 /MUSICIANS/T/THCM/,Uwe Anfang,,,,,,,,,,,,
-/MUSICIANS/T/Tel_Jeroen/,Jeroen Tel,approved,old,0.7,0.85,,,,,0.15,,,
+/MUSICIANS/T/Tel_Jeroen/,Jeroen Tel,approved,,0.3,0.85,,,,0.9,,,,
 /MUSICIANS/T/Tinman_Keith/,Keith Tinman,,,0.3,0.7,,,,,,,,
 /MUSICIANS/T/Tjelta_Geir/,Geir Tjelta,,,,,,,,,,,,"Echofied_6581#3,4 = Jeroen Tel; Echofied_6581#5 = Laxity; Echofied_6581#6,7 = Thomas Mogensen (DRAX)"
 /MUSICIANS/T/Turner_Steve/,Steve Turner,,,0.35,,,,,,,,,Bushido#2 = Jason Page
 /MUSICIANS/V/Vaca_Ramiro/,Ramiro Vaca,,,0.3,,,,,,,,,Rock_n_Roll#1 = Chris Hülsbeck; StarTrash#1 = Chris Hülsbeck; Turrican#1 = Stefan Hartwig; Turrican#3 = Chris Hülsbeck; Turrican#4 = Michael Hendriks
 /MUSICIANS/W/Walker_Martin/,Martin Walker,,old,0.5,,,,,,,,,
-/MUSICIANS/W/Whittaker_David/,David Whittaker,,old,,1,,,,0.5,,,,
+/MUSICIANS/W/Whittaker_David/,David Whittaker,,old,,1,,,,,,,,
 /MUSICIANS/W/Wilson_Mark/,Mark Wilson,,old,0.7,,,,,,,strong+,,
 /MUSICIANS/W/Winterberg_Michael/,Michael Winterberg,,old,0.7,1,,,,,,strong+,,
 /MUSICIANS/Y/Yip/,Jori Olkkonen (Yip),,,,0.8,,,,1.1,,,,

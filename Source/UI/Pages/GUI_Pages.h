@@ -98,7 +98,11 @@ public:
 	[[ nodiscard ]] int getCRTPage () const					{	return crtPage.getCRTPage ();	}
 	void setCRTPage ( const int page )						{	crtPage.setCRTPage ( page );	}
 	void paintCRTIntoSnapshot ( juce::Image& snapshot, juce::Component& top )	{	crtPage.paintIntoSnapshot ( snapshot, top );	}
-	[[ nodiscard ]] juce::File getLastLoadedArtwork ()		{	return crtPage.getLastLoadedFile ();	}
+	[[ nodiscard ]] juce::String getLastLoadedArtwork () const	{	return crtPage.getLastLoadedName ();	}
+	void showPictures ( const juce::StringArray& files )	{	crtPage.showPictures ( files );	}
+	void userScreenshotsChanged ()							{	crtPage.userScreenshotsChanged ();	}
+	[[ nodiscard ]] bool isCRTBrowserVisible () const		{	return crtPage.isBrowserVisible ();	}
+	[[ nodiscard ]] juce::String getCRTBrowserFolder () const	{	return crtPage.getBrowserFolder ();	}
 	void setCRTBackground ( const juce::Colour& col )		{	crtPage.setBackgroundColour ( col );	}
 	void setCRTVoiceRegs ( const uint8_t* regs, const int count )	{	crtPage.setVoiceRegs ( regs, count );	}
 	void setCRTPlaybackTime ( const int timeMS, const int lengthMS, const int renderMS )	{	crtPage.setPlaybackTime ( timeMS, lengthMS, renderMS );	}

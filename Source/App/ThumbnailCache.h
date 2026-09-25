@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 
 #include <chrono>
+#include <optional>
 
 #include "std_lime/lime_string_utils.h"
 
@@ -29,7 +30,16 @@ public:
 	// Use the returned reference immediately, never store it. It stays valid only while
 	// nothing evicts or reassigns that entry
 	[[ nodiscard ]] MipMap& getThumbnail ( std::string_view tunename, const bool isNTSC, std::function<void()> callback = nullptr );
+
+	// The same for one art file (Screenshots-relative name), whichever tune it
+	// belongs to; the screenshot browser's rows
+	[[ nodiscard ]] MipMap& getArtThumbnail ( const std::string& artName, const bool isNTSC, std::function<void()> callback = nullptr );
+
 	void removeCacheEntry ( const std::string& tunename );
+
+	// Picture facts known once its thumbnail is cached: false, or unknown, before
+	[[ nodiscard ]] bool isInterlaced ( const std::string& key ) const;
+	[[ nodiscard ]] std::optional<bool> isMulticolor ( const std::string& key ) const;
 
 	[[ nodiscard ]] juce::Image& getDefaultScreen () { return defaultScreen; }
 	[[ nodiscard ]] int getCacheSize () const;
@@ -43,7 +53,18 @@ private:
 	void removeStaleEntries ();
 	[[ nodiscard ]] bool hasCacheEntry ( const std::string& tunename );
 
-	[[ nodiscard ]] MipMap renderThumbnail ( VIC2_Render& vic2, const std::string& artName, const bool isNTSC );
+	// The cache entry under key, rendered from artName when missing
+	[[ nodiscard ]] MipMap& getOrRender ( const std::string& key, const std::string& artName, const bool isNTSC, std::function<void()> callback );
+
+	struct CacheEntry
+	{
+		MipMap	image;
+		std::chrono::steady_clock::time_point	lastAccess;
+		bool	interlaced = false;
+		bool	multicolor = false;
+	};
+
+	[[ nodiscard ]] CacheEntry renderThumbnail ( VIC2_Render& vic2, const std::string& artName, const bool isNTSC );
 	[[ nodiscard ]] static juce::Image postProcess ( juce::Image img, const int reduceX, const int reduceY );
 	[[ nodiscard ]] static juce::Image createImage ( VIC2_Render& vic2, const std::string& artName );
 
@@ -51,13 +72,7 @@ private:
 	VIC2_Render				vic2Thumb { false };
 	VIC2_Render				vic2Job { false };	// Job renderer, lock-free: the pool is one thread wide
 
-	juce::CriticalSection	cacheCs;
-
-	struct CacheEntry
-	{
-		MipMap	image;
-		std::chrono::steady_clock::time_point	lastAccess;
-	};
+	mutable juce::CriticalSection	cacheCs;
 	std::unordered_map<std::string, CacheEntry, lime::str::TransparentHash, std::equal_to<>>	cache;
 
 	// One queued render job per tune, every requester's callback joins the

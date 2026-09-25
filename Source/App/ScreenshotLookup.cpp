@@ -28,10 +28,29 @@ static std::string screenshotKey ( const std::string& tunename )
 }
 //-----------------------------------------------------------------------------
 
-// The LUT key for an art filename ("A/B_01.png" -> "a/b")
+// The LUT key for an art filename ("A/B_01#5.png" -> "a/b"); a name without
+// the _NN number is a group of its own, hints aside
 static std::string artKey ( const std::string& filename )
 {
-	return lime::str::toLower ( filename.substr ( 0, filename.find_last_of ( '_' ) ) );
+	const auto	base = imageutils::hintFromFilename ( filename ).name.toStdString ();
+
+	return lime::str::toLower ( base.substr ( 0, base.find_last_of ( '_' ) ) );
+}
+//-----------------------------------------------------------------------------
+
+// The name without its hints ("a/b_01#5.png" -> "a/b_01.png"), lowercase:
+// what decides whether a user file replaces a factory one
+static std::string stemKey ( const std::string& filename )
+{
+	const auto	hint = imageutils::hintFromFilename ( filename );
+
+	return lime::str::toLower ( ( hint.name + hint.extension ).toStdString () );
+}
+//-----------------------------------------------------------------------------
+
+static void sortNatural ( std::vector<std::string>& v )
+{
+	std::ranges::sort ( v, [] ( const std::string& a, const std::string& b ) { return lime::str::naturalCompare ( std::string_view ( a ), std::string_view ( b ) ) < 0; } );
 }
 //-----------------------------------------------------------------------------
 
@@ -39,20 +58,75 @@ void ScreenshotLookup::reload ()
 {
 	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
 
-	tuneFileToArtFiles.clear ();
+	names.clear ();
+	userNames.clear ();
 
-	// Scan for art files (C64 titles screens and game play screen-shots)
+	userRoot = filepaths::getUserScreenshotsPath ();
+
+	// Factory first, then the user files replace or add; hints do not make a
+	// name distinct
+	std::unordered_map<std::string, std::string>	byStem;
+
 	for ( const auto& f : datasource::listFiles ( "Screenshots/", true, "*.png" ) )
 	{
 		const auto	filename = f.toStdString ();
-
-		// Add to LUT
-		tuneFileToArtFiles[ artKey ( filename ) ].emplace_back ( filename );
+		byStem[ stemKey ( filename ) ] = filename;
 	}
 
-	// Sort filenames
+	if ( userRoot.isDirectory () )
+	{
+		for ( const auto& f : userRoot.findChildFiles ( juce::File::findFiles | juce::File::ignoreHiddenFiles, true, "*.png" ) )
+		{
+			const auto	filename = f.getRelativePathFrom ( userRoot ).replaceCharacter ( '\\', '/' ).toStdString ();
+
+			byStem[ stemKey ( filename ) ] = filename;
+			userNames.insert ( filename );
+		}
+	}
+
+	for ( const auto& [ _, filename ] : byStem )
+		names.insert ( filename );
+
+	rebuildIndex ();
+}
+//-----------------------------------------------------------------------------
+
+void ScreenshotLookup::rebuildIndex ()
+{
+	tuneFileToArtFiles.clear ();
+	tree.clear ();
+
+	for ( const auto& filename : names )
+	{
+		tuneFileToArtFiles[ artKey ( filename ) ].emplace_back ( filename );
+
+		// Every folder on the way down gets the child, once
+		auto	pos = filename.find_last_of ( '/' );
+		const auto	folder = pos == std::string::npos ? std::string () : filename.substr ( 0, pos );
+
+		tree[ lime::str::toLower ( folder ) ].files.emplace_back ( filename );
+
+		for ( auto sub = folder; ! sub.empty (); )
+		{
+			pos = sub.find_last_of ( '/' );
+			const auto	parent = pos == std::string::npos ? std::string () : sub.substr ( 0, pos );
+
+			auto&	folders = tree[ lime::str::toLower ( parent ) ].folders;
+			if ( ! std::ranges::contains ( folders, sub ) )
+				folders.emplace_back ( sub );
+
+			sub = parent;
+		}
+	}
+
 	for ( auto& [ _, files ] : tuneFileToArtFiles )
 		std::ranges::sort ( files );
+
+	for ( auto& [ _, l ] : tree )
+	{
+		sortNatural ( l.folders );
+		sortNatural ( l.files );
+	}
 }
 //-----------------------------------------------------------------------------
 
@@ -86,13 +160,107 @@ int ScreenshotLookup::getDefaultScreenshotIndex ( const std::vector<std::string>
 {
 	for ( auto index = 0; const auto& scr : screenshots )
 	{
-		if ( imageutils::hintFromFilename ( scr ).isGameScreen )
+		if ( imageutils::hintFromFilename ( scr ).kind == imageutils::screenKind::game )
 			return index;
 
 		++index;
 	}
 
 	return 0;
+}
+//-----------------------------------------------------------------------------
+
+std::vector<std::string> ScreenshotLookup::getSiblings ( const std::string& artName ) const
+{
+	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
+
+	if ( const auto it = tuneFileToArtFiles.find ( artKey ( artName ) ); it != tuneFileToArtFiles.end () )
+		return it->second;
+
+	return { artName };
+}
+//-----------------------------------------------------------------------------
+
+int ScreenshotLookup::getLastNumber ( const std::string& tunename ) const
+{
+	auto	last = 0;
+
+	for ( const auto& scr : getScreenshots ( tunename ) )
+	{
+		const auto	stem = imageutils::hintFromFilename ( scr ).name;
+		last = std::max ( last, stem.fromLastOccurrenceOf ( "_", false, false ).getIntValue () );
+	}
+
+	return last;
+}
+//-----------------------------------------------------------------------------
+
+bool ScreenshotLookup::exists ( const std::string& artName ) const
+{
+	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
+
+	return names.contains ( artName );
+}
+//-----------------------------------------------------------------------------
+
+bool ScreenshotLookup::isUserFile ( const std::string& artName ) const
+{
+	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
+
+	return userNames.contains ( artName );
+}
+//-----------------------------------------------------------------------------
+
+std::string ScreenshotLookup::currentName ( const std::string& artName ) const
+{
+	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
+
+	if ( names.contains ( artName ) )
+		return artName;
+
+	const auto	stem = stemKey ( artName );
+
+	if ( const auto it = tuneFileToArtFiles.find ( artKey ( artName ) ); it != tuneFileToArtFiles.end () )
+		for ( const auto& sibling : it->second )
+			if ( stemKey ( sibling ) == stem )
+				return sibling;
+
+	return {};
+}
+//-----------------------------------------------------------------------------
+
+juce::MemoryBlock ScreenshotLookup::loadData ( const std::string& artName ) const
+{
+	if ( isUserFile ( artName ) )
+	{
+		juce::MemoryBlock	mb;
+		getUserFile ( artName ).loadFileAsData ( mb );
+		return mb;
+	}
+
+	return datasource::loadData ( "Screenshots/" + artName );
+}
+//-----------------------------------------------------------------------------
+
+juce::File ScreenshotLookup::getUserFile ( const std::string& artName ) const
+{
+	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
+
+	if ( userRoot == juce::File () )
+		return {};
+
+	return userRoot.getChildFile ( juce::String ( artName ) );
+}
+//-----------------------------------------------------------------------------
+
+ScreenshotLookup::listing ScreenshotLookup::list ( const std::string& folder ) const
+{
+	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
+
+	if ( const auto it = tree.find ( lime::str::toLower ( folder ) ); it != tree.end () )
+		return it->second;
+
+	return {};
 }
 //-----------------------------------------------------------------------------
 
@@ -111,41 +279,26 @@ void ScreenshotLookup::addScreenshot ( const std::string& filename )
 		return filename == hint.name + hint.extension;
 	};
 
-	// Add to LUT
 	if ( auto it = tuneFileToArtFiles.find ( tunename ); it != tuneFileToArtFiles.end () )
 	{
-		if ( auto itFile = std::ranges::find_if ( it->second, findWithHint ); itFile == it->second.end () )
-		{
-			it->second.emplace_back ( filename );
-			std::ranges::sort ( it->second );
-		}
-		else
+		if ( auto itFile = std::ranges::find_if ( it->second, findWithHint ); itFile != it->second.end () )
 		{
 			// Developer curation normalizes the incoming name onto the known one
 			datasource::getDevFile ( "Screenshots/" + filename ).moveFileTo ( datasource::getDevFile ( "Screenshots/" + *itFile ) );
+			return;
 		}
 	}
-	else
-	{
-		tuneFileToArtFiles[ tunename ] = { filename };
-	}
+
+	names.insert ( filename );
+	rebuildIndex ();
 }
 //-----------------------------------------------------------------------------
 
 void ScreenshotLookup::removeScreenshot ( const std::string& filename )
 {
-	const auto	tunename = artKey ( filename );
-
 	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
 
-	// Remove from LUT
-	if ( auto it = tuneFileToArtFiles.find ( tunename ); it != tuneFileToArtFiles.end () )
-		if ( auto it2 = std::ranges::find ( it->second, filename ); it2 != it->second.end () )
-		{
-			it->second.erase ( it2 );
-
-			if ( it->second.empty () )
-				tuneFileToArtFiles.erase ( it );
-		}
+	if ( names.erase ( filename ) )
+		rebuildIndex ();
 }
 //-----------------------------------------------------------------------------

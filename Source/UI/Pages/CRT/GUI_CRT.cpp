@@ -11,6 +11,8 @@
 #include "ultra-shared/Helpers/TextUtils.h"
 #include "ultra-shared/UI/UI_Helpers.h"
 
+#include "App/AssetTools.h"
+#include "Config/FilePaths.h"
 #include "Database/TuneInfo.h"
 #include "Helpers/Messages.h"
 #include "UI/Components/FFT/fft-helpers.h"
@@ -63,8 +65,26 @@ GUI_CRT::GUI_CRT ()
 	settingsPanel.onOverlayChanged = [ this ]	{	overlay.updateOverlay ();		};
 	settingsPanel.onZoomChanged = [ this ]		{	overlay.updateZoom ();			};
 
-	settingsPanel.autoSystem = [ this ]			{	return juce::String ( sidInfoStr.clock );	};
+	settingsPanel.autoSystem = [ this ]			{	return lastForceNTSC ? juce::String ( "NTSC" ) : juce::String ( sidInfoStr.clock );	};
 	settingsPanel.autoFirstLuma = [ this ]		{	return lastFirstLuma;	};
+
+	// Screenshot browser
+	{
+		overlay.openBrowser.onClick = [ this ]
+		{
+			showBrowser ( overlay.openBrowser.getStage () );
+		};
+
+		browser.onPick = [ this ] ( const juce::String& artName )	{	showScreenshot ( artName );	};
+
+		browser.onDropFiles = [] ( const juce::StringArray& files, const juce::String& folder )
+		{
+			for ( const auto& f : files )
+				assettools::saveToFolder ( f, folder.toStdString () );
+		};
+
+		addChildComponent ( browser );
+	}
 
 	addMouseListener ( this, true );
 }
@@ -77,6 +97,7 @@ void GUI_CRT::resized ()
 	crtLayout.setConstant ( "fullscreen", kioskMode ? 1 : 0 );
 	crtLayout.setConstant ( "windowed", kioskMode ? 0 : 1 );
 	crtLayout.setConstant ( "showSettings", settingsVisible ? 1 : 0 );
+	crtLayout.setConstant ( "showBrowser", browserVisible ? 1 : 0 );
 
 	UI::setLayout ( crtLayout, {	"UI/layouts/constants.json",
 								"UI/layouts/crt.json" } );
@@ -115,20 +136,50 @@ void GUI_CRT::mouseWheelMove ( const juce::MouseEvent& event, const juce::MouseW
 }
 //-----------------------------------------------------------------------------
 
-juce::File GUI_CRT::getLastLoadedFile ()
-{
-	return lastLoadedName.isEmpty () ? juce::File () : datasource::getDevFile ( "Screenshots/" + lastLoadedName );
-}
-//-----------------------------------------------------------------------------
-
 bool GUI_CRT::loadArtworkImage ()
 {
 	if ( lastLoadedName.isEmpty () )
 		return false;
 
-	const auto	mb = datasource::loadData ( "Screenshots/" + lastLoadedName );
+	juce::MemoryBlock	mb;
+
+	if ( isDroppedPicture () )
+		juce::File ( lastLoadedName ).loadFileAsData ( mb );
+	else
+		mb = scrshot->loadData ( lastLoadedName.toStdString () );
+
+	fieldTime = 0.0f;
+
+	const auto	hint = imageutils::hintFromFilename ( lastLoadedName );
+	lastFirstLuma = hint.firstLuma;
+	lastForceNTSC = hint.forceNTSC;
 
 	return vicRender.loadImage ( lastLoadedName.toRawUTF8 (), mb.getData (), mb.getSize () );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::showArtworkIndex ( const int index )
+{
+	if ( index < 0 || index >= int ( tuneArtwork.size () ) )
+	{
+		lastLoadedName = {};
+		lastForceNTSC = false;
+		renderCRT ( true );
+		return;
+	}
+
+	tuneArtIndex = index;
+	lastLoadedName = tuneArtwork[ size_t ( tuneArtIndex ) ];
+
+	overlay.setCRTPage ( index, false );
+
+	if ( loadArtworkImage () )
+		renderCRT ();
+	else
+		renderCRT ( true );
+
+	if ( browserVisible && ! isDroppedPicture () )
+		browser.selectPicture ( lastLoadedName );
 }
 //-----------------------------------------------------------------------------
 
@@ -141,41 +192,75 @@ void GUI_CRT::setStrings ( const SidTuneInfoEZ& src )
 
 void GUI_CRT::loadGameArtwork ( const juce::String& sidName, const juce::String& index /* ="" */ )
 {
+	tuneKey = sidName;
+
+	// The open browser overrides the tune's art, closing it keeps the pick
+	// until the next tune change
+	if ( browserVisible )
+		return;
+
 	std::tie ( lastLoadedName, tuneArtIndex ) = findArtwork ( sidName, index );
 
 	freqFramesUsed = 0;
-
-	lastFirstLuma = imageutils::hintFromFilename ( lastLoadedName.toStdString () ).firstLuma;
 
 	sidname = sidName.fromLastOccurrenceOf ( "/", false, false );
 
 	loadPlayerLayout ( sidname.isEmpty () );
 
-	if ( loadArtworkImage () )
-		renderCRT ();
-	else
-		renderCRT ( true );
+	showArtworkIndex ( tuneArtIndex );
 }
 //-----------------------------------------------------------------------------
 
 void GUI_CRT::loadGameArtwork ( const int index )
 {
-	if ( index < 0 || index >= int ( tuneArtwork.size () ) )
-	{
-		lastLoadedName = {};
-		renderCRT ( true );
+	showArtworkIndex ( index );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::showScreenshot ( const juce::String& artName )
+{
+	const auto	siblings = scrshot->getSiblings ( artName.toStdString () );
+
+	tuneArtwork = siblings;
+
+	// The page count change must not clamp the old page into this set
+	overlay.setCRTPage ( 0, false );
+	overlay.setNumCRTpages ( int ( tuneArtwork.size () ) );
+
+	const auto	it = std::ranges::find ( tuneArtwork, artName.toStdString () );
+
+	showArtworkIndex ( it == tuneArtwork.end () ? 0 : int ( it - tuneArtwork.begin () ) );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::showPictures ( const juce::StringArray& files )
+{
+	tuneArtwork.clear ();
+	for ( const auto& f : files )
+		tuneArtwork.emplace_back ( f.toStdString () );
+
+	overlay.setCRTPage ( 0, false );
+	overlay.setNumCRTpages ( int ( tuneArtwork.size () ) );
+
+	showArtworkIndex ( 0 );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::userScreenshotsChanged ()
+{
+	browser.refresh ();
+
+	if ( lastLoadedName.isEmpty () || isDroppedPicture () )
 		return;
-	}
 
-	tuneArtIndex = index;
-	lastLoadedName = tuneArtwork[ size_t ( tuneArtIndex ) ];
+	// The shown picture may have been renamed, replaced or removed; the
+	// viewer keeps a removed one on screen until the next pick
+	const auto	now = scrshot->currentName ( lastLoadedName.toStdString () );
 
-	lastFirstLuma = imageutils::hintFromFilename ( lastLoadedName.toStdString () ).firstLuma;
-
-	if ( loadArtworkImage () )
-		renderCRT ();
-	else
-		renderCRT ( true );
+	if ( ! now.empty () )
+		showScreenshot ( now );
+	else if ( ! browserVisible )
+		loadGameArtwork ( tuneKey );
 }
 //-----------------------------------------------------------------------------
 
@@ -188,6 +273,127 @@ void GUI_CRT::showSettings ( const bool visible )
 	settingsPanel.setVisible ( visible );
 	settingsVisible = visible;
 	resized ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::showBrowser ( const bool visible )
+{
+	browserVisible = visible;
+	overlay.openBrowser.setStage ( visible ? 1 : 0 );
+
+	browser.setVisible ( visible );
+
+	if ( visible )
+	{
+		browser.isNTSC = overlay.getSettings ().isNTSC;
+		browser.refresh ();
+
+		if ( ! isDroppedPicture () )
+			browser.selectPicture ( lastLoadedName );
+	}
+
+	resized ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::mouseDown ( const juce::MouseEvent& event )
+{
+	if ( event.mods.isPopupMenu () && event.eventComponent == &overlay )
+		showPictureMenu ();
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::showPictureMenu ()
+{
+	if ( lastLoadedName.isEmpty () )
+		return;
+
+	const juce::SharedResourcePointer<Strings>	strings;
+	const juce::SharedResourcePointer<Icons>	icons;
+
+	const auto	name = lastLoadedName.toStdString ();
+	const auto	dropped = isDroppedPicture ();
+	const auto	hint = imageutils::hintFromFilename ( lastLoadedName );
+
+	auto	m = UI::newPopupMenu ( *this );
+
+	// Into the user tree: as the playing tune's next screenshot, or under
+	// its own name
+	{
+		const auto	ownArt = ! dropped && std::ranges::contains ( scrshot->getScreenshots ( tuneKey.toStdString () ), name );
+		const auto	hvscTune = tuneKey.startsWith ( filepaths::hvscMarker.data () );
+
+		m.addItem ( UI::newMenuItem ( strings->get ( "menu/keep_for_tune" ), icons->get ( "crt-browser/keep" ), [] { msg::KeepForTune {}.send (); } )
+					.setEnabled ( hvscTune && ! ownArt ) );
+
+		if ( dropped )
+		{
+			const auto	folder = browserVisible ? browser.getFolder () : juce::String ();
+			const auto	shown = folder.isEmpty () ? strings->get ( "crt-browser/root" ) : folder;
+
+			m.addItem ( UI::newMenuItem ( strings->get ( "menu/save_to_folder" ).replace ( "{}", shown ), icons->get ( "crt-browser/save" ),
+										  [ folder ] { msg::SaveScreenshot { folder }.send (); } ) );
+		}
+	}
+
+	m.addSeparator ();
+
+	// Border color, the palette as swatches
+	{
+		juce::PopupMenu	colors;
+
+		colors.addItem ( juce::PopupMenu::Item ( strings->get ( "menu/border_none" ) ).setTicked ( hint.borderColor < 0 ).setAction ( [] { msg::RemoveBorderColor {}.send (); } ) );
+		colors.addSeparator ();
+
+		const auto	rgb = colo.generateRGB ( VIC2_Render::settings::PAL, colo.generateYUV ( VIC2_Render::settings::PAL ) );
+
+		juce::StringArray	names;
+		names.addTokens ( strings->get ( "crt-browser/vic2_colors" ), ",", "" );
+		names.trim ();
+
+		for ( auto i = 0; i < int ( rgb.size () ); ++i )
+		{
+			if ( i == 8 )
+				colors.addColumnBreak ();
+
+			colors.addItem ( juce::PopupMenu::Item ( names[ i ] )
+								.setColour ( juce::Colour ( rgb[ size_t ( i ) ] ).withAlpha ( 1.0f ) )
+								.setTicked ( hint.borderColor == i )
+								.setAction ( [ i ] { msg::AssignBorderColor { i }.send (); } ) );
+		}
+
+		m.addSubMenu ( strings->get ( "menu/border_color" ), colors, ! dropped, UI::getMenuIcon ( icons->get ( "crt-browser/border" ) ) );
+	}
+
+	// The hints as states, ticked when the file carries them; the tick takes
+	// the icon's place
+	m.addItem ( juce::PopupMenu::Item ( strings->get ( "menu/ntsc" ) ).setTicked ( hint.forceNTSC ).setEnabled ( ! dropped )
+				.setAction ( [] { msg::ToggleNTSC {}.send (); } ) );
+	m.addItem ( juce::PopupMenu::Item ( strings->get ( "menu/first_luma" ) ).setTicked ( hint.firstLuma ).setEnabled ( ! dropped )
+				.setAction ( [] { msg::ToggleFirstLuma {}.send (); } ) );
+
+	// What the screenshot shows, one pick
+	{
+		juce::PopupMenu	kinds;
+
+		using imageutils::screenKind;
+
+		for ( const auto& [ key, kind ] : { std::pair { "menu/screen_none", screenKind::none }, { "menu/screen_loading", screenKind::loading },
+											{ "menu/screen_title", screenKind::title }, { "menu/screen_game", screenKind::game } } )
+		{
+			kinds.addItem ( juce::PopupMenu::Item ( strings->get ( key ) ).setTicked ( hint.kind == kind )
+							.setAction ( [ kind ] { msg::SetScreenKind { int ( kind ) }.send (); } ) );
+		}
+
+		m.addSubMenu ( strings->get ( "menu/screen_kind" ), kinds, ! dropped, UI::getMenuIcon ( icons->get ( "crt-browser/thumbnail" ) ) );
+	}
+
+	m.addSeparator ();
+
+	m.addItem ( UI::newDangerousMenuItem ( strings->get ( "menu/delete_screenshot" ), icons->get ( "crt-browser/delete" ), [] { msg::DeleteImage {}.send (); } )
+				.setEnabled ( ! dropped && assettools::canDelete ( name ) ) );
+
+	UI::showMenuAtMouse ( m, *this );
 }
 //-----------------------------------------------------------------------------
 
@@ -220,12 +426,28 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 	// Update OpenGL iFrame & iTime
 	overlay.setFrameAndTime ( 0, float ( juce::Time::highResolutionTicksToSeconds ( juce::Time::getHighResolutionTicks () ) ) );
 
+	// Interlaced artwork alternates its fields at the emulated refresh rate,
+	// off the real clock: the 60 Hz gate below would drop 50 Hz flips
+	auto	fieldFlipped = false;
+	if ( ! lastWasGenerated && vicRender.getNumFields () > 1 )
+	{
+		const auto	fieldPeriod = 1.0f / ( overlay.getSettings ().isNTSC ? VIC2::ntscRefreshHz : VIC2::palRefreshHz );
+
+		fieldTime += secondsPassed;
+		if ( fieldTime >= fieldPeriod )
+		{
+			fieldTime = std::fmod ( fieldTime, fieldPeriod );
+			vicRender.nextField ();
+			fieldFlipped = true;
+		}
+	}
+
 	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
 	constexpr auto	frameMS = 1.0f / 60.0f - 0.001f;
 
 	// Handle updates (skip if it happened faster than 65 Hz)
 	timePassed += secondsPassed;
-	if ( timePassed < frameMS )
+	if ( timePassed < frameMS && ! fieldFlipped )
 		return;
 
 	timePassed = 0.0f;
@@ -272,12 +494,13 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 		return;
 	}
 
-	if ( ! haveRaster )
+	if ( ! haveRaster && ! fieldFlipped )
 		return;
 
 	vicRender.restoreIndexBuffer ();
 
-	drawRasterBars ( vicRender.getIndexPixels (), cpuCycles );
+	if ( haveRaster )
+		drawRasterBars ( vicRender.getIndexPixels (), cpuCycles );
 
 	// The bars sit in the buffer unseen by renderScreen: without this, the
 	// cursor blink's render would bake them into the next backup
@@ -1237,27 +1460,25 @@ std::pair<juce::String, const int> GUI_CRT::findArtwork ( const juce::String& _s
 
 bool GUI_CRT::isInterestedInFileDrag ( const juce::StringArray& files )
 {
-	if ( ! buildinfo::isDeveloperMode () )
-		return false;
-
-	if ( textutils::getFilteredStrings ( files, { ".png" } ).size () )
-		return true;
-
-	return false;
+	return textutils::getFilteredStrings ( files, { ".png" } ).size () > 0;
 }
 //-----------------------------------------------------------------------------
 
 void GUI_CRT::filesDropped ( const juce::StringArray& files, int /*x*/, int /*y*/ )
 {
-	if ( ! buildinfo::isDeveloperMode () )
+	const auto	pictures = textutils::getFilteredStrings ( files, { ".png" } );
+	if ( pictures.isEmpty () )
 		return;
 
-	const msg::AddScreenshots	e { textutils::getFilteredStrings ( files, { ".png" } ) };
-
-	if ( e.files.isEmpty () )
+	// The developer tree imports the drop as the tune's artwork, everywhere
+	// else the pictures just show
+	if ( buildinfo::isDeveloperMode () && ! datasource::isPak () && ! browserVisible )
+	{
+		msg::AddScreenshots { pictures }.send ();
 		return;
+	}
 
-	e.send ();
+	showPictures ( pictures );
 }
 //-----------------------------------------------------------------------------
 

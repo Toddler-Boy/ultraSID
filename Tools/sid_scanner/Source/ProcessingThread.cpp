@@ -303,21 +303,19 @@ void ProcessingThread::run ()
 	}
 
 	//
-	// Parse command line: optional initial pattern(s), -f to re-measure, --batch
-	// to build the database once the queue has drained even if nothing rendered
+	// Parse command line: optional pattern(s), -f6581 / -f8580 re-measure that chip's tunes (-f both),
+	// --batch builds the database once the queue has drained even if nothing rendered
 	//
 	const auto	args = juce::JUCEApplicationBase::getCommandLineParameterArray ();
 
 	const auto	batch = args.contains ( "--batch" );
 
-	auto	cliForce = false;
-	for ( const auto& arg : args )
-		if ( arg.startsWithChar ( '-' ) && arg != "--batch" )
-			cliForce = cliForce || arg.containsChar ( 'f' );
+	const auto	cliForce6581 = args.contains ( "-f" ) || args.contains ( "-f6581" );
+	const auto	cliForce8580 = args.contains ( "-f" ) || args.contains ( "-f8580" );
 
 	for ( const auto& arg : args )
 		if ( ! arg.startsWithChar ( '-' ) )
-			addPattern ( arg, cliForce );
+			addPattern ( arg, cliForce6581, cliForce8580 );
 
 	//
 	// Load lengths and LUFS databases

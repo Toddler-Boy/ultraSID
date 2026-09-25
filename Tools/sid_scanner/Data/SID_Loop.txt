@@ -3158,6 +3158,7 @@
 /GAMES/A-F/Axis=11
 /GAMES/A-F/Axis_Komputerkunst_Intro=1
 /GAMES/A-F/BOFH_Servers_Under_Siege=111
+/GAMES/A-F/B_Cs_Quest_for_Tires=0000000000
 /GAMES/A-F/Baal=11
 /GAMES/A-F/Babylons_Ark=1111110
 /GAMES/A-F/Baccaroo=1
@@ -3193,6 +3194,7 @@
 /GAMES/A-F/Benji_Space_Rescue=1
 /GAMES/A-F/Berania=1010001111111111
 /GAMES/A-F/Berks_Four=0100
+/GAMES/A-F/Beyond_Dark_Castle=000000000000000000000000000000000000000000000000000
 /GAMES/A-F/Big_Ben=10000
 /GAMES/A-F/Big_Mac=11
 /GAMES/A-F/Bill_Da_Snowman=1
@@ -3620,6 +3622,7 @@
 /GAMES/G-L/Gwendolyn_BASIC=1
 /GAMES/G-L/Gyroscope_3=1
 /GAMES/G-L/Gyruss=10011111
+/GAMES/G-L/H_E_R_O=1100000
 /GAMES/G-L/Hack_Attack=1
 /GAMES/G-L/Haegar_der_Schreckliche=1111000000000
 /GAMES/G-L/Hakkaa_Hanuria=1
@@ -4163,6 +4166,7 @@
 /GAMES/M-R/Rings_of_Medusa=11
 /GAMES/M-R/Ringside=1
 /GAMES/M-R/River_Chase=00000
+/GAMES/M-R/River_Raid=100000010
 /GAMES/M-R/Road_Roller=1
 /GAMES/M-R/Roadrunner=1
 /GAMES/M-R/Robby=1
@@ -4326,6 +4330,7 @@
 /GAMES/S-Z/Star_Storm=11101
 /GAMES/S-Z/Star_Trader=1
 /GAMES/S-Z/Star_Trooper=1
+/GAMES/S-Z/Star_Wars-The_Arcade_Game=000000
 /GAMES/S-Z/Starflight=1
 /GAMES/S-Z/Starquake=00000
 /GAMES/S-Z/Starsat=11000
@@ -13020,6 +13025,7 @@
 /MUSICIANS/B/Butka/Ranked_1=1
 /MUSICIANS/B/Butka/Wild_West_Rumble=1
 /MUSICIANS/B/Butler_Paul/Ace_of_Aces=1
+/MUSICIANS/B/Butler_Paul/Blue_Angels=111000
 /MUSICIANS/B/Butler_Paul/Deceptor=0000001110100000111001
 /MUSICIANS/B/Butler_Paul/Desert_Fox=00000000000000000001001000000
 /MUSICIANS/B/Butler_Paul/Fight_Night=0000000000
@@ -18261,6 +18267,7 @@
 /MUSICIANS/D/DeMeo_Alex/Anthem=0
 /MUSICIANS/D/DeMeo_Alex/Birthday_Greetings=1
 /MUSICIANS/D/DeMeo_Alex/Chopper=00000
+/MUSICIANS/D/DeMeo_Alex/Crossbow=1000000000000000000000000000000000000000000000000000000000000000000000000000001000
 /MUSICIANS/D/DeMeo_Alex/DO_RA_ME=0
 /MUSICIANS/D/DeMeo_Alex/Draw_Poker=00000
 /MUSICIANS/D/DeMeo_Alex/For_Hes_a_Jolly_Good_Fellow=0

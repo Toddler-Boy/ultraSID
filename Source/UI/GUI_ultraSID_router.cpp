@@ -217,7 +217,7 @@ void GUI_ultraSID::registerSettingsActions ()
 }
 //-----------------------------------------------------------------------------
 
-// Screenshot/artwork editing (developer mode)
+// Screenshot/artwork editing
 void GUI_ultraSID::registerArtworkActions ()
 {
 	router.on<msg::AddScreenshots> ( [ this ] ( const auto& e )		{	addScreenshots ( e.files );	} );
@@ -226,6 +226,10 @@ void GUI_ultraSID::registerArtworkActions ()
 	router.on<msg::ToggleFirstLuma> ( [ this ]		{	toggleFirstLuma ();	} );
 	router.on<msg::ToggleFirstLumaAll> ( [ this ]	{	toggleFirstLumaAll ();	} );
 	router.on<msg::ToggleThumbnail> ( [ this ]		{	toggleThumbnail ();	} );
+	router.on<msg::SetScreenKind> ( [ this ] ( const auto& e )		{	setScreenKind ( e.kind );	} );
+	router.on<msg::ToggleNTSC> ( [ this ]			{	toggleNTSC ();	} );
 	router.on<msg::DeleteImage> ( [ this ]			{	deleteImage ();	} );
+	router.on<msg::KeepForTune> ( [ this ]			{	keepForTune ();	} );
+	router.on<msg::SaveScreenshot> ( [ this ] ( const auto& e )		{	saveScreenshot ( e.folder );	} );
 }
 //-----------------------------------------------------------------------------

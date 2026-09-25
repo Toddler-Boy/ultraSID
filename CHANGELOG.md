@@ -2,6 +2,18 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.3.0 (2026-09-22)
+
+- The CRT now has a browser and shows any C64 screenshot (320x200 or 384x272).
+- Search is smarter about years: only 1982 to today and decades like "198?" filter by
+  year, any other number is searched as text.
+- Fixed the menu shadow covering the menu on Linux (Wayland).
+
+## 85.2.5 (2026-09-20)
+
+- Fixed the menus showing up black on macOS, the previous fix did not reach the
+  release build.
+
 ## 85.2.4 (2026-09-19)
 
 - Fixed the menus showing up black on macOS.

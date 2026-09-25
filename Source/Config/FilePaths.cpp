@@ -100,6 +100,12 @@ juce::File filepaths::getUserCRTPresetsPath ()
 }
 //-----------------------------------------------------------------------------
 
+juce::File filepaths::getUserScreenshotsPath ()
+{
+	return getUserPath ( "Screenshots" );
+}
+//-----------------------------------------------------------------------------
+
 juce::String filepaths::markerFor ( const root which )
 {
 	// The markers are literals, so data () is NUL-terminated

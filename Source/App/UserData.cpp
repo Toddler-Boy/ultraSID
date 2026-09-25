@@ -30,6 +30,7 @@ namespace
 			{ userdata::Category::tunes,		"tunes",		{ "Tunes" },								{ "SID_LUFS.txt" } },
 			{ userdata::Category::themes,		"themes",		{ "Themes" },								{} },
 			{ userdata::Category::crt,			"crt",			{ "Overlays", "CRT Masks", "CRT Presets" },	{} },
+			{ userdata::Category::screenshots,	"screenshots",	{ "Screenshots" },							{} },
 			{ userdata::Category::preferences,	"preferences",	{},											{ "preferences.yml", "chip-profiles.csv" } },
 		};
 

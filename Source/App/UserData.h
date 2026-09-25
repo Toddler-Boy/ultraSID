@@ -14,7 +14,7 @@
 
 namespace userdata
 {
-	enum class Category { playlists, likes, history, tunes, themes, crt, preferences, count };
+	enum class Category { playlists, likes, history, tunes, themes, crt, screenshots, preferences, count };
 
 	// Fixed lowercase token per category, shared by the string keys and the UI ids
 	[[ nodiscard ]] juce::String idOf ( Category category );

@@ -91,7 +91,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ultraSID-windows
-          path: ci/bin/ultraSID.exe
+          path: ${{ env.OUT }}/ultraSID.exe
+          if-no-files-found: error
           archive: false
 
   macos:
@@ -133,7 +134,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ultraSID-macos
-          path: ci/bin/ultraSID.dmg
+          path: ${{ env.OUT }}/ultraSID.dmg
+          if-no-files-found: error
           archive: false
 
   # The prebuilt image (ci/linux/Dockerfile, built by linux_image.yaml)
@@ -167,7 +169,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ultraSID-linux
-          path: ci/bin/ultraSID.AppImage
+          path: ${{ env.OUT }}/ultraSID.AppImage
+          if-no-files-found: error
           archive: false
 
   # The USBSID-Pico hardware output (ULTRASID_HARDWARE_OUTPUT, Linux only)

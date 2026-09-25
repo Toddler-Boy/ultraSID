@@ -1,11 +1,15 @@
 {
 	"constants": [
-		{ "settingsW": "276 + 16" }
+		{ "settingsW": "276 + 16" },
+		{ "browserW": 300 }
 	],
 
 	"components": [
-		{ "id": "crt", "x": "fullscreen", "y": 0, "r": "parW - ( settingsW + bentoGap ) * showSettings - fullscreen", "b": "parH",
+		{ "id": "browser", "x": "bentoGap", "y": 0, "w": "browserW", "b": "parH - bentoGap" },
+
+		{ "id": "crt", "x": "fullscreen + ( browserW + bentoGap * 2 ) * showBrowser", "y": 0, "r": "parW - ( settingsW + bentoGap ) * showSettings - fullscreen", "b": "parH",
 			"components": [
+				{ "id": "browse", "x": 0, "y": 0 },
 				{ "id": "open", "r": "parW", "y": 0 },
 				{ "id": "pageControl", "cx": "parW2", "b": "parH - bentoGap * 2" }
 			]
