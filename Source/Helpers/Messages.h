@@ -296,18 +296,6 @@ struct AssignBorderColor
 	void send () const	{	msg::send ( *this );	}
 };
 //-----------------------------------------------------------------------------
-
-// What the shown screenshot is (imageutils::screenKind): none, title, game, loading
-struct SetScreenKind
-{
-	int	kind = 0;
-
-	static constexpr auto	verb = "setScreenKind";
-	[[ nodiscard ]] juce::String encode () const								{	return juce::String ( verb ) + " " + juce::String ( kind );	}
-	[[ nodiscard ]] static SetScreenKind decode ( const juce::StringArray& p )		{	return { p[ 0 ].getIntValue () };	}
-
-	void send () const	{	msg::send ( *this );	}
-};
 //-----------------------------------------------------------------------------
 
 // Export / downloads

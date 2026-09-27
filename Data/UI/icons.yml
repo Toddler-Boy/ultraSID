@@ -72,7 +72,6 @@ crt-browser:
   border:    crt/tint
   luma:      crt/brightness
   ntsc:      font-awesome/display-solid-full
-  thumbnail: font-awesome/images-solid-full
   delete:    font-awesome/trash-can-regular-full
 
 crt:

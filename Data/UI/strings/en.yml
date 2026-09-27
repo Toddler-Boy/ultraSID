@@ -119,10 +119,6 @@ menu:
   border_none:          None
   ntsc:                 NTSC
   first_luma:           First luma (5 levels)
-  screen_kind:          Screenshot shows
-  screen_none:          Other
-  screen_title:         Title screen
-  screen_game:          Game screen
   screen_loading:       Loading screen
   delete_screenshot:    Delete screenshot
 

@@ -991,14 +991,7 @@ void GUI_ultraSID::toggleFirstLumaAll ()
 void GUI_ultraSID::toggleThumbnail ()
 {
 	if ( const auto name = shownArtName ( mainScreen.pages.getLastLoadedArtwork () ); ! name.empty () )
-		assettools::cycleScreenKind ( name );
-}
-//-----------------------------------------------------------------------------
-
-void GUI_ultraSID::setScreenKind ( const int kind )
-{
-	if ( const auto name = shownArtName ( mainScreen.pages.getLastLoadedArtwork () ); ! name.empty () )
-		assettools::setScreenKind ( name, kind );
+		assettools::toggleLoadingScreen ( name );
 }
 //-----------------------------------------------------------------------------
 

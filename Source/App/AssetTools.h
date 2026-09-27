@@ -16,8 +16,7 @@ namespace assettools
 	void setBorderColor ( const std::string& artName, const int index );
 	void toggleFirstLuma ( const std::string& artName );
 	void toggleFirstLumaAll ( const std::vector<std::string>& artwork );
-	void setScreenKind ( const std::string& artName, const int kind );
-	void cycleScreenKind ( const std::string& artName );
+	void toggleLoadingScreen ( const std::string& artName );
 	void toggleNTSC ( const std::string& artName );
 
 	// User files always, factory files only in the developer tree

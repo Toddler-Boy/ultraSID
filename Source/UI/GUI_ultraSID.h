@@ -334,7 +334,6 @@ private:
 	void toggleFirstLuma ();
 	void toggleFirstLumaAll ();
 	void toggleThumbnail ();
-	void setScreenKind ( const int kind );
 	void toggleNTSC ();
 	void deleteImage ();
 	void keepForTune ();

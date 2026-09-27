@@ -290,15 +290,9 @@ void assettools::toggleFirstLumaAll ( const std::vector<std::string>& artwork )
 }
 //-----------------------------------------------------------------------------
 
-void assettools::setScreenKind ( const std::string& artName, const int kind )
+void assettools::toggleLoadingScreen ( const std::string& artName )
 {
-	changeHint ( artName, [ kind ] ( imageutils::imageHint& hint ) { hint.kind = imageutils::screenKind ( std::clamp ( kind, 0, 3 ) ); } );
-}
-//-----------------------------------------------------------------------------
-
-void assettools::cycleScreenKind ( const std::string& artName )
-{
-	changeHint ( artName, [] ( imageutils::imageHint& hint ) { hint.kind = imageutils::screenKind ( ( int ( hint.kind ) + 1 ) % 4 ); } );
+	changeHint ( artName, [] ( imageutils::imageHint& hint ) { hint.loadingScreen = ! hint.loadingScreen; } );
 }
 //-----------------------------------------------------------------------------
 

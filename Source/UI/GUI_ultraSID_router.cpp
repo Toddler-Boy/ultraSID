@@ -224,7 +224,6 @@ void GUI_ultraSID::registerArtworkActions ()
 	router.on<msg::ToggleFirstLuma> ( [ this ]		{	toggleFirstLuma ();	} );
 	router.on<msg::ToggleFirstLumaAll> ( [ this ]	{	toggleFirstLumaAll ();	} );
 	router.on<msg::ToggleThumbnail> ( [ this ]		{	toggleThumbnail ();	} );
-	router.on<msg::SetScreenKind> ( [ this ] ( const auto& e )		{	setScreenKind ( e.kind );	} );
 	router.on<msg::ToggleNTSC> ( [ this ]			{	toggleNTSC ();	} );
 	router.on<msg::DeleteImage> ( [ this ]			{	deleteImage ();	} );
 	router.on<msg::KeepForTune> ( [ this ]			{	keepForTune ();	} );

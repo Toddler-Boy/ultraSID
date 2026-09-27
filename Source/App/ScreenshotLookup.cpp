@@ -160,7 +160,7 @@ int ScreenshotLookup::getDefaultScreenshotIndex ( const std::vector<std::string>
 {
 	for ( auto index = 0; const auto& scr : screenshots )
 	{
-		if ( imageutils::hintFromFilename ( scr ).kind == imageutils::screenKind::loading )
+		if ( imageutils::hintFromFilename ( scr ).loadingScreen )
 			return index;
 
 		++index;

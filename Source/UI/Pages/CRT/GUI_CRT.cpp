@@ -371,22 +371,8 @@ void GUI_CRT::showPictureMenu ()
 				.setAction ( [] { msg::ToggleNTSC {}.send (); } ) );
 	m.addItem ( juce::PopupMenu::Item ( strings->get ( "menu/first_luma" ) ).setTicked ( hint.firstLuma ).setEnabled ( ! dropped )
 				.setAction ( [] { msg::ToggleFirstLuma {}.send (); } ) );
-
-	// What the screenshot shows, one pick
-	{
-		juce::PopupMenu	kinds;
-
-		using imageutils::screenKind;
-
-		for ( const auto& [ key, kind ] : { std::pair { "menu/screen_none", screenKind::none }, { "menu/screen_loading", screenKind::loading },
-											{ "menu/screen_title", screenKind::title }, { "menu/screen_game", screenKind::game } } )
-		{
-			kinds.addItem ( juce::PopupMenu::Item ( strings->get ( key ) ).setTicked ( hint.kind == kind )
-							.setAction ( [ kind ] { msg::SetScreenKind { int ( kind ) }.send (); } ) );
-		}
-
-		m.addSubMenu ( strings->get ( "menu/screen_kind" ), kinds, ! dropped, UI::getMenuIcon ( icons->get ( "crt-browser/thumbnail" ) ) );
-	}
+	m.addItem ( juce::PopupMenu::Item ( strings->get ( "menu/screen_loading" ) ).setTicked ( hint.loadingScreen ).setEnabled ( ! dropped )
+				.setAction ( [] { msg::ToggleThumbnail {}.send (); } ) );
 
 	m.addSeparator ();
 
