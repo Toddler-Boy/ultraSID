@@ -8,4 +8,5 @@ Builds
 /Tools/sid_scanner/Data/mail.yml
 *.7z
 /Tools/sid_scanner/Data/bugs.txt
+/Data/Screenshots/Scene/
 __pycache__
