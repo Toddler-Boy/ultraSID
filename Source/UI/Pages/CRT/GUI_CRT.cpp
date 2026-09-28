@@ -1,5 +1,7 @@
 #include <JuceHeader.h>
 
+#include <numbers>
+
 #include "GUI_CRT.h"
 
 #include "libSidplayEZ/src/stringutils.h"
@@ -149,6 +151,8 @@ bool GUI_CRT::loadArtworkImage ()
 		mb = scrshot->loadData ( lastLoadedName.toStdString () );
 
 	fieldTime = 0.0f;
+	scrollTime = 0.0;
+	scrollPos = {};
 
 	const auto	hint = imageutils::hintFromFilename ( lastLoadedName );
 	lastFirstLuma = hint.firstLuma;
@@ -412,13 +416,13 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 	// Update OpenGL iFrame & iTime
 	overlay.setFrameAndTime ( 0, float ( juce::Time::highResolutionTicksToSeconds ( juce::Time::getHighResolutionTicks () ) ) );
 
+	const auto	fieldPeriod = 1.0f / ( overlay.getSettings ().isNTSC ? VIC2::ntscRefreshHz : VIC2::palRefreshHz );
+
 	// Interlaced artwork alternates its fields at the emulated refresh rate,
 	// off the real clock: the 60 Hz gate below would drop 50 Hz flips
 	auto	fieldFlipped = false;
 	if ( ! lastWasGenerated && vicRender.getNumFields () > 1 )
 	{
-		const auto	fieldPeriod = 1.0f / ( overlay.getSettings ().isNTSC ? VIC2::ntscRefreshHz : VIC2::palRefreshHz );
-
 		fieldTime += secondsPassed;
 		if ( fieldTime >= fieldPeriod )
 		{
@@ -428,12 +432,40 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 		}
 	}
 
+	// A picture larger than the screen sweeps back and forth on a sine per axis, in
+	// whole pixels per emulated frame; the sweep time grows with the root of the distance
+	auto	scrolled = false;
+	if ( ! lastWasGenerated && ( vicRender.getScrollRangeX () > 0 || vicRender.getScrollRangeY () > 0 ) )
+	{
+		constexpr auto	secondsPerRootPixel = 0.3;
+
+		scrollTime += secondsPassed;
+		const auto	frameTime = std::floor ( scrollTime / fieldPeriod ) * fieldPeriod;
+
+		auto sweep = [ frameTime ] ( const int range )
+		{
+			if ( range <= 0 )
+				return 0;
+
+			const auto	period = 2.0 * secondsPerRootPixel * std::sqrt ( double ( range ) );
+			return int ( std::lround ( range * ( 1.0 - std::cos ( 2.0 * std::numbers::pi * frameTime / period ) ) / 2.0 ) );
+		};
+
+		const juce::Point<int>	pos { sweep ( vicRender.getScrollRangeX () ), sweep ( vicRender.getScrollRangeY () ) };
+		if ( pos != scrollPos )
+		{
+			scrollPos = pos;
+			vicRender.setScroll ( pos.x, pos.y );
+			scrolled = true;
+		}
+	}
+
 	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
 	constexpr auto	frameMS = 1.0f / 60.0f - 0.001f;
 
 	// Handle updates (skip if it happened faster than 65 Hz)
 	timePassed += secondsPassed;
-	if ( timePassed < frameMS && ! fieldFlipped )
+	if ( timePassed < frameMS && ! fieldFlipped && ! scrolled )
 		return;
 
 	timePassed = 0.0f;
@@ -480,7 +512,7 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 		return;
 	}
 
-	if ( ! haveRaster && ! fieldFlipped )
+	if ( ! haveRaster && ! fieldFlipped && ! scrolled )
 		return;
 
 	vicRender.restoreIndexBuffer ();

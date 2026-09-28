@@ -154,6 +154,8 @@ private:
 	GUI_Overlay		overlay;
 	float			timePassed = 0.0f;
 	float			fieldTime = 0.0f;		// interlace field clock
+	double			scrollTime = 0.0;		// sweep clock of a picture larger than the screen
+	juce::Point<int>	scrollPos;
 
 public:
 	// A hand-drawn Petmate screen from Data/C64 Screens: the base buffers plus
