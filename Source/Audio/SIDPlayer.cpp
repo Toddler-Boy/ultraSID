@@ -120,26 +120,52 @@ bool SIDPlayer::init ( const unsigned int songNo, const bool useFilter )
 
 bool SIDPlayer::play ( float* const* dst, int lengthWanted )
 {
+	// Resuming at the end must signal it again
 	if ( ! readyToPlay || paused )
+	{
+		silentSamples = 0;
 		return false;
+	}
 
 	// One snapshot for the whole callback: seek () can move the offset from the
 	// message thread at any moment, and the length math and the read pointers
 	// below must agree on the same value
 	const auto	playOffset = renderPlayOffset.load ();
+	const auto	numSamples = waveform.getNumSamples ();
 
-	const auto	toCopy = std::min ( {	renderProgress.load ( std::memory_order_acquire ) - playOffset,
-										lengthWanted,
-										waveform.getNumSamples () - playOffset } );
-	lenLeft = toCopy;
-	if ( toCopy <= 0 )
+	const auto	toCopy = std::max ( 0, std::min ( {	renderProgress.load ( std::memory_order_acquire ) - playOffset,
+													lengthWanted,
+													numSamples - playOffset } ) );
+
+	// Live-tweak loops by re-rendering
+	const auto	wrapCopy = loop && ! liveTweak && rendered && playOffset + toCopy >= numSamples ? std::min ( lengthWanted - toCopy, numSamples ) : 0;
+	const auto	copied = toCopy + wrapCopy;
+	lenLeft = copied;
+
+	if ( copied > 0 || ! rendered || playOffset == 0 )
+	{
+		silentSamples = 0;
+	}
+	else if ( silentSamples <= endDelaySamples )
+	{
+		silentSamples += lengthWanted;
+
+		if ( silentSamples > endDelaySamples )
+		{
+			++endCount;
+			endCount.notify_one ();
+		}
+	}
+
+	if ( copied == 0 )
 		return false;
 
-	lengthWanted -= toCopy;
-
-	auto copyGained = [ this, playOffset ] ( float* destination, const int channel, const int toCopy, const int restLength )
+	auto copyGained = [ this ] ( float* destination, const int channel, const int sourceOffset, const int toCopy )
 	{
-		auto	source = waveform.getReadPointer ( channel, playOffset );
+		if ( toCopy <= 0 )
+			return;
+
+		auto	source = waveform.getReadPointer ( channel, sourceOffset );
 
 		if ( useReplayGain )
 		{
@@ -162,18 +188,23 @@ bool SIDPlayer::play ( float* const* dst, int lengthWanted )
 		{
 			std::copy_n ( source, toCopy, destination );
 		}
-
-		std::fill_n ( destination + toCopy, restLength, 0.0f );
 	};
 
-	copyGained ( dst[ 0 ], 0, toCopy, lengthWanted );
+	auto fill = [ & ] ( float* destination, const int channel )
+	{
+		copyGained ( destination, channel, playOffset, toCopy );
+		copyGained ( destination + toCopy, channel, 0, wrapCopy );
+		std::fill_n ( destination + copied, lengthWanted - copied, 0.0f );
+	};
+
+	fill ( dst[ 0 ], 0 );
 
 	if ( waveform.getNumChannels () == 2 )
-		copyGained ( dst[ 1 ], 1, toCopy, lengthWanted );
+		fill ( dst[ 1 ], 1 );
 
 	// Advance only if no seek landed during the copy, the seek wins then
 	auto	expected = playOffset;
-	renderPlayOffset.compare_exchange_strong ( expected, playOffset + toCopy );
+	renderPlayOffset.compare_exchange_strong ( expected, wrapCopy > 0 ? wrapCopy : playOffset + toCopy );
 
 	return true;
 }

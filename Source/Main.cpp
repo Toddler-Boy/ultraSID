@@ -230,6 +230,14 @@ public:
 			JUCEApplication::getInstance ()->systemRequestedQuit ();
 		}
 
+		void minimisationStateChanged ( const bool isNowMinimised ) override
+		{
+			juce::DocumentWindow::minimisationStateChanged ( isNowMinimised );
+
+			if ( auto content = dynamic_cast<GUI_ultraSID*> ( getContentComponent () ) )
+				content->minimisationChanged ( isNowMinimised );
+		}
+
 		void resized () override
 		{
 			juce::DocumentWindow::resized ();

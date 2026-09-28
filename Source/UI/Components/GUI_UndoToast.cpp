@@ -93,31 +93,27 @@ void GUI_UndoToast::paint ( juce::Graphics& g )
 	g.setFont ( UI::font ( UI::fonts::toast ) );
 	g.drawText ( message, r, juce::Justification::centredLeft, true );
 
-	if ( counting )
-	{
-		if ( now >= targetMS )
-		{
-			counting = false;
-
-			// Committing tears the toast down, never from inside paint
-			juce::MessageManager::callAsync ( [ cb = onExpired ]	{	if ( cb ) cb ();	} );
-			return;
-		}
-	}
-
 	// Chain to the next vblank
 	if ( counting || rewinding )
 		repaint ();
 }
 //-----------------------------------------------------------------------------
 
-void GUI_UndoToast::visibilityChanged ()
+void GUI_UndoToast::stopCountdown ()
 {
-	if ( ! isVisible () )
-	{
-		counting = false;
-		rewinding = false;
-	}
+	stopTimer ();
+	pending = false;
+	counting = false;
+	rewinding = false;
+}
+//-----------------------------------------------------------------------------
+
+void GUI_UndoToast::timerCallback ()
+{
+	stopCountdown ();
+
+	if ( onExpired )
+		onExpired ();
 }
 //-----------------------------------------------------------------------------
 
@@ -131,6 +127,7 @@ void GUI_UndoToast::mouseEnter ( const juce::MouseEvent& /*evt*/ )
 		rewinding = true;
 	}
 
+	stopTimer ();
 	counting = false;
 	repaint ();
 }
@@ -180,8 +177,11 @@ void GUI_UndoToast::startCountdown ( const int timeoutMS )
 	targetMS = startMS + timeoutMS;
 
 	progress = 0.0f;
+	pending = true;
 	counting = true;
 	rewinding = false;
+
+	startTimer ( timeoutMS );
 
 	repaint ();
 }

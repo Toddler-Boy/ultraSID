@@ -25,6 +25,11 @@ public:
 	void setSamplerate ( const int _sampleRate )	{	engineEZ.setSamplerate ( _sampleRate );	}
 	void setOutputLatency ( const int _latency )	{	outputLatency = _latency;				}
 
+	// Silence (44.1 kHz samples) pulled before the end is signalled, the queued tail plays out
+	void setEndDelay ( const int samples )			{	endDelaySamples = samples;				}
+
+	void setLoop ( const bool enabled )				{	loop = enabled;							}
+
 	// The replay-gain target every rated tune is leveled to
 	static constexpr auto	targetLUFS = -18.0f;
 
@@ -72,6 +77,10 @@ public:
 
 	[[ nodiscard ]] bool finishedPlaying () const;
 
+	// Blocks until the next end, returns the count for the next call
+	[[ nodiscard ]] uint32_t waitForEnd ( const uint32_t seen ) const	{	endCount.wait ( seen );	return endCount.load ();	}
+	void wakeEndWaiter ()	{	++endCount;	endCount.notify_one ();	}
+
 	[[ nodiscard ]] std::pair<uint8_t*, int> getSidStatus ( int sidNum ) const;
 	[[ nodiscard ]] uint16_t getCPUCycles () const;
 	[[ nodiscard ]] bool lockDigiBuffers ();
@@ -114,6 +123,12 @@ private:
 	std::atomic<bool>	paused = false;
 	std::atomic<int>	lenLeft = 0;	// Written by the audio callback, read by finishedPlaying ()
 	int		outputLatency = 0;
+
+	// Bumped by the audio callback once per end
+	std::atomic<uint32_t>	endCount = 0;
+	std::atomic<int>		endDelaySamples = 0;
+	std::atomic<bool>		loop = false;
+	int		silentSamples = 0;		// Audio callback only
 
 	libsidplayEZ::Player	engineEZ;
 

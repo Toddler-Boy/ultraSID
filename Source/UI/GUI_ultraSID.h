@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <thread>
 
 #include "ultra-shared/App/AppUpdater.h"
 #include "ultra-shared/Helpers/MessageRouter.h"
@@ -75,6 +76,8 @@ public:
 	void moved () override;
 	void resized () override;
 	void parentHierarchyChanged () override;
+
+	void minimisationChanged ( const bool minimised );
 
 	// juce::MouseListener
 	void mouseDoubleClick ( const juce::MouseEvent& evt ) override;
@@ -227,8 +230,15 @@ private:
 	// Playlist stuff
 	juce::SharedResourcePointer<PlayQueue>	playQueue;
 	void updatePlaylistPosition ();
+
+	// Waits for the player's end signal
+	std::thread			endWatcher;
+	std::atomic<bool>	endWatcherStop = false;
+
 	void nextPreviousPlaylistItem ( const int delta, const bool manual );
 	[[ nodiscard ]] PlayQueue::Repeat getRepeatMode () const;
+	[[ nodiscard ]] bool loopsCurrentTune () const;
+	void updatePlayerLoop ();
 
 	// Sub-tunes
 	void playSubtune ( const int subtune );

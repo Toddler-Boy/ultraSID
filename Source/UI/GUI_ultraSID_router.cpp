@@ -144,6 +144,8 @@ void GUI_ultraSID::registerTransportActions ()
 			if ( auto pl = mainScreen.pages.getCurrentPlaylist () )
 				pl->selectRow ( playQueue->playPosition );
 		}
+		else if ( e.action == "repeat" )
+			updatePlayerLoop ();
 		else
 			Z_ERR ( "Unknown transport: " << e.action );
 	} );

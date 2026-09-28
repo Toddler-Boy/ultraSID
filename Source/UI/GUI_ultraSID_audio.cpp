@@ -71,7 +71,11 @@ void GUI_ultraSID::prepareToPlay ( int samplesPerBlockExpected, double sampleRat
 
 	// Get output latency from audio device and set it to player for accurate display timing
 	auto	audioDevice = deviceManager.getCurrentAudioDevice ();
-	player.setOutputLatency ( audioDevice ? audioDevice->getOutputLatencyInSamples () : 0 );
+	const auto	latency = audioDevice ? audioDevice->getOutputLatencyInSamples () : 0;
+	player.setOutputLatency ( latency );
+
+	// The resampling FIFO holds up to one block of 44.1 kHz audio, the device its latency
+	player.setEndDelay ( samplesPerBlockExpected + int ( int64_t ( latency ) * internalSamplerate / std::max ( 1, sampleRate ) ) );
 }
 //-----------------------------------------------------------------------------
 

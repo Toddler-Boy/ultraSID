@@ -84,7 +84,11 @@ GUI_ultraSID::GUI_ultraSID ()
 		undoToast.startCountdown ( UndoManager::timeoutMS );
 	};
 
-	undoManager->onHide = [ this ]	{	undoToast.setVisible ( false );	};
+	undoManager->onHide = [ this ]
+	{
+		undoToast.stopCountdown ();
+		undoToast.setVisible ( false );
+	};
 
 	undoToast.onUndo = [ this ]		{	undoManager->undo ();	};
 	undoToast.onExpired = [ this ]	{	undoManager->flush ();	};
@@ -177,11 +181,35 @@ GUI_ultraSID::GUI_ultraSID ()
 	updateVolume ();
 
 	initAudio ();
+
+	// Creating a SafePointer is not thread-safe
+	endWatcher = std::thread ( [ this, safeThis = juce::Component::SafePointer<GUI_ultraSID> ( this ) ]
+	{
+		auto	seen = 0u;
+
+		for ( ;; )
+		{
+			seen = player.waitForEnd ( seen );
+
+			if ( endWatcherStop )
+				return;
+
+			juce::MessageManager::callAsync ( [ safeThis ]
+			{
+				if ( safeThis != nullptr )
+					safeThis->updatePlaylistPosition ();
+			} );
+		}
+	} );
 }
 //-----------------------------------------------------------------------------
 
 GUI_ultraSID::~GUI_ultraSID ()
 {
+	endWatcherStop = true;
+	player.wakeEndWaiter ();
+	endWatcher.join ();
+
 	juce::Desktop::getInstance ().removeFocusChangeListener ( this );
 
 	// This component is the message-bus broadcaster, late sends must be dropped
@@ -300,6 +328,22 @@ void GUI_ultraSID::resized ()
 }
 //-----------------------------------------------------------------------------
 
+void GUI_ultraSID::minimisationChanged ( const bool minimised )
+{
+	// The toast is a desktop window of its own
+	if ( minimised )
+	{
+		undoToast.setVisible ( false );
+	}
+	else if ( undoToast.isPending () )
+	{
+		positionUndoToast ();
+		undoToast.setVisible ( true );
+		undoToast.toFront ( false );
+	}
+}
+//-----------------------------------------------------------------------------
+
 void GUI_ultraSID::positionUndoToast ()
 {
 	if ( ! undoToast.isOnDesktop () )
@@ -389,8 +433,6 @@ void GUI_ultraSID::update ( double time )
 	// wrap re-renders from 0:00 with the current tweaks and resumes at start
 	if ( chipEditor != nullptr && chipEditor->isLoopSet () && player.getTimeMS () >= chipEditor->getLoopEndMS () )
 		restartTweakRender ( chipEditor->getLoopStartMS () );
-
-	updatePlaylistPosition ();
 }
 //-----------------------------------------------------------------------------
 

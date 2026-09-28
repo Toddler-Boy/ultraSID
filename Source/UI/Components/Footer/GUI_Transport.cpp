@@ -32,7 +32,6 @@ GUI_Transport::GUI_Transport ()
 
 	// Repeat
 	repeat.margin = 8.0f;
-	repeat.polled = true;
 	repeat.translation.y = 1.0f;
 	repeat.tooltips = { "footer/enable_repeat_all", "footer/enable_repeat_one", "footer/disable_repeat" };
 

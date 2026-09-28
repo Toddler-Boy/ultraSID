@@ -37,8 +37,8 @@ public:
 	}
 	//-----------------------------------------------------------------------------
 
-	// Mode buttons (shuffle, repeat) are read via getStage() when the queue
-	// advances, only the momentary ones announce a click
+	// Shuffle is read via getStage() when the queue advances, the other
+	// buttons announce a click
 	bool	polled = false;
 
 private:

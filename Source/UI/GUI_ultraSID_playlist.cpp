@@ -173,8 +173,7 @@ void GUI_ultraSID::togglePause ()
 void GUI_ultraSID::updatePlaylistPosition ()
 {
 	//
-	// Called once per v-blank to check if the song
-	// is over and move on to next one in playlist
+	// Runs on the player's end signal, a seek or pause may have landed since
 	//
 	if ( ! player.finishedPlaying () )
 		return;
@@ -188,18 +187,14 @@ void GUI_ultraSID::updatePlaylistPosition ()
 		return;
 	}
 
-	const auto	repeat = getRepeatMode ();
-	const auto	inPlaylist = playQueue->position >= 0;
-
-	// A single tune (search result, subtune, dropped file) is a playlist of
-	// one, so "repeat all" loops it just like "repeat one"
-	if ( repeat == PlayQueue::Repeat::one || ( repeat == PlayQueue::Repeat::all && ! inPlaylist ) )
+	// A playlist edit can drop the queue position behind the player's back
+	if ( loopsCurrentTune () )
 	{
 		player.seek ( 0 );
 		return;
 	}
 
-	if ( ! inPlaylist )
+	if ( playQueue->position < 0 )
 	{
 		mainScreen.pages.setPlaying ( "", -1 );
 		mainScreen.sidebarRight.setTunePlaying ( -1 );
@@ -207,6 +202,22 @@ void GUI_ultraSID::updatePlaylistPosition ()
 	}
 
 	nextPreviousPlaylistItem ( 1, false );
+}
+//-----------------------------------------------------------------------------
+
+bool GUI_ultraSID::loopsCurrentTune () const
+{
+	const auto	repeat = getRepeatMode ();
+
+	// A single tune (search result, subtune, dropped file) is a playlist of
+	// one, so "repeat all" loops it just like "repeat one"
+	return repeat == PlayQueue::Repeat::one || ( repeat == PlayQueue::Repeat::all && playQueue->position < 0 );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraSID::updatePlayerLoop ()
+{
+	player.setLoop ( loopsCurrentTune () );
 }
 //-----------------------------------------------------------------------------
 
@@ -272,6 +283,7 @@ void GUI_ultraSID::loadTune ( const juce::String& name, const int subtune, const
 		playQueue->position = playQueue->playPosition = _playlistPosition;
 
 	playQueue->subtune = subtune;
+	updatePlayerLoop ();
 
 	disableAudio ();
 
@@ -409,6 +421,7 @@ void GUI_ultraSID::playSubtune ( const int subtune )
 	// A manually picked subtune (the STIL list is the only caller) detaches from
 	// the playlist: it plays once and stops, like a tune started from the search
 	playQueue->position = -1;
+	updatePlayerLoop ();
 
 	if ( playQueue->subtune == subtune )
 	{
