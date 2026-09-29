@@ -498,6 +498,15 @@ void GUI_ScreenshotBrowser::selectPicture ( const juce::String& artName )
 }
 //-----------------------------------------------------------------------------
 
+void GUI_ScreenshotBrowser::highlightPicture ( const juce::String& artName )
+{
+	if ( const auto row = rowOfPicture ( artName ); row >= 0 )
+		selectQuietly ( row );
+	else
+		list.deselectAllRows ();
+}
+//-----------------------------------------------------------------------------
+
 bool GUI_ScreenshotBrowser::List::keyPressed ( const juce::KeyPress& key )
 {
 	if ( extraKey && extraKey ( key ) )

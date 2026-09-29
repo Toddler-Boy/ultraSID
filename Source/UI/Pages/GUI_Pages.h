@@ -101,7 +101,7 @@ public:
 	[[ nodiscard ]] juce::String getLastLoadedArtwork () const	{	return crtPage.getLastLoadedName ();	}
 	void showPictures ( const juce::StringArray& files )	{	crtPage.showPictures ( files );	}
 	void userScreenshotsChanged ()							{	crtPage.userScreenshotsChanged ();	}
-	[[ nodiscard ]] bool isCRTBrowserVisible () const		{	return crtPage.isBrowserVisible ();	}
+	[[ nodiscard ]] bool isCRTViewerMode () const			{	return crtPage.isViewerMode ();	}
 	void focusCRTBrowserSearch ()							{	crtPage.focusBrowserSearch ();	}
 	[[ nodiscard ]] GUI_ScreenshotBrowser::state getCRTBrowserState () const	{	return crtPage.getBrowserState ();	}
 	void setCRTBrowserState ( const GUI_ScreenshotBrowser::state& s )			{	crtPage.setBrowserState ( s );	}

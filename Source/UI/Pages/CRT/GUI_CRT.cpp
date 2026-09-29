@@ -189,7 +189,7 @@ void GUI_CRT::showArtworkIndex ( const int index )
 	else
 		renderCRT ( true );
 
-	if ( browserVisible && ! isDroppedPicture () )
+	if ( isViewerMode () && ! isDroppedPicture () )
 		browser.selectPicture ( lastLoadedName );
 }
 //-----------------------------------------------------------------------------
@@ -205,9 +205,9 @@ void GUI_CRT::loadGameArtwork ( const juce::String& sidName, const juce::String&
 {
 	tuneKey = sidName;
 
-	// The open browser overrides the tune's art, closing it keeps the pick
-	// until the next tune change
-	if ( browserVisible )
+	// The open browser on the shown page overrides the tune's art; closing it or leaving
+	// the page keeps the pick until the next tune change
+	if ( isViewerMode () )
 		return;
 
 	std::tie ( lastLoadedName, tuneArtIndex ) = findArtwork ( sidName, index );
@@ -272,11 +272,19 @@ void GUI_CRT::userScreenshotsChanged ()
 	{
 		showScreenshot ( now );
 
-		if ( browserVisible )
+		if ( isViewerMode () )
 			browser.selectPicture ( now );
 	}
-	else if ( ! browserVisible )
+	else if ( ! isViewerMode () )
 		loadGameArtwork ( tuneKey );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_CRT::visibilityChanged ()
+{
+	// Back on the page: the tune's art may have changed meanwhile, the browser keeps its place
+	if ( isVisible () && browserVisible && ! isDroppedPicture () )
+		browser.highlightPicture ( lastLoadedName );
 }
 //-----------------------------------------------------------------------------
 

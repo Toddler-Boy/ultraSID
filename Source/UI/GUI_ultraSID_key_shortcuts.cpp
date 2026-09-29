@@ -153,7 +153,7 @@ void GUI_ultraSID::registerShortcutActions ()
 	// With the screenshot browser open, search means its pictures
 	router.on<msg::FocusSearch> ( [ this ]
 	{
-		if ( mainScreen.pages.isCRTVisible () && mainScreen.pages.isCRTBrowserVisible () )
+		if ( mainScreen.pages.isCRTViewerMode () )
 		{
 			mainScreen.pages.focusCRTBrowserSearch ();
 			return;

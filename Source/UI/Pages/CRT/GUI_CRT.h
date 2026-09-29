@@ -27,6 +27,7 @@ public:
 
 	// juce::Component
 	void resized () override;
+	void visibilityChanged () override;
 	void mouseWheelMove ( const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel ) override;
 	void mouseDown ( const juce::MouseEvent& event ) override;
 
@@ -69,8 +70,10 @@ public:
 	[[ nodiscard ]] bool areSettingsVisible () const	{ return settingsVisible;	}
 	void showSettings ( const bool visible );
 
-	// The open browser is viewer mode: tune changes leave the picture alone
 	[[ nodiscard ]] bool isBrowserVisible () const	{	return browserVisible;	}
+
+	// The open browser on the shown page is viewer mode: tune changes leave the picture alone
+	[[ nodiscard ]] bool isViewerMode () const		{	return browserVisible && isVisible ();	}
 	void focusBrowserSearch ()						{	browser.focusSearch ();	}
 
 	// A restored browser keeps its own folder and selection on its first opening

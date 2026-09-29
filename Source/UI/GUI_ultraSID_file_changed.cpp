@@ -84,7 +84,7 @@ void GUI_ultraSID::fileChanged ( const juce::File& file, gin::FileSystemWatcher:
 			if ( ! updateCRT )
 				return;
 
-			if ( mainScreen.pages.isCRTBrowserVisible () || filename.empty () )
+			if ( mainScreen.pages.isCRTViewerMode () || filename.empty () )
 				mainScreen.pages.userScreenshotsChanged ();
 			else
 				mainScreen.pages.loadGameArtwork ( lastFilename, filename );

@@ -50,8 +50,11 @@ public:
 	// picture passes the selection on to the one now in its row
 	void refresh ();
 
-	// Highlight the picture the CRT shows, when it is in this folder
+	// Highlight the picture the CRT shows, entering its folder
 	void selectPicture ( const juce::String& artName );
+
+	// The same where the browser stands: highlighted when listed, nothing otherwise
+	void highlightPicture ( const juce::String& artName );
 
 	void focusSearch ()	{	searchBar.getTextEditor ().grabKeyboardFocus ();	}
 
