@@ -91,21 +91,25 @@ static int8_t cropUniformBorder ( const juce::File& file )
 	if ( ! ( img.width == VIC2_Render::outerUnscaledWidth && img.height == VIC2_Render::outerUnscaledHeight ) )
 		return -1;
 
-	// Convert, then find the border color and the bounding box of everything
-	// that differs from it. Index space is enough: distinct source colors
-	// always convert to distinct indices
+	// Convert for the border's VIC color, then find the bounding box of everything that
+	// differs from it in the source itself: the renderer shows the picture centered
 	VIC2_Render	vic2 ( false );
 	if ( ! vic2.loadImage ( file.getFullPathName ().toRawUTF8 (), mb.getData (), mb.getSize () ) )
 		return -1;
 
-	auto	borderIndex = uint8_t ( 0 );
+	const auto	borderIndex = *juce::Image::BitmapData ( vic2.getCRT (), juce::Image::BitmapData::readOnly ).getLinePointer ( 0 );
+
+	auto sourceColor = [ &img ] ( const int x, const int y )
+	{
+		const auto	i = size_t ( y ) * size_t ( img.width ) + size_t ( x );
+		return img.paletted ? img.palette[ img.indices[ i ] ] : img.pixels[ i ] & 0xFFFFFF;
+	};
+
 	auto	xOfs = 0;
 	auto	yOfs = 0;
 
 	{
-		const auto	bmp = juce::Image::BitmapData ( vic2.getCRT (), juce::Image::BitmapData::readOnly );
-
-		borderIndex = *bmp.getLinePointer ( 0 );
+		const auto	border = sourceColor ( 0, 0 );
 
 		auto	minX = VIC2_Render::outerUnscaledWidth;
 		auto	maxX = -1;
@@ -114,11 +118,9 @@ static int8_t cropUniformBorder ( const juce::File& file )
 
 		for ( auto y = 0; y < VIC2_Render::outerUnscaledHeight; ++y )
 		{
-			const auto*	line = bmp.getLinePointer ( y );
-
 			for ( auto x = 0; x < VIC2_Render::outerUnscaledWidth; ++x )
 			{
-				if ( line[ x ] == borderIndex )
+				if ( sourceColor ( x, y ) == border )
 					continue;
 
 				minX = std::min ( minX, x );	maxX = std::max ( maxX, x );
