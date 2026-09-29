@@ -40,6 +40,11 @@ private:
 			{ "ui",			"search-col",		4 },
 			{ "ui",			"search-forwards",	true },
 
+			{ "ui",			"browser-folder",	"" },
+			{ "ui",			"browser-search",	"" },
+			{ "ui",			"browser-picture",	"" },
+			{ "ui",			"browser-pos",		0.0 },
+
 			{ "ui",			"playlist",				"" },
 			{ "ui",			"playlist-selected",	0 },
 			{ "ui",			"playlist-pos",			0.0 },

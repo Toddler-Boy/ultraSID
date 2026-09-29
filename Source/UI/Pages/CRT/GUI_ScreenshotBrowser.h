@@ -55,6 +55,21 @@ public:
 
 	void focusSearch ()	{	searchBar.getTextEditor ().grabKeyboardFocus ();	}
 
+	// What the browser shows, kept across sessions
+	struct state
+	{
+		juce::String	folder;
+		juce::String	query;
+		juce::String	picture;
+		double			scroll = 0.0;
+	};
+
+	[[ nodiscard ]] state getState () const;
+
+	// The scroll position waits for applyPendingScroll: a hidden list has no size yet
+	void setState ( const state& s );
+	void applyPendingScroll ();
+
 	std::function<void ( const juce::String& artName )>						onPick;
 
 	// Right-click on a picture: it is picked first, the menu acts on the shown picture
@@ -122,6 +137,7 @@ private:
 	juce::String				folder;
 	juce::String				query;
 	ScreenshotLookup::listing	entries;
+	std::optional<double>		pendingScroll;
 	juce::StringArray			colorNames;		// VIC-II palette, for the border hint
 
 	std::map<juce::String, std::unique_ptr<juce::Drawable>>	iconCache;

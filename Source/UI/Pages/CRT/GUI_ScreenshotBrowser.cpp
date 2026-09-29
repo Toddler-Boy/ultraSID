@@ -333,6 +333,44 @@ void GUI_ScreenshotBrowser::filesDropped ( const juce::StringArray& files, int, 
 }
 //-----------------------------------------------------------------------------
 
+GUI_ScreenshotBrowser::state GUI_ScreenshotBrowser::getState () const
+{
+	const auto	row = list.getSelectedRow ();
+	const auto	picture = juce::isPositiveAndBelow ( row, int ( entries.folders.size () + entries.files.size () ) ) && ! isFolderRow ( row )
+							? juce::String ( entries.files[ size_t ( row ) - entries.folders.size () ] ) : juce::String ();
+
+	return { folder, query, picture, pendingScroll.value_or ( list.getVerticalPosition () ) };
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ScreenshotBrowser::setState ( const state& s )
+{
+	navigateTo ( s.folder );
+
+	// The editor reports text changes later, the results must be listed now
+	searchBar.getTextEditor ().setText ( s.query, false );
+	searchBar.updateClearButton ();
+
+	query = s.query.trim ();
+	relist ();
+	list.updateContent ();
+
+	if ( const auto row = rowOfPicture ( s.picture ); row >= 0 )
+		selectQuietly ( row );
+
+	pendingScroll = s.scroll;
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ScreenshotBrowser::applyPendingScroll ()
+{
+	if ( pendingScroll )
+		list.setVerticalPosition ( *pendingScroll );
+
+	pendingScroll.reset ();
+}
+//-----------------------------------------------------------------------------
+
 void GUI_ScreenshotBrowser::relist ()
 {
 	entries = query.isEmpty () ? lookup->list ( folder.toStdString () ) : lookup->search ( folder.toStdString (), query );

@@ -103,6 +103,8 @@ public:
 	void userScreenshotsChanged ()							{	crtPage.userScreenshotsChanged ();	}
 	[[ nodiscard ]] bool isCRTBrowserVisible () const		{	return crtPage.isBrowserVisible ();	}
 	void focusCRTBrowserSearch ()							{	crtPage.focusBrowserSearch ();	}
+	[[ nodiscard ]] GUI_ScreenshotBrowser::state getCRTBrowserState () const	{	return crtPage.getBrowserState ();	}
+	void setCRTBrowserState ( const GUI_ScreenshotBrowser::state& s )			{	crtPage.setBrowserState ( s );	}
 	[[ nodiscard ]] juce::String getCRTBrowserFolder () const	{	return crtPage.getBrowserFolder ();	}
 	void setCRTBackground ( const juce::Colour& col )		{	crtPage.setBackgroundColour ( col );	}
 	void setCRTVoiceRegs ( const uint8_t* regs, const int count )	{	crtPage.setVoiceRegs ( regs, count );	}

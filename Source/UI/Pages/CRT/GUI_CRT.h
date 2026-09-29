@@ -72,6 +72,10 @@ public:
 	// The open browser is viewer mode: tune changes leave the picture alone
 	[[ nodiscard ]] bool isBrowserVisible () const	{	return browserVisible;	}
 	void focusBrowserSearch ()						{	browser.focusSearch ();	}
+
+	// A restored browser keeps its own folder and selection on its first opening
+	[[ nodiscard ]] GUI_ScreenshotBrowser::state getBrowserState () const	{	return browser.getState ();	}
+	void setBrowserState ( const GUI_ScreenshotBrowser::state& s )			{	browser.setState ( s );	browserRestored = true;	}
 	void showBrowser ( const bool visible );
 	[[ nodiscard ]] juce::String getBrowserFolder () const	{	return browser.getFolder ();	}
 	void setBackgroundColour ( const juce::Colour& bckCol );
@@ -310,6 +314,7 @@ private:
 	// Show hide/settings
 	bool	settingsVisible = false;
 	bool	browserVisible = false;
+	bool	browserRestored = false;
 
 	// The shared settings panel; the page layout positions it by its
 	// component name "settings"

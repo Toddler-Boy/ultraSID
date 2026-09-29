@@ -304,11 +304,16 @@ void GUI_CRT::showBrowser ( const bool visible )
 		browser.isNTSC = overlay.getSettings ().isNTSC;
 		browser.refresh ();
 
-		if ( ! isDroppedPicture () )
+		if ( ! isDroppedPicture () && ! browserRestored )
 			browser.selectPicture ( lastLoadedName );
+
+		browserRestored = false;
 	}
 
 	resized ();
+
+	if ( visible )
+		browser.applyPendingScroll ();
 }
 //-----------------------------------------------------------------------------
 

@@ -875,6 +875,18 @@ void GUI_ultraSID::saveState ()
 		settings->set ( "ui/search-col", header.getSortColumnId () );
 		settings->set ( "ui/search-forwards", header.isSortedForwards () );
 	}
+
+	//
+	// Screenshot browser
+	//
+	{
+		const auto	browser = mainScreen.pages.getCRTBrowserState ();
+
+		settings->set ( "ui/browser-folder", browser.folder );
+		settings->set ( "ui/browser-search", browser.query );
+		settings->set ( "ui/browser-picture", browser.picture );
+		settings->set ( "ui/browser-pos", browser.scroll );
+	}
 }
 //-----------------------------------------------------------------------------
 
@@ -910,6 +922,14 @@ void GUI_ultraSID::restoreState ()
 		results.selectRow ( settings->get<int> ( "ui/search-selected" ) );
 		results.setVerticalPosition ( settings->get<double> ( "ui/search-pos" ) );
 	}
+
+	//
+	// Restore screenshot browser state
+	//
+	mainScreen.pages.setCRTBrowserState ( { settings->get<juce::String> ( "ui/browser-folder" ),
+											settings->get<juce::String> ( "ui/browser-search" ),
+											settings->get<juce::String> ( "ui/browser-picture" ),
+											settings->get<double> ( "ui/browser-pos" ) } );
 
 	//
 	// Restore page
