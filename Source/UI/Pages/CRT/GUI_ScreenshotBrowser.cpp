@@ -228,6 +228,9 @@ void GUI_ScreenshotBrowser::paintListBoxItem ( int rowNumber, juce::Graphics& g,
 	// Name over the file's hints; a search result first names its subfolder
 	juce::StringArray	hints;
 
+	if ( hint.forceNTSC )
+		hints.add ( strings->get ( "crt-browser/hint_ntsc" ) );
+
 	if ( query.isNotEmpty () )
 	{
 		const auto	below = parentFolder ( art ).substring ( folder.isEmpty () ? 0 : folder.length () + 1 );
