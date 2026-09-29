@@ -16,8 +16,6 @@
 namespace
 {
 	constexpr auto	rowHeight = 56;
-	constexpr auto	pathBarHeight = 28;
-	constexpr auto	padding = 8;
 
 	// Thumbnails keep the CRT picture's aspect
 	constexpr auto	thumbRatio = ( 320.0f * VIC2::truePalX ) / 200.0f;
@@ -38,10 +36,46 @@ GUI_ScreenshotBrowser::GUI_ScreenshotBrowser ()
 {
 	setName ( "browser" );
 
+	// The CRT page's crt.json places them by these names
+	pathBar.setName ( "pathBar" );
+	searchInfo.setName ( "info" );
+	list.setName ( "list" );
+
 	addAndMakeVisible ( pathBar );
+	addAndMakeVisible ( searchBar );
+	addAndMakeVisible ( searchInfo );
 	addAndMakeVisible ( list );
 
 	pathBar.onNavigate = [ this ] ( const juce::String& f )	{	navigateTo ( f );	};
+
+	searchBar.onTextChange = [ this ]
+	{
+		query = searchBar.getTextEditor ().getText ().trim ();
+
+		relist ();
+
+		list.deselectAllRows ();
+		list.updateContent ();
+		list.getViewport ()->setViewPosition ( 0, 0 );
+		list.repaint ();
+	};
+
+	searchBar.getTextEditor ().onEscapePressed = [ this ]
+	{
+		clearSearch ();
+		list.grabKeyboardFocus ();
+	};
+
+	searchBar.getTextEditor ().setTitle ( strings->get ( "crt-browser/search" ) );
+
+	searchBar.getTextEditor ().onReturnPressed = [ this ]
+	{
+		if ( entries.files.empty () )
+			return;
+
+		list.selectRow ( int ( entries.folders.size () ) );
+		list.grabKeyboardFocus ();
+	};
 
 	list.setModel ( this );
 	list.setRowHeight ( rowHeight );
@@ -58,9 +92,18 @@ GUI_ScreenshotBrowser::GUI_ScreenshotBrowser ()
 			return true;
 		}
 
+		if ( key.isKeyCode ( juce::KeyPress::deleteKey ) )
+		{
+			if ( const auto row = list.getSelectedRow (); juce::isPositiveAndBelow ( row, getNumRows () ) && ! isFolderRow ( row ) && onDelete )
+				onDelete ();
+
+			return true;
+		}
+
 		return false;
 	};
 
+	lookAndFeelChanged ();
 	navigateTo ( {} );
 }
 //-----------------------------------------------------------------------------
@@ -82,17 +125,15 @@ void GUI_ScreenshotBrowser::paint ( juce::Graphics& g )
 }
 //-----------------------------------------------------------------------------
 
-void GUI_ScreenshotBrowser::resized ()
-{
-	auto	b = getLocalBounds ().reduced ( padding );
-
-	pathBar.setBounds ( b.removeFromTop ( pathBarHeight ) );
-	list.setBounds ( b );
-}
-//-----------------------------------------------------------------------------
 
 void GUI_ScreenshotBrowser::lookAndFeelChanged ()
 {
+	auto&	editor = searchBar.getTextEditor ();
+
+	const auto	txtCol = findColour ( UI::colors::text );
+	editor.setTextToShowWhenEmpty ( strings->get ( "crt-browser/search" ), txtCol.withMultipliedAlpha ( 0.25f ) );
+	editor.applyColourToAllText ( txtCol );
+
 	repaint ();
 }
 //-----------------------------------------------------------------------------
@@ -184,22 +225,32 @@ void GUI_ScreenshotBrowser::paintListBoxItem ( int rowNumber, juce::Graphics& g,
 
 	const auto	hint = imageutils::hintFromFilename ( art );
 
-	// Name over the file's hints; the TV standard always shows
+	// Name over the file's hints; a search result first names its subfolder
 	juce::StringArray	hints;
 
-	hints.add ( strings->get ( hint.forceNTSC ? "crt-browser/hint_ntsc" : "crt-browser/hint_pal" ) );
+	if ( query.isNotEmpty () )
+	{
+		const auto	below = parentFolder ( art ).substring ( folder.isEmpty () ? 0 : folder.length () + 1 );
+		if ( below.isNotEmpty () )
+			hints.add ( below );
+	}
 
-	if ( const auto multicolor = thumbnailCache->isMulticolor ( art ) )
-		hints.add ( strings->get ( *multicolor ? "crt-browser/hint_multicolor" : "crt-browser/hint_hires" ) );
+	if ( const auto flags = thumbnailCache->getPictureFlags ( art ) )
+	{
+		hints.add ( strings->get ( *flags & pictureanalyzer::multicolor ? "crt-browser/hint_multicolor" : "crt-browser/hint_hires" ) );
+
+		if ( *flags & pictureanalyzer::borderSprites )
+			hints.add ( strings->get ( "crt-browser/hint_border_sprites" ) );
+
+		if ( *flags & pictureanalyzer::rasterSplits )
+			hints.add ( strings->get ( "crt-browser/hint_raster_splits" ) );
+	}
 
 	if ( thumbnailCache->isInterlaced ( art ) )
-		hints.add ( strings->get ( "crt-browser/hint_ifli" ) );
+		hints.add ( strings->get ( "crt-browser/hint_interlaced" ) );
 
 	if ( hint.firstLuma )
 		hints.add ( strings->get ( "crt-browser/hint_first_luma" ) );
-
-	if ( hint.borderColor >= 0 && hint.borderColor < colorNames.size () )
-		hints.add ( strings->get ( "crt-browser/hint_border" ).replace ( "{}", colorNames[ hint.borderColor ] ) );
 
 	b.reduce ( 0.0f, 4.0f );
 
@@ -215,6 +266,18 @@ void GUI_ScreenshotBrowser::openRow ( const int row )
 {
 	if ( isFolderRow ( row ) )
 		navigateTo ( entries.folders[ size_t ( row ) ] );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ScreenshotBrowser::listBoxItemClicked ( int row, const juce::MouseEvent& e )
+{
+	if ( ! e.mods.isPopupMenu () || ! juce::isPositiveAndBelow ( row, getNumRows () ) || isFolderRow ( row ) )
+		return;
+
+	list.selectRow ( row );
+
+	if ( onMenu )
+		onMenu ();
 }
 //-----------------------------------------------------------------------------
 
@@ -267,10 +330,38 @@ void GUI_ScreenshotBrowser::filesDropped ( const juce::StringArray& files, int, 
 }
 //-----------------------------------------------------------------------------
 
+void GUI_ScreenshotBrowser::relist ()
+{
+	entries = query.isEmpty () ? lookup->list ( folder.toStdString () ) : lookup->search ( folder.toStdString (), query );
+
+	const auto	count = int ( entries.files.size () );
+	const auto	number = textutils::getHumanNumber ( count );
+
+	if ( query.isEmpty () )
+		searchInfo.setText ( strings->get ( count == 1 ? "crt-browser/picture" : "crt-browser/pictures" ).replace ( "{}", number ) );
+	else if ( count > 0 )
+		searchInfo.setText ( strings->get ( count == 1 ? "search/result" : "search/results" ).replace ( "{}", number ) );
+	else
+		searchInfo.setText ( strings->get ( "search/no_results" ) );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ScreenshotBrowser::clearSearch ()
+{
+	searchBar.getTextEditor ().setText ( {}, true );
+	searchBar.updateClearButton ();
+}
+//-----------------------------------------------------------------------------
+
 void GUI_ScreenshotBrowser::navigateTo ( const juce::String& f )
 {
 	folder = f;
-	entries = lookup->list ( folder.toStdString () );
+
+	query.clear ();
+	searchBar.getTextEditor ().setText ( {}, false );
+	searchBar.updateClearButton ();
+
+	relist ();
 
 	pathBar.setPath ( strings->get ( "crt-browser/root" ), folder );
 
@@ -286,11 +377,12 @@ void GUI_ScreenshotBrowser::refresh ()
 	const auto	selected = list.getSelectedRow ();
 	const auto	selectedName = juce::isPositiveAndBelow ( selected, getNumRows () ) && ! isFolderRow ( selected )
 									? juce::String ( entries.files[ size_t ( selected ) - entries.folders.size () ] ) : juce::String ();
+	const auto	fileCount = entries.files.size ();
 
-	entries = lookup->list ( folder.toStdString () );
+	relist ();
 
 	// The folder itself went away
-	if ( entries.folders.empty () && entries.files.empty () && folder.isNotEmpty () )
+	if ( entries.folders.empty () && entries.files.empty () && folder.isNotEmpty () && query.isEmpty () )
 	{
 		navigateTo ( parentFolder ( folder ) );
 		return;
@@ -304,8 +396,20 @@ void GUI_ScreenshotBrowser::refresh ()
 
 	list.updateContent ();
 
+	// A deleted picture: the next one moved into its row (or the new last one) gets picked
+	const auto	deleted = selectedName.isNotEmpty () && rowOfPicture ( selectedName ) < 0 && entries.files.size () < fileCount;
+
 	if ( const auto row = rowOfPicture ( selectedName ); row >= 0 )
 		selectQuietly ( row );
+	else if ( deleted && ! entries.files.empty () )
+	{
+		// Usually the same row index: the list sees no change and would not pick
+		const auto	row = std::min ( selected, getNumRows () - 1 );
+		selectQuietly ( row );
+
+		if ( onPick )
+			onPick ( entries.files[ size_t ( row ) - entries.folders.size () ] );
+	}
 	else
 		list.deselectAllRows ();
 

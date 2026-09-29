@@ -1063,10 +1063,10 @@ void GUI_ultraSID::saveScreenshot ( const juce::String& folder )
 }
 //-----------------------------------------------------------------------------
 
-void GUI_ultraSID::userScreenshotsChanged ()
+void GUI_ultraSID::userScreenshotsChanged ( const std::string& artName )
 {
 	screenshots->reload ();
-	thumbnailCache->reset ();
+	thumbnailCache->removeArtEntries ( artName );
 
 	updateFooterThumbnail ( lastFilename );
 	mainScreen.pages.userScreenshotsChanged ();

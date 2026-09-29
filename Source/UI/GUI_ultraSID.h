@@ -349,8 +349,8 @@ private:
 	void keepForTune ();
 	void saveScreenshot ( const juce::String& folder );
 
-	// The user's Screenshots folder changed: merged tree, thumbnails, the CRT
-	void userScreenshotsChanged ();
+	// A file in the user's Screenshots folder changed: merged tree, its thumbnails, the CRT
+	void userScreenshotsChanged ( const std::string& artName );
 
 	#if ULTRA_INSPECTOR
 		std::unique_ptr<melatonin::Inspector>	inspector;

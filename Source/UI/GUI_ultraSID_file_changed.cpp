@@ -76,6 +76,7 @@ void GUI_ultraSID::fileChanged ( const juce::File& file, gin::FileSystemWatcher:
 
 			// Update footer thumbnail
 			thumbnailCache->removeCacheEntry ( lastFilename );
+			thumbnailCache->removeArtEntries ( parent.fromFirstOccurrenceOf ( "/", false, false ).toStdString () );
 			updateFooterThumbnail ( lastFilename );
 
 			// Set CRT page to new artwork; the viewer follows its own picture
@@ -247,7 +248,7 @@ void GUI_ultraSID::fileChanged ( const juce::File& file, gin::FileSystemWatcher:
 		if ( parent.startsWithIgnoreCase ( "Screenshots/" ) )
 		{
 			if ( file.hasFileExtension ( ".png" ) )
-				userScreenshotsChanged ();
+				userScreenshotsChanged ( parent.fromFirstOccurrenceOf ( "/", false, false ).toStdString () );
 
 			return;
 		}

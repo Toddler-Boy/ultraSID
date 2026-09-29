@@ -150,8 +150,15 @@ void GUI_ultraSID::registerShortcutActions ()
 
 	router.on<msg::NewPlaylist> ( [ this ]		{	mainScreen.sidebarLeft.clickAddPlaylist ();	} );
 
+	// With the screenshot browser open, search means its pictures
 	router.on<msg::FocusSearch> ( [ this ]
 	{
+		if ( mainScreen.pages.isCRTVisible () && mainScreen.pages.isCRTBrowserVisible () )
+		{
+			mainScreen.pages.focusCRTBrowserSearch ();
+			return;
+		}
+
 		showPage ( "search" );
 		mainScreen.pages.showSearch ();
 	} );

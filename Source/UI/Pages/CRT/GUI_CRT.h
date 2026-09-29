@@ -71,6 +71,7 @@ public:
 
 	// The open browser is viewer mode: tune changes leave the picture alone
 	[[ nodiscard ]] bool isBrowserVisible () const	{	return browserVisible;	}
+	void focusBrowserSearch ()						{	browser.focusSearch ();	}
 	void showBrowser ( const bool visible );
 	[[ nodiscard ]] juce::String getBrowserFolder () const	{	return browser.getFolder ();	}
 	void setBackgroundColour ( const juce::Colour& bckCol );

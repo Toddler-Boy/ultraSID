@@ -4,6 +4,8 @@
 
 #include "ultra-shared/Resources/Icons.h"
 #include "ultra-shared/Resources/Strings.h"
+#include "ultra-shared/UI/Components/GUI_Label.h"
+#include "ultra-shared/UI/Components/GUI_SearchBar.h"
 #include "ultra-shared/UI/Components/GUI_ViewportSmoothScroll.h"
 
 #include "App/ScreenshotLookup.h"
@@ -25,12 +27,12 @@ public:
 
 	// juce::Component
 	void paint ( juce::Graphics& g ) override;
-	void resized () override;
 	void lookAndFeelChanged () override;
 
 	// juce::ListBoxModel
 	int getNumRows () override;
 	void paintListBoxItem ( int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected ) override;
+	void listBoxItemClicked ( int row, const juce::MouseEvent& e ) override;
 	void listBoxItemDoubleClicked ( int row, const juce::MouseEvent& e ) override;
 	void returnKeyPressed ( int row ) override;
 	void selectedRowsChanged ( int lastRowSelected ) override;
@@ -44,13 +46,22 @@ public:
 	void navigateTo ( const juce::String& folder );
 	[[ nodiscard ]] const juce::String& getFolder () const	{	return folder;	}
 
-	// The tree changed: re-list the folder, keeping the selection by name
+	// The tree changed: re-list the folder, keeping the selection by name. A deleted
+	// picture passes the selection on to the one now in its row
 	void refresh ();
 
 	// Highlight the picture the CRT shows, when it is in this folder
 	void selectPicture ( const juce::String& artName );
 
+	void focusSearch ()	{	searchBar.getTextEditor ().grabKeyboardFocus ();	}
+
 	std::function<void ( const juce::String& artName )>						onPick;
+
+	// Right-click on a picture: it is picked first, the menu acts on the shown picture
+	std::function<void ()>													onMenu;
+
+	// Delete key on a picture: the selected one is the shown one
+	std::function<void ()>													onDelete;
 	std::function<void ( const juce::StringArray& files, const juce::String& folder )>	onDropFiles;
 
 	// Thumbnails render in the CRT's TV standard
@@ -89,6 +100,10 @@ private:
 	};
 
 	[[ nodiscard ]] bool isFolderRow ( const int row ) const	{	return row < int ( entries.folders.size () );	}
+
+	// The folder's entries, or the search results below it while a query is typed
+	void relist ();
+	void clearSearch ();
 	[[ nodiscard ]] int rowOfPicture ( const juce::String& artName ) const;
 	void openRow ( const int row );
 
@@ -98,11 +113,14 @@ private:
 	// Icons recolored to the theme's text color on demand
 	[[ nodiscard ]] juce::Drawable* icon ( const juce::String& key );
 
-	PathBar		pathBar;
-	List		list;
+	PathBar			pathBar;
+	GUI_SearchBar	searchBar;
+	GUI_Label		searchInfo { "", UI::fonts::search_info };
+	List			list;
 	GUI_ViewportSmoothScroll	smoothScroll { list };
 
 	juce::String				folder;
+	juce::String				query;
 	ScreenshotLookup::listing	entries;
 	juce::StringArray			colorNames;		// VIC-II palette, for the border hint
 

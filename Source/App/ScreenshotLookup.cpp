@@ -264,6 +264,41 @@ ScreenshotLookup::listing ScreenshotLookup::list ( const std::string& folder ) c
 }
 //-----------------------------------------------------------------------------
 
+ScreenshotLookup::listing ScreenshotLookup::search ( const std::string& folder, const juce::String& query ) const
+{
+	std::vector<std::string>	words;
+	for ( const auto& w : juce::StringArray::fromTokens ( query.toLowerCase (), true ) )
+		if ( w.isNotEmpty () )
+			words.emplace_back ( w.toStdString () );
+
+	const auto	prefix = folder.empty () ? std::string () : lime::str::toLower ( folder ) + "/";
+
+	listing	result;
+
+	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
+
+	for ( const auto& name : names )
+	{
+		auto	path = lime::str::toLower ( name );
+		if ( ! path.starts_with ( prefix ) )
+			continue;
+
+		path.erase ( 0, prefix.size () );
+		path.erase ( std::min ( path.find_last_of ( '.' ), path.size () ) );
+
+		if ( const auto hash = path.find_last_of ( '#' ); hash != std::string::npos && hash > path.find_last_of ( '/' ) + 1 )
+			path.erase ( hash );
+
+		if ( std::ranges::all_of ( words, [ &path ] ( const std::string& w ) { return path.find ( w ) != std::string::npos; } ) )
+			result.files.emplace_back ( name );
+	}
+
+	sortNatural ( result.files );
+
+	return result;
+}
+//-----------------------------------------------------------------------------
+
 void ScreenshotLookup::addScreenshot ( const std::string& filename )
 {
 	const auto	tunename = artKey ( filename );

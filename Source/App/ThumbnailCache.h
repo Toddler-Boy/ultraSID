@@ -12,7 +12,8 @@
 
 //-----------------------------------------------------------------------------
 
-class ThumbnailCache final
+// Renders on its own low-priority thread, never competing with the message thread
+class ThumbnailCache final : private juce::Thread
 {
 public:
 	ThumbnailCache ();
@@ -37,9 +38,13 @@ public:
 
 	void removeCacheEntry ( const std::string& tunename );
 
-	// Picture facts known once its thumbnail is cached: false, or unknown, before
+	// A screenshot changed on disk: its own thumbnail and those of the tune it belongs to
+	void removeArtEntries ( const std::string& artName );
+
+	// Picture facts known once its thumbnail is cached: false, or unknown, before.
+	// Only art thumbnails carry the analyzer's flags
 	[[ nodiscard ]] bool isInterlaced ( const std::string& key ) const;
-	[[ nodiscard ]] std::optional<bool> isMulticolor ( const std::string& key ) const;
+	[[ nodiscard ]] std::optional<uint16_t> getPictureFlags ( const std::string& key ) const;
 
 	[[ nodiscard ]] juce::Image& getDefaultScreen () { return defaultScreen; }
 	[[ nodiscard ]] int getCacheSize () const;
@@ -54,40 +59,52 @@ private:
 	[[ nodiscard ]] bool hasCacheEntry ( const std::string& tunename );
 
 	// The cache entry under key, rendered from artName when missing
-	[[ nodiscard ]] MipMap& getOrRender ( const std::string& key, const std::string& artName, const bool isNTSC, std::function<void()> callback );
+	[[ nodiscard ]] MipMap& getOrRender ( const std::string& key, const std::string& artName, const bool isNTSC, const bool analyze, std::function<void()> callback );
 
 	struct CacheEntry
 	{
 		MipMap	image;
+		std::string	artName;
 		std::chrono::steady_clock::time_point	lastAccess;
 		bool	interlaced = false;
-		bool	multicolor = false;
+		std::optional<uint16_t>	pictureFlags;
 	};
 
-	[[ nodiscard ]] CacheEntry renderThumbnail ( VIC2_Render& vic2, const std::string& artName, const bool isNTSC );
+	[[ nodiscard ]] CacheEntry renderThumbnail ( VIC2_Render& vic2, const std::string& artName, const bool isNTSC, const bool analyze );
 	[[ nodiscard ]] static juce::Image postProcess ( juce::Image img, const int reduceX, const int reduceY );
-	[[ nodiscard ]] static juce::Image createImage ( VIC2_Render& vic2, const std::string& artName );
+	[[ nodiscard ]] static juce::Image createImage ( VIC2_Render& vic2, const std::string& artName, std::optional<uint16_t>* pictureFlags );
 
 	VIC2_Render::settings	vic2Set { .standard = VIC2_Render::settings::PAL, .contrast = 110.0f };
 	VIC2_Render				vic2Thumb { false };
-	VIC2_Render				vic2Job { false };	// Job renderer, lock-free: the pool is one thread wide
+	VIC2_Render				vic2Job { false };	// The render thread's own renderer, lock-free
 
 	mutable juce::CriticalSection	cacheCs;
 	std::unordered_map<std::string, CacheEntry, lime::str::TransparentHash, std::equal_to<>>	cache;
 
-	// One queued render job per tune, every requester's callback joins the
-	// entry and fires on completion; guarded by cacheCs
-	std::unordered_map<std::string, std::vector<std::function<void ()>>>	pending;
+	// One waiting render per key, newest at the back and taken first: what is on screen
+	// renders before rows scrolled past. Guarded by cacheCs
+	struct Request
+	{
+		std::string		key;
+		std::string		artName;
+		bool			isNTSC = false;
+		bool			analyze = false;
+		std::vector<std::function<void ()>>	callbacks;
+	};
+
+	std::vector<Request>	pending;
+
+	// Above any screenful of thumbnails; older requests belong to rows scrolled past and
+	// get asked again when their row comes back
+	static constexpr size_t	maxPendingRenders = 200;
+
+	void run () override;
 
 	int	cacheMaxEntries = 200;
 
 	MipMap		defaultImage;
 	juce::Image	defaultScreen;
 	int			defaultImageVersion = 0;
-
-	// Last member: destroyed first, so a still-running render job is joined
-	// while the lock, cache and renderer it uses are all alive
-	juce::ThreadPool	threadPool { 1, juce::Thread::osDefaultStackSize, juce::Thread::Priority::low };
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( ThumbnailCache )
 };

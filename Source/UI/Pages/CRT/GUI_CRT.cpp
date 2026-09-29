@@ -78,6 +78,13 @@ GUI_CRT::GUI_CRT ()
 		};
 
 		browser.onPick = [ this ] ( const juce::String& artName )	{	showScreenshot ( artName );	};
+		browser.onMenu = [ this ]									{	showPictureMenu ();			};
+
+		browser.onDelete = [ this ]
+		{
+			if ( ! isDroppedPicture () && assettools::canDelete ( lastLoadedName.toStdString () ) )
+				msg::DeleteImage {}.send ();
+		};
 
 		browser.onDropFiles = [] ( const juce::StringArray& files, const juce::String& folder )
 		{
@@ -262,7 +269,12 @@ void GUI_CRT::userScreenshotsChanged ()
 	const auto	now = scrshot->currentName ( lastLoadedName.toStdString () );
 
 	if ( ! now.empty () )
+	{
 		showScreenshot ( now );
+
+		if ( browserVisible )
+			browser.selectPicture ( now );
+	}
 	else if ( ! browserVisible )
 		loadGameArtwork ( tuneKey );
 }

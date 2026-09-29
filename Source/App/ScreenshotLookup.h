@@ -52,6 +52,10 @@ public:
 
 	[[ nodiscard ]] listing list ( const std::string& folder ) const;
 
+	// Every picture in the folder and below whose path under it holds all words of the
+	// query, any case, hints ignored; files only, in natural order
+	[[ nodiscard ]] listing search ( const std::string& folder, const juce::String& query ) const;
+
 	void addScreenshot ( const std::string& filename );
 	void removeScreenshot ( const std::string& filename );
 

@@ -11,8 +11,11 @@
 //-----------------------------------------------------------------------------
 
 ThumbnailCache::ThumbnailCache ()
+	: juce::Thread ( "Thumbnails" )
 {
 	refreshDefaultImage ();
+
+	startThread ( juce::Thread::Priority::low );
 }
 //-----------------------------------------------------------------------------
 
@@ -58,8 +61,7 @@ void ThumbnailCache::refreshDefaultImage ()
 
 ThumbnailCache::~ThumbnailCache ()
 {
-	// Drop queued jobs and wait for the running one, it uses the members below
-	threadPool.removeAllJobs ( false, -1 );
+	stopThread ( -1 );
 }
 //-----------------------------------------------------------------------------
 
@@ -87,7 +89,7 @@ MipMap& ThumbnailCache::getThumbnail ( const std::string_view tunenameView, cons
 	if ( artName.empty () )
 		return defaultImage;
 
-	return getOrRender ( tunename, artName, isNTSC, std::move ( callback ) );
+	return getOrRender ( tunename, artName, isNTSC, false, std::move ( callback ) );
 }
 //-----------------------------------------------------------------------------
 
@@ -103,64 +105,82 @@ MipMap& ThumbnailCache::getArtThumbnail ( const std::string& artName, const bool
 		return it->second.image;
 	}
 
-	return getOrRender ( artName, artName, isNTSC, std::move ( callback ) );
+	return getOrRender ( artName, artName, isNTSC, true, std::move ( callback ) );
 }
 //-----------------------------------------------------------------------------
 
-MipMap& ThumbnailCache::getOrRender ( const std::string& key, const std::string& artName, const bool isNTSC, std::function<void ()> callback )
+MipMap& ThumbnailCache::getOrRender ( const std::string& key, const std::string& artName, const bool isNTSC, const bool analyze, std::function<void ()> callback )
 {
 	// No callback: render the thumbnail synchronously and return it
 	if ( ! callback )
 	{
-		cache[ key ] = renderThumbnail ( vic2Thumb, artName, isNTSC );
+		cache[ key ] = renderThumbnail ( vic2Thumb, artName, isNTSC, analyze );
 		return cache[ key ].image;
 	}
 
-	// A render for this key is already queued, the callback joins the waiters
-	if ( auto it = pending.find ( key ); it != pending.end () )
+	// Asked again: the waiting render moves to the back, the callback joins the waiters
+	if ( auto it = std::ranges::find ( pending, key, &Request::key ); it != pending.end () )
 	{
-		it->second.emplace_back ( std::move ( callback ) );
+		it->callbacks.emplace_back ( std::move ( callback ) );
+		std::rotate ( it, it + 1, pending.end () );
 		return defaultImage;
 	}
 
-	pending[ key ].emplace_back ( std::move ( callback ) );
+	pending.push_back ( { key, artName, isNTSC, analyze, {} } );
+	pending.back ().callbacks.emplace_back ( std::move ( callback ) );
 
-	//
-	// Add job to thread pool
-	//
-	threadPool.addJob ( [ this, key, artName, isNTSC ]
-	{
-		// The synchronous path may have cached this key already
-		auto	entry = hasCacheEntry ( key ) ? CacheEntry {} : renderThumbnail ( vic2Job, artName, isNTSC );
+	if ( pending.size () > maxPendingRenders )
+		pending.erase ( pending.begin () );
 
-		std::vector<std::function<void ()>>	callbacks;
-
-		{
-			const juce::CriticalSection::ScopedLockType	csLock ( cacheCs );
-
-			// Insert only, never reassign: getThumbnail hands out references into the entry
-			if ( ! cache.contains ( key ) )
-			{
-				removeStaleEntries ();
-				cache[ key ] = std::move ( entry );
-			}
-
-			if ( auto it = pending.find ( key ); it != pending.end () )
-			{
-				callbacks = std::move ( it->second );
-				pending.erase ( it );
-			}
-		}
-
-		for ( auto& cb : callbacks )
-			juce::MessageManager::callAsync ( std::move ( cb ) );
-	} );
+	notify ();
 
 	return defaultImage;
 }
 //-----------------------------------------------------------------------------
 
-ThumbnailCache::CacheEntry ThumbnailCache::renderThumbnail ( VIC2_Render& vic2, const std::string& artName, const bool isNTSC )
+void ThumbnailCache::run ()
+{
+	while ( ! threadShouldExit () )
+	{
+		Request	request;
+
+		{
+			const juce::CriticalSection::ScopedLockType	csLock ( cacheCs );
+
+			if ( ! pending.empty () )
+			{
+				request = std::move ( pending.back () );
+				pending.pop_back ();
+			}
+		}
+
+		if ( request.key.empty () )
+		{
+			wait ( -1 );
+			continue;
+		}
+
+		// The synchronous path may have cached this key already
+		auto	entry = hasCacheEntry ( request.key ) ? CacheEntry {} : renderThumbnail ( vic2Job, request.artName, request.isNTSC, request.analyze );
+
+		{
+			const juce::CriticalSection::ScopedLockType	csLock ( cacheCs );
+
+			// Insert only, never reassign: getThumbnail hands out references into the entry
+			if ( ! cache.contains ( request.key ) )
+			{
+				removeStaleEntries ();
+				cache[ request.key ] = std::move ( entry );
+			}
+		}
+
+		for ( auto& cb : request.callbacks )
+			juce::MessageManager::callAsync ( std::move ( cb ) );
+	}
+}
+//-----------------------------------------------------------------------------
+
+ThumbnailCache::CacheEntry ThumbnailCache::renderThumbnail ( VIC2_Render& vic2, const std::string& artName, const bool isNTSC, const bool analyze )
 {
 	const auto	hints = imageutils::hintFromFilename ( artName );
 
@@ -169,12 +189,14 @@ ThumbnailCache::CacheEntry ThumbnailCache::renderThumbnail ( VIC2_Render& vic2, 
 	set.firstLuma = hints.firstLuma;
 	vic2.setSettings ( set );
 
-	auto	img = createImage ( vic2, artName );
+	std::optional<uint16_t>	pictureFlags;
+	auto	img = createImage ( vic2, artName, analyze ? &pictureFlags : nullptr );
 
 	return { MipMap ( img.convertedToFormat ( juce::Image::PixelFormat::RGB ).rescaled ( img.getWidth () / 2, img.getHeight () / 2 ), vic2Enhance ),
+			 artName,
 			 std::chrono::steady_clock::now (),
 			 vic2.getNumFields () > 1,
-			 vic2.isMulticolor () };
+			 pictureFlags };
 }
 //-----------------------------------------------------------------------------
 
@@ -188,7 +210,7 @@ bool ThumbnailCache::isInterlaced ( const std::string& key ) const
 }
 //-----------------------------------------------------------------------------
 
-std::optional<bool> ThumbnailCache::isMulticolor ( const std::string& key ) const
+std::optional<uint16_t> ThumbnailCache::getPictureFlags ( const std::string& key ) const
 {
 	const juce::CriticalSection::ScopedLockType	csLock ( cacheCs );
 
@@ -196,7 +218,7 @@ std::optional<bool> ThumbnailCache::isMulticolor ( const std::string& key ) cons
 	if ( it == cache.end () )
 		return std::nullopt;
 
-	return it->second.multicolor;
+	return it->second.pictureFlags;
 }
 //-----------------------------------------------------------------------------
 
@@ -213,6 +235,20 @@ void ThumbnailCache::removeCacheEntry ( const std::string& tunename )
 	const juce::CriticalSection::ScopedLockType	csLock ( cacheCs );
 
 	cache.erase ( tunename );
+}
+//-----------------------------------------------------------------------------
+
+void ThumbnailCache::removeArtEntries ( const std::string& artName )
+{
+	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
+
+	// A curation can move the tune's default pick to another of its screenshots
+	auto	affected = lookup->getSiblings ( artName );
+	affected.emplace_back ( artName );
+
+	const juce::CriticalSection::ScopedLockType	csLock ( cacheCs );
+
+	std::erase_if ( cache, [ &affected ] ( const auto& entry ) { return std::ranges::contains ( affected, entry.second.artName ); } );
 }
 //-----------------------------------------------------------------------------
 
@@ -270,13 +306,15 @@ void ThumbnailCache::setCacheLimit ( const int maxEntries )
 }
 //-----------------------------------------------------------------------------
 
-juce::Image ThumbnailCache::createImage ( VIC2_Render& vic2, const std::string& artName )
+juce::Image ThumbnailCache::createImage ( VIC2_Render& vic2, const std::string& artName, std::optional<uint16_t>* pictureFlags )
 {
 	const juce::SharedResourcePointer<ScreenshotLookup>	scrSht;
 
 	const auto	mb = scrSht->loadData ( artName );
 
-	vic2.loadImage ( artName.c_str (), mb.getData (), mb.getSize () );
+	if ( vic2.loadImage ( artName.c_str (), mb.getData (), mb.getSize () ) && pictureFlags )
+		*pictureFlags = vic2.analyze ();
+
 	vic2.renderCRT ();
 
 	const auto	div = vic2.wasBorderFilled () * 1 + 1;

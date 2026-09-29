@@ -12,6 +12,38 @@
 
 //-----------------------------------------------------------------------------
 
+// Makes the git repository root the working directory, false outside a repository
+static bool enterRepository ()
+{
+	auto	cwd = juce::File::getCurrentWorkingDirectory ();
+	while ( ! cwd.getChildFile ( ".git" ).isDirectory () )
+	{
+		const auto	parent = cwd.getParentDirectory ();
+		if ( parent == cwd || ! parent.isDirectory () )
+			return false;
+
+		cwd = parent;
+	}
+
+	cwd.setAsCurrentWorkingDirectory ();
+	return true;
+}
+//-----------------------------------------------------------------------------
+
+// Local files in the developer tree (an ignored folder, a fresh drop) are not in git
+static bool isTracked ( const juce::File& file )
+{
+	if ( ! enterRepository () )
+		return false;
+
+	auto	cp = juce::ChildProcess ();
+	if ( ! cp.start ( juce::StringArray { "git", "ls-files", "--error-unmatch", file.getFullPathName () } ) || ! cp.waitForProcessToFinish ( 10'000 ) )
+		return false;
+
+	return cp.getExitCode () == 0;
+}
+//-----------------------------------------------------------------------------
+
 static void executeCommand ( const juce::String& command, const juce::String& root, const juce::StringArray& files )
 {
 	if ( command == "mv" && files[ 0 ] == files[ 1 ] )
@@ -20,20 +52,8 @@ static void executeCommand ( const juce::String& command, const juce::String& ro
 	if ( command == "rm" && files[ 0 ].isEmpty () )
 		return;
 
-	// Find git repository root
-	{
-		auto	cwd = juce::File::getCurrentWorkingDirectory ();
-		while ( ! cwd.getChildFile ( ".git" ).isDirectory () )
-		{
-			const auto	parent = cwd.getParentDirectory ();
-			if ( parent == cwd || ! parent.isDirectory () )
-				return;
-
-			cwd = parent;
-		}
-
-		cwd.setAsCurrentWorkingDirectory ();
-	}
+	if ( ! enterRepository () )
+		return;
 
 	// Build command
 	auto	cmd = "git " + command;
@@ -242,8 +262,14 @@ static void renameScreenshot ( const std::string& artName, const juce::String& n
 
 	if ( isDeveloperTree () )
 	{
-		executeCommand ( "mv", "/Screenshots/", { datasource::getDevFile ( "Screenshots/" + artName ).getFullPathName (),
-												  datasource::getDevFile ( "Screenshots/" + newName ).getFullPathName () } );
+		const auto	src = datasource::getDevFile ( "Screenshots/" + artName );
+		const auto	dst = datasource::getDevFile ( "Screenshots/" + newName );
+
+		if ( isTracked ( src ) )
+			executeCommand ( "mv", "/Screenshots/", { src.getFullPathName (), dst.getFullPathName () } );
+		else if ( ! src.moveFileTo ( dst ) )
+			Z_ERR ( "Could not rename " << src.getFullPathName () );
+
 		return;
 	}
 
@@ -321,7 +347,14 @@ void assettools::deleteImage ( const std::string& artName )
 	}
 
 	if ( isDeveloperTree () )
-		executeCommand ( "rm", "/Screenshots/", { datasource::getDevFile ( "Screenshots/" + artName ).getFullPathName () } );
+	{
+		const auto	file = datasource::getDevFile ( "Screenshots/" + artName );
+
+		if ( isTracked ( file ) )
+			executeCommand ( "rm", "/Screenshots/", { file.getFullPathName () } );
+		else if ( ! file.deleteFile () )
+			Z_ERR ( "Could not delete " << file.getFullPathName () );
+	}
 }
 //-----------------------------------------------------------------------------
 

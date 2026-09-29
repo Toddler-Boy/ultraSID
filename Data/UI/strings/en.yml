@@ -125,12 +125,17 @@ menu:
 crt-browser:
   root:          Screenshots
   browse_tip:    Browse screenshots
+  search:        Search screenshots
+  picture:       "{} picture"
+  pictures:      "{} pictures"
   hint_border:   "#{}"
   hint_pal:      PAL
   hint_ntsc:     NTSC
-  hint_ifli:     IFLI
+  hint_interlaced: Interlaced
   hint_hires:    Hires
   hint_multicolor: Multi
+  hint_border_sprites: Border sprites
+  hint_raster_splits: Raster splits
   hint_first_luma: 1st luma
   vic2_colors:   "Black, White, Red, Cyan, Purple, Green, Blue, Yellow, Orange, Brown, Light red, Dark grey, Grey, Light green, Light blue, Light grey"
 

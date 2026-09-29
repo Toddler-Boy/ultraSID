@@ -102,6 +102,7 @@ public:
 	void showPictures ( const juce::StringArray& files )	{	crtPage.showPictures ( files );	}
 	void userScreenshotsChanged ()							{	crtPage.userScreenshotsChanged ();	}
 	[[ nodiscard ]] bool isCRTBrowserVisible () const		{	return crtPage.isBrowserVisible ();	}
+	void focusCRTBrowserSearch ()							{	crtPage.focusBrowserSearch ();	}
 	[[ nodiscard ]] juce::String getCRTBrowserFolder () const	{	return crtPage.getBrowserFolder ();	}
 	void setCRTBackground ( const juce::Colour& col )		{	crtPage.setBackgroundColour ( col );	}
 	void setCRTVoiceRegs ( const uint8_t* regs, const int count )	{	crtPage.setVoiceRegs ( regs, count );	}
