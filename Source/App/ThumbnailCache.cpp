@@ -196,6 +196,7 @@ ThumbnailCache::CacheEntry ThumbnailCache::renderThumbnail ( VIC2_Render& vic2, 
 			 artName,
 			 std::chrono::steady_clock::now (),
 			 vic2.getNumFields () > 1,
+			 vic2.getScrollRangeX () > 0 || vic2.getScrollRangeY () > 0,
 			 pictureFlags };
 }
 //-----------------------------------------------------------------------------
@@ -207,6 +208,16 @@ bool ThumbnailCache::isInterlaced ( const std::string& key ) const
 	const auto	it = cache.find ( key );
 
 	return it != cache.end () && it->second.interlaced;
+}
+//-----------------------------------------------------------------------------
+
+bool ThumbnailCache::isScrolling ( const std::string& key ) const
+{
+	const juce::CriticalSection::ScopedLockType	csLock ( cacheCs );
+
+	const auto	it = cache.find ( key );
+
+	return it != cache.end () && it->second.scrolling;
 }
 //-----------------------------------------------------------------------------
 

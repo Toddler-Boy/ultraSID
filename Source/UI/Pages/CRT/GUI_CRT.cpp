@@ -455,8 +455,8 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 		}
 	}
 
-	// A picture larger than the screen scrolls back and forth like a demo scroller, resting two seconds
-	// at each end: 1 pixel per emulated frame for up to one extra screen, 2 beyond that
+	// A picture larger than the screen scrolls back and forth like a demo scroller, one pixel per
+	// emulated frame, resting two seconds at each end
 	auto	scrolled = false;
 	if ( ! lastWasGenerated && ( vicRender.getScrollRangeX () > 0 || vicRender.getScrollRangeY () > 0 ) )
 	{
@@ -466,32 +466,29 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 		// A new picture enters halfway through its first rest, so it starts moving after one second
 		const auto	frame = int64_t ( scrollTime / fieldPeriod ) + restFrames / 2;
 
-		auto sweep = [ frame, restFrames ] ( const int range, const int screen )
+		auto sweep = [ frame, restFrames ] ( const int range )
 		{
 			if ( range <= 0 )
 				return 0;
 
-			const auto	pixelsPerFrame = range <= screen ? 1 : 2;
-			const auto	travel = ( range + pixelsPerFrame - 1 ) / pixelsPerFrame;
-			auto		f = int ( frame % ( 2 * ( travel + restFrames ) ) );
+			auto	f = int ( frame % ( 2 * ( range + restFrames ) ) );
 
 			if ( f < restFrames )
 				return 0;
 			f -= restFrames;
 
-			if ( f < travel )
-				return std::min ( range, f * pixelsPerFrame );
-			f -= travel;
+			if ( f < range )
+				return f;
+			f -= range;
 
 			if ( f < restFrames )
 				return range;
 			f -= restFrames;
 
-			return std::max ( 0, range - f * pixelsPerFrame );
+			return range - f;
 		};
 
-		const juce::Point<int>	pos { sweep ( vicRender.getScrollRangeX (), VIC2_Render::innerUnscaledWidth ),
-									  sweep ( vicRender.getScrollRangeY (), VIC2_Render::innerUnscaledHeight ) };
+		const juce::Point<int>	pos { sweep ( vicRender.getScrollRangeX () ), sweep ( vicRender.getScrollRangeY () ) };
 		if ( pos != scrollPos )
 		{
 			scrollPos = pos;

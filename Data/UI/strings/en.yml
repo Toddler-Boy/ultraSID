@@ -131,11 +131,12 @@ crt-browser:
   hint_border:   "#{}"
   hint_pal:      PAL
   hint_ntsc:     NTSC
-  hint_interlaced: Interlaced
-  hint_hires:    Hires
-  hint_multicolor: Multi
-  hint_border_sprites: Border sprites
-  hint_raster_splits: Raster splits
+  hint_interlaced: interlaced
+  hint_hires:    hires
+  hint_multicolor: multi
+  hint_border_sprites: border-sprites
+  hint_raster:   raster
+  hint_scrolling: scrolling
   hint_first_luma: 1st luma
   vic2_colors:   "Black, White, Red, Cyan, Purple, Green, Blue, Yellow, Orange, Brown, Light red, Dark grey, Grey, Light green, Light blue, Light grey"
 

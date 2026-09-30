@@ -48,9 +48,14 @@ static std::string stemKey ( const std::string& filename )
 }
 //-----------------------------------------------------------------------------
 
+// Case-insensitive, the exact spelling only breaks ties
 static void sortNatural ( std::vector<std::string>& v )
 {
-	std::ranges::sort ( v, [] ( const std::string& a, const std::string& b ) { return lime::str::naturalCompare ( std::string_view ( a ), std::string_view ( b ) ) < 0; } );
+	std::ranges::sort ( v, [] ( const std::string& a, const std::string& b )
+	{
+		const auto	byName = lime::str::naturalCompare ( std::string_view ( lime::str::toLower ( a ) ), std::string_view ( lime::str::toLower ( b ) ) );
+		return byName != 0 ? byName < 0 : a < b;
+	} );
 }
 //-----------------------------------------------------------------------------
 

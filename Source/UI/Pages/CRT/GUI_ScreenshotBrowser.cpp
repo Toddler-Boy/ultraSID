@@ -241,16 +241,18 @@ void GUI_ScreenshotBrowser::paintListBoxItem ( int rowNumber, juce::Graphics& g,
 	if ( const auto flags = thumbnailCache->getPictureFlags ( art ) )
 	{
 		hints.add ( strings->get ( *flags & pictureanalyzer::multicolor ? "crt-browser/hint_multicolor" : "crt-browser/hint_hires" ) );
-
 		if ( *flags & pictureanalyzer::borderSprites )
 			hints.add ( strings->get ( "crt-browser/hint_border_sprites" ) );
 
 		if ( *flags & pictureanalyzer::rasterSplits )
-			hints.add ( strings->get ( "crt-browser/hint_raster_splits" ) );
+			hints.add ( strings->get ( "crt-browser/hint_raster" ) );
 	}
 
 	if ( thumbnailCache->isInterlaced ( art ) )
 		hints.add ( strings->get ( "crt-browser/hint_interlaced" ) );
+
+	if ( thumbnailCache->isScrolling ( art ) )
+		hints.add ( strings->get ( "crt-browser/hint_scrolling" ) );
 
 	if ( hint.firstLuma )
 		hints.add ( strings->get ( "crt-browser/hint_first_luma" ) );
@@ -315,6 +317,17 @@ juce::String GUI_ScreenshotBrowser::getNameForRow ( int rowNumber )
 		return leafName ( entries.folders[ size_t ( rowNumber ) ] );
 
 	return leafName ( imageutils::hintFromFilename ( entries.files[ size_t ( rowNumber ) - entries.folders.size () ] ).name.toStdString () );
+}
+//-----------------------------------------------------------------------------
+
+juce::String GUI_ScreenshotBrowser::getTooltipForRow ( int row )
+{
+	if ( ! juce::isPositiveAndBelow ( row, getNumRows () ) )
+		return {};
+
+	const auto&	path = isFolderRow ( row ) ? entries.folders[ size_t ( row ) ] : entries.files[ size_t ( row ) - entries.folders.size () ];
+
+	return juce::String ( path );
 }
 //-----------------------------------------------------------------------------
 

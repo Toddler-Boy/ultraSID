@@ -37,6 +37,7 @@ public:
 	void returnKeyPressed ( int row ) override;
 	void selectedRowsChanged ( int lastRowSelected ) override;
 	juce::String getNameForRow ( int rowNumber ) override;
+	juce::String getTooltipForRow ( int row ) override;
 
 	// juce::FileDragAndDropTarget
 	bool isInterestedInFileDrag ( const juce::StringArray& files ) override;

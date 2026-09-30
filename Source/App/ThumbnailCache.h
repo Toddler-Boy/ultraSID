@@ -44,6 +44,7 @@ public:
 	// Picture facts known once its thumbnail is cached: false, or unknown, before.
 	// Only art thumbnails carry the analyzer's flags
 	[[ nodiscard ]] bool isInterlaced ( const std::string& key ) const;
+	[[ nodiscard ]] bool isScrolling ( const std::string& key ) const;
 	[[ nodiscard ]] std::optional<uint16_t> getPictureFlags ( const std::string& key ) const;
 
 	[[ nodiscard ]] juce::Image& getDefaultScreen () { return defaultScreen; }
@@ -67,6 +68,7 @@ private:
 		std::string	artName;
 		std::chrono::steady_clock::time_point	lastAccess;
 		bool	interlaced = false;
+		bool	scrolling = false;
 		std::optional<uint16_t>	pictureFlags;
 	};
 
