@@ -1,7 +1,5 @@
 #include <JuceHeader.h>
 
-#include <numbers>
-
 #include "GUI_CRT.h"
 
 #include "libSidplayEZ/src/stringutils.h"
@@ -457,26 +455,43 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 		}
 	}
 
-	// A picture larger than the screen sweeps back and forth on a sine per axis, in
-	// whole pixels per emulated frame; the sweep time grows with the root of the distance
+	// A picture larger than the screen scrolls back and forth like a demo scroller, resting two seconds
+	// at each end: 1 pixel per emulated frame for up to one extra screen, 2 beyond that
 	auto	scrolled = false;
 	if ( ! lastWasGenerated && ( vicRender.getScrollRangeX () > 0 || vicRender.getScrollRangeY () > 0 ) )
 	{
-		constexpr auto	secondsPerRootPixel = 0.3;
+		const auto	restFrames = int ( std::lround ( 2.0f / fieldPeriod ) );
 
 		scrollTime += secondsPassed;
-		const auto	frameTime = std::floor ( scrollTime / fieldPeriod ) * fieldPeriod;
+		// A new picture enters halfway through its first rest, so it starts moving after one second
+		const auto	frame = int64_t ( scrollTime / fieldPeriod ) + restFrames / 2;
 
-		auto sweep = [ frameTime ] ( const int range )
+		auto sweep = [ frame, restFrames ] ( const int range, const int screen )
 		{
 			if ( range <= 0 )
 				return 0;
 
-			const auto	period = 2.0 * secondsPerRootPixel * std::sqrt ( double ( range ) );
-			return int ( std::lround ( range * ( 1.0 - std::cos ( 2.0 * std::numbers::pi * frameTime / period ) ) / 2.0 ) );
+			const auto	pixelsPerFrame = range <= screen ? 1 : 2;
+			const auto	travel = ( range + pixelsPerFrame - 1 ) / pixelsPerFrame;
+			auto		f = int ( frame % ( 2 * ( travel + restFrames ) ) );
+
+			if ( f < restFrames )
+				return 0;
+			f -= restFrames;
+
+			if ( f < travel )
+				return std::min ( range, f * pixelsPerFrame );
+			f -= travel;
+
+			if ( f < restFrames )
+				return range;
+			f -= restFrames;
+
+			return std::max ( 0, range - f * pixelsPerFrame );
 		};
 
-		const juce::Point<int>	pos { sweep ( vicRender.getScrollRangeX () ), sweep ( vicRender.getScrollRangeY () ) };
+		const juce::Point<int>	pos { sweep ( vicRender.getScrollRangeX (), VIC2_Render::innerUnscaledWidth ),
+									  sweep ( vicRender.getScrollRangeY (), VIC2_Render::innerUnscaledHeight ) };
 		if ( pos != scrollPos )
 		{
 			scrollPos = pos;
