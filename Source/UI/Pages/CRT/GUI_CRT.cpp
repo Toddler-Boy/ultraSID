@@ -143,6 +143,12 @@ void GUI_CRT::mouseWheelMove ( const juce::MouseEvent& event, const juce::MouseW
 }
 //-----------------------------------------------------------------------------
 
+int GUI_CRT::scrollRestFrames ()
+{
+	return int ( std::lround ( 2.0f * ( overlay.getSettings ().isNTSC ? VIC2::ntscRefreshHz : VIC2::palRefreshHz ) ) );
+}
+//-----------------------------------------------------------------------------
+
 bool GUI_CRT::loadArtworkImage ()
 {
 	if ( lastLoadedName.isEmpty () )
@@ -156,14 +162,36 @@ bool GUI_CRT::loadArtworkImage ()
 		mb = scrshot->loadData ( lastLoadedName.toStdString () );
 
 	fieldTime = 0.0f;
-	scrollTime = 0.0;
-	scrollPos = {};
+	// A new picture enters halfway through its first rest, so it starts moving after one second
+	scroll = {};
+	scrollClock = 0.0;
+	for ( auto& axis : scroll )
+		axis.rested = scrollRestFrames () / 2;
 
 	const auto	hint = imageutils::hintFromFilename ( lastLoadedName );
 	lastFirstLuma = hint.firstLuma;
 	lastForceNTSC = hint.forceNTSC;
 
-	return vicRender.loadImage ( lastLoadedName.toRawUTF8 (), mb.getData (), mb.getSize () );
+	if ( ! vicRender.loadImage ( lastLoadedName.toRawUTF8 (), mb.getData (), mb.getSize () ) )
+		return false;
+
+	// Graphics or colour splits beside the screen take all of a frame's raster time, none left for
+	// a tune's display: anything there other than the frame's own border colour
+	const auto*	pixels = vicRender.getIndexPixels ();
+	const auto	border = pixels[ 0 ];
+
+	sideBorderArt = false;
+	for ( auto y = VIC2_Render::unscaledBorderSizeY; y < VIC2_Render::unscaledBorderSizeY + VIC2_Render::innerUnscaledHeight && ! sideBorderArt; ++y )
+	{
+		const auto*	row = pixels + y * VIC2_Render::outerUnscaledWidth;
+		const auto*	right = row + VIC2_Render::unscaledBorderSizeX + VIC2_Render::innerUnscaledWidth;
+		auto		plain = [ border ] ( const uint8_t p ) { return p == border; };
+
+		sideBorderArt = ! std::all_of ( row, row + VIC2_Render::unscaledBorderSizeX, plain )
+					 || ! std::all_of ( right, right + VIC2_Render::unscaledBorderSizeX, plain );
+	}
+
+	return true;
 }
 //-----------------------------------------------------------------------------
 
@@ -460,41 +488,40 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 	auto	scrolled = false;
 	if ( ! lastWasGenerated && ( vicRender.getScrollRangeX () > 0 || vicRender.getScrollRangeY () > 0 ) )
 	{
-		const auto	restFrames = int ( std::lround ( 2.0f / fieldPeriod ) );
+		const auto	restFrames = scrollRestFrames ();
+		const std::array	ranges { vicRender.getScrollRangeX (), vicRender.getScrollRangeY () };
 
-		scrollTime += secondsPassed;
-		// A new picture enters halfway through its first rest, so it starts moving after one second
-		const auto	frame = int64_t ( scrollTime / fieldPeriod ) + restFrames / 2;
+		// A stalled timer catches up a few frames at most instead of racing
+		scrollClock = std::min ( scrollClock + secondsPassed, 4.0 * fieldPeriod );
 
-		auto sweep = [ frame, restFrames ] ( const int range )
+		for ( ; scrollClock >= fieldPeriod; scrollClock -= fieldPeriod )
 		{
-			if ( range <= 0 )
-				return 0;
+			for ( size_t i = 0; i < scroll.size (); ++i )
+			{
+				auto&	axis = scroll[ i ];
+				if ( ranges[ i ] <= 0 )
+					continue;
 
-			auto	f = int ( frame % ( 2 * ( range + restFrames ) ) );
+				if ( axis.resting )
+				{
+					axis.resting = ++axis.rested < restFrames;
+					continue;
+				}
 
-			if ( f < restFrames )
-				return 0;
-			f -= restFrames;
+				axis.pos = std::clamp ( axis.pos + axis.dir, 0, ranges[ i ] );
+				scrolled = true;
 
-			if ( f < range )
-				return f;
-			f -= range;
-
-			if ( f < restFrames )
-				return range;
-			f -= restFrames;
-
-			return range - f;
-		};
-
-		const juce::Point<int>	pos { sweep ( vicRender.getScrollRangeX () ), sweep ( vicRender.getScrollRangeY () ) };
-		if ( pos != scrollPos )
-		{
-			scrollPos = pos;
-			vicRender.setScroll ( pos.x, pos.y );
-			scrolled = true;
+				if ( axis.pos == 0 || axis.pos == ranges[ i ] )
+				{
+					axis.resting = true;
+					axis.rested = 0;
+					axis.dir = -axis.dir;
+				}
+			}
 		}
+
+		if ( scrolled )
+			vicRender.setScroll ( scroll[ 0 ].pos, scroll[ 1 ].pos );
 	}
 
 	// This gets called once per V-BLANK (so may be higher than refresh rate of the C64)
@@ -549,12 +576,14 @@ void GUI_CRT::timerUpdate ( const float secondsPassed, const uint16_t cpuCycles 
 		return;
 	}
 
-	if ( ! haveRaster && ! fieldFlipped && ! scrolled )
+	const auto	showRaster = haveRaster && ! sideBorderArt;
+
+	if ( ! showRaster && ! fieldFlipped && ! scrolled )
 		return;
 
 	vicRender.restoreIndexBuffer ();
 
-	if ( haveRaster )
+	if ( showRaster )
 		drawRasterBars ( vicRender.getIndexPixels (), cpuCycles );
 
 	// The bars sit in the buffer unseen by renderScreen: without this, the

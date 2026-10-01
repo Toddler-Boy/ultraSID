@@ -77,27 +77,132 @@ static void executeCommand ( const juce::String& command, const juce::String& ro
 }
 //-----------------------------------------------------------------------------
 
-// A uniform single-color border carries no pixel information: the image gets
-// cropped to the inner 320x200 and the border color moves into the filename
-// hint. Returns the hint digit, -1 = no hint (untouched, or black = default)
-static int8_t cropUniformBorder ( const juce::File& file )
+// A picture larger than the screen keeps its picture area: each border margin goes where it holds
+// nothing but the border color, which moves into the hint. Returns the hint digit, -1 = none
+static int8_t cropPictureArea ( const juce::File& file, const juce::MemoryBlock& mb, pngloader::image& img )
 {
+	auto sourceColor = [ &img ] ( const int x, const int y )
+	{
+		const auto	i = size_t ( y ) * size_t ( img.width ) + size_t ( x );
+		return img.paletted ? img.palette[ img.indices[ i ] ] : img.pixels[ i ] & 0xFFFFFF;
+	};
+
+	const auto	border = sourceColor ( 0, 0 );
+
+	auto	minX = img.width;
+	auto	maxX = -1;
+	auto	minY = img.height;
+	auto	maxY = -1;
+
+	for ( auto y = 0; y < img.height; ++y )
+		for ( auto x = 0; x < img.width; ++x )
+			if ( sourceColor ( x, y ) != border )
+			{
+				minX = std::min ( minX, x );	maxX = std::max ( maxX, x );
+				minY = std::min ( minY, y );	maxY = std::max ( maxY, y );
+			}
+
+	if ( maxX < 0 )
+		return -1;
+
+	// The picture area of one direction when only border color lies outside it, else all of it;
+	// exports put it a line or so off center, the nearest window to the standard margin wins
+	auto window = [] ( const int size, const int margin, const int screen, const int lo, const int hi ) -> std::pair<int, int>
+	{
+		const auto	length = size - 2 * margin;
+		const auto	low = std::max ( 0, hi - ( length - 1 ) );
+		const auto	high = std::min ( lo, size - length );
+
+		if ( length < screen || low > high )
+			return { 0, size };
+
+		return { std::clamp ( margin, low, high ), length };
+	};
+
+	const auto [ x0, w ] = window ( img.width, VIC2_Render::unscaledBorderSizeX, VIC2_Render::innerUnscaledWidth, minX, maxX );
+	const auto [ y0, h ] = window ( img.height, VIC2_Render::unscaledBorderSizeY, VIC2_Render::innerUnscaledHeight, minY, maxY );
+
+	if ( w == img.width && h == img.height )
+		return -1;
+
+	// The renderer shows the picture area's top-left corner, border color, at the window's corner
+	VIC2_Render	vic2 ( false );
+	if ( ! vic2.loadImage ( file.getFullPathName ().toRawUTF8 (), mb.getData (), mb.getSize () ) )
+		return -1;
+
+	const auto	windowX = img.width == VIC2_Render::outerUnscaledWidth ? 0 : VIC2_Render::unscaledBorderSizeX;
+	const auto	borderIndex = juce::Image::BitmapData ( vic2.getCRT (), juce::Image::BitmapData::readOnly ).getLinePointer ( VIC2_Render::unscaledBorderSizeY )[ windowX ];
+
+	auto crop = [ &img, x0, y0, w, h ] ( auto& buf )
+	{
+		if ( buf.empty () )
+			return;
+
+		std::remove_reference_t<decltype ( buf )>	area ( size_t ( w ) * size_t ( h ) );
+
+		for ( auto y = 0; y < h; ++y )
+			std::copy_n ( buf.begin () + size_t ( y + y0 ) * size_t ( img.width ) + size_t ( x0 ), w, area.begin () + size_t ( y ) * size_t ( w ) );
+
+		buf = std::move ( area );
+	};
+
+	crop ( img.indices );
+	crop ( img.pixels );
+
+	img.width = w;
+	img.height = h;
+
+	const auto	encoded = pngloader::encode ( img );
+	if ( encoded.empty () || ! file.replaceWithData ( encoded.data (), encoded.size () ) )
+		return -1;
+
+	return borderIndex != vic2::black ? int8_t ( borderIndex ) : int8_t ( -1 );
+}
+//-----------------------------------------------------------------------------
+
+// A framed picture saved as displayed: the screen centered like the renderer does, a one-color
+// border cropped to 320x200. Returns that border's hint digit, -1 = no hint (none, or black)
+static int8_t normalizePicture ( const juce::File& file )
+{
+	constexpr auto	width = VIC2_Render::outerUnscaledWidth;
+	constexpr auto	height = VIC2_Render::outerUnscaledHeight;
+	constexpr auto	left = VIC2_Render::unscaledBorderSizeX;
+	constexpr auto	top = VIC2_Render::unscaledBorderSizeY;
+
 	juce::MemoryBlock	mb;
 	if ( ! file.loadFileAsData ( mb ) )
 		return -1;
 
 	auto	img = pngloader::decode ( mb.getData (), mb.getSize () );
 
-	if ( ! ( img.width == VIC2_Render::outerUnscaledWidth && img.height == VIC2_Render::outerUnscaledHeight ) )
-		return -1;
+	if ( ! ( img.width == width && img.height == height ) )
+	{
+		const auto	larger = img.width >= width && img.height >= height;
+		return larger && ! imageutils::hintFromFilename ( file.getFileName () ).interlaced ? cropPictureArea ( file, mb, img ) : int8_t ( -1 );
+	}
 
-	// Convert for the border's VIC color, then find the bounding box of everything that
-	// differs from it in the source itself: the renderer shows the picture centered
+	// The renderer finds the screen and the border's VIC color
 	VIC2_Render	vic2 ( false );
 	if ( ! vic2.loadImage ( file.getFullPathName ().toRawUTF8 (), mb.getData (), mb.getSize () ) )
 		return -1;
 
+	const auto	shift = vic2.getScreenShift ();
 	const auto	borderIndex = *juce::Image::BitmapData ( vic2.getCRT (), juce::Image::BitmapData::readOnly ).getLinePointer ( 0 );
+
+	// The same move on the source, palette untouched; lines moved in repeat the edge
+	auto move = [ shift ] ( auto& buf )
+	{
+		if ( buf.empty () || shift.isOrigin () )
+			return;
+
+		const auto	src = buf;
+		for ( auto y = 0; y < height; ++y )
+			for ( auto x = 0; x < width; ++x )
+				buf[ size_t ( y * width + x ) ] = src[ size_t ( std::clamp ( y - shift.y, 0, height - 1 ) * width + std::clamp ( x - shift.x, 0, width - 1 ) ) ];
+	};
+
+	move ( img.indices );
+	move ( img.pixels );
 
 	auto sourceColor = [ &img ] ( const int x, const int y )
 	{
@@ -105,55 +210,19 @@ static int8_t cropUniformBorder ( const juce::File& file )
 		return img.paletted ? img.palette[ img.indices[ i ] ] : img.pixels[ i ] & 0xFFFFFF;
 	};
 
-	auto	xOfs = 0;
-	auto	yOfs = 0;
+	auto	uniform = true;
+	for ( auto y = 0; y < height && uniform; ++y )
+		for ( auto x = 0; x < width && uniform; ++x )
+			if ( ( x < left || x >= left + VIC2_Render::innerUnscaledWidth || y < top || y >= top + VIC2_Render::innerUnscaledHeight )
+				 && sourceColor ( x, y ) != sourceColor ( 0, 0 ) )
+				uniform = false;
 
+	if ( ! uniform && shift.isOrigin () )
+		return -1;
+
+	if ( uniform )
 	{
-		const auto	border = sourceColor ( 0, 0 );
-
-		auto	minX = VIC2_Render::outerUnscaledWidth;
-		auto	maxX = -1;
-		auto	minY = VIC2_Render::outerUnscaledHeight;
-		auto	maxY = -1;
-
-		for ( auto y = 0; y < VIC2_Render::outerUnscaledHeight; ++y )
-		{
-			for ( auto x = 0; x < VIC2_Render::outerUnscaledWidth; ++x )
-			{
-				if ( sourceColor ( x, y ) == border )
-					continue;
-
-				minX = std::min ( minX, x );	maxX = std::max ( maxX, x );
-				minY = std::min ( minY, y );	maxY = std::max ( maxY, y );
-			}
-		}
-
-		// A single-color image crops at the standard window
-		if ( maxX < 0 )
-		{
-			minX = maxX = VIC2_Render::unscaledBorderSizeX;
-			minY = maxY = VIC2_Render::unscaledBorderSizeY;
-		}
-
-		// The screen window must cover the box with only border color outside;
-		// no such window means artwork in the border, which stays full size
-		const auto	xLow = std::max ( 0, maxX - ( VIC2_Render::innerUnscaledWidth - 1 ) );
-		const auto	xHigh = std::min ( minX, VIC2_Render::outerUnscaledWidth - VIC2_Render::innerUnscaledWidth );
-		const auto	yLow = std::max ( 0, maxY - ( VIC2_Render::innerUnscaledHeight - 1 ) );
-		const auto	yHigh = std::min ( minY, VIC2_Render::outerUnscaledHeight - VIC2_Render::innerUnscaledHeight );
-
-		if ( xLow > xHigh || yLow > yHigh )
-			return -1;
-
-		// When the box does not pin the window, prefer the centered standard
-		// (VICE and the app's own renders); off-center captures pin themselves
-		xOfs = std::clamp ( int ( VIC2_Render::unscaledBorderSizeX ), xLow, xHigh );
-		yOfs = std::clamp ( int ( VIC2_Render::unscaledBorderSizeY ), yLow, yHigh );
-	}
-
-	// Crop the decoded source down to the screen window, palette untouched
-	{
-		auto crop = [ xOfs, yOfs ] ( auto& buf )
+		auto crop = [] ( auto& buf )
 		{
 			if ( buf.empty () )
 				return;
@@ -161,8 +230,7 @@ static int8_t cropUniformBorder ( const juce::File& file )
 			std::remove_reference_t<decltype ( buf )>	inner ( size_t ( VIC2_Render::innerUnscaledWidth ) * VIC2_Render::innerUnscaledHeight );
 
 			for ( auto y = 0; y < VIC2_Render::innerUnscaledHeight; ++y )
-				std::copy_n ( buf.begin () + ( y + yOfs ) * VIC2_Render::outerUnscaledWidth + xOfs,
-							  VIC2_Render::innerUnscaledWidth,
+				std::copy_n ( buf.begin () + ( y + top ) * width + left, VIC2_Render::innerUnscaledWidth,
 							  inner.begin () + size_t ( y ) * VIC2_Render::innerUnscaledWidth );
 
 			buf = std::move ( inner );
@@ -175,12 +243,12 @@ static int8_t cropUniformBorder ( const juce::File& file )
 		img.height = VIC2_Render::innerUnscaledHeight;
 	}
 
-	// Only replace the file once the cropped version encoded successfully
+	// Only replace the file once the new version encoded successfully
 	const auto	encoded = pngloader::encode ( img );
 	if ( encoded.empty () || ! file.replaceWithData ( encoded.data (), encoded.size () ) )
 		return -1;
 
-	return borderIndex == vic2::black ? int8_t ( -1 ) : int8_t ( borderIndex );
+	return uniform && borderIndex != vic2::black ? int8_t ( borderIndex ) : int8_t ( -1 );
 }
 //-----------------------------------------------------------------------------
 
@@ -189,11 +257,11 @@ void assettools::addScreenshots ( const juce::File& dataRoot, const std::string&
 	if ( filenames.isEmpty () || tuneFilename.empty () )
 		return;
 
-	// A uniform border shrinks to a filename hint before the optimizer runs
+	// Saved as displayed before the optimizer runs, a uniform border shrinks to a filename hint
 	std::map<juce::String, int8_t>	borderHints;
 
 	for ( const auto& f : filenames )
-		borderHints[ f ] = cropUniformBorder ( juce::File ( f ) );
+		borderHints[ f ] = normalizePicture ( juce::File ( f ) );
 
 	// Use oxipng to optimize screenshots
 	for ( const auto& f : filenames )
@@ -377,8 +445,8 @@ static juce::MemoryBlock pictureBytes ( const juce::String& picture )
 }
 //-----------------------------------------------------------------------------
 
-// A picture into the user tree under name. A uniform border shrinks to the
-// border-color hint, as on import; black is the default and gets no hint
+// A picture into the user tree under name, saved as displayed like on import; a uniform
+// border shrinks to the border-color hint, black is the default and gets no hint
 static void writeUserPicture ( const juce::String& name, const juce::MemoryBlock& mb )
 {
 	const juce::SharedResourcePointer<ScreenshotLookup>	lookup;
@@ -395,7 +463,7 @@ static void writeUserPicture ( const juce::String& name, const juce::MemoryBlock
 		return;
 	}
 
-	if ( const auto border = cropUniformBorder ( target ); border >= 0 )
+	if ( const auto border = normalizePicture ( target ); border >= 0 )
 	{
 		auto	hint = imageutils::hintFromFilename ( name );
 		hint.borderColor = border;

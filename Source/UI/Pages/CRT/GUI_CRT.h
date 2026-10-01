@@ -162,8 +162,24 @@ private:
 	GUI_Overlay		overlay;
 	float			timePassed = 0.0f;
 	float			fieldTime = 0.0f;		// interlace field clock
-	double			scrollTime = 0.0;		// sweep clock of a picture larger than the screen
-	juce::Point<int>	scrollPos;
+
+	// A picture larger than the screen scrolls per direction, one step per emulated frame of the
+	// current TV standard; switching PAL/NTSC keeps the state and changes only the timing
+	struct scrollAxis
+	{
+		int		pos = 0;
+		int		dir = 1;
+		int		rested = 0;
+		bool	resting = true;
+	};
+
+	std::array<scrollAxis, 2>	scroll;
+	double			scrollClock = 0.0;		// time towards the next emulated frame
+
+	bool			sideBorderArt = false;	// the shown picture draws beside the screen: no raster time
+
+	// Two seconds in frames of the current TV standard
+	[[ nodiscard ]] int scrollRestFrames ();
 
 public:
 	// A hand-drawn Petmate screen from Data/C64 Screens: the base buffers plus
