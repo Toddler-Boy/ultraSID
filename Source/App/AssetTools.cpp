@@ -2,6 +2,7 @@
 
 #include "AssetTools.h"
 
+#include "Database/Database.h"
 #include "ultra-shared/Config/BuildInfo.h"
 #include "ultra-shared/Config/DataSource.h"
 #include "ultra-shared/Helpers/ImageUtils.h"
@@ -160,6 +161,15 @@ static int8_t cropPictureArea ( const juce::File& file, const juce::MemoryBlock&
 }
 //-----------------------------------------------------------------------------
 
+// The tune's video standard travels as a filename hint so the picture shows
+// right on its own, without the tune to look it up from
+static bool tuneIsNTSC ( const std::string& tuneFilename )
+{
+	const auto	ent = db::findDatabaseEntry ( tuneFilename );
+	return ent && ent->isNTSC ();
+}
+//-----------------------------------------------------------------------------
+
 // A framed picture saved as displayed: the screen centered like the renderer does, a one-color
 // border cropped to 320x200. Returns that border's hint digit, -1 = no hint (none, or black)
 static int8_t normalizePicture ( const juce::File& file )
@@ -279,6 +289,8 @@ void assettools::addScreenshots ( const juce::File& dataRoot, const std::string&
 	auto	dst = dataRoot.getChildFile ( "Screenshots/" + dstDir );
 	dst.createDirectory ();
 
+	const auto	isNTSC = tuneIsNTSC ( tuneFilename );
+
 	for ( const auto& f : filenames )
  	{
 		auto	srcFile = juce::File ( f );
@@ -291,15 +303,15 @@ void assettools::addScreenshots ( const juce::File& dataRoot, const std::string&
 		if ( srcNumber.length () != 7 )
 			continue;
 
-		auto	dstFileName = dstName + srcNumber;
+		// A cropped border and the tune's video standard travel as filename hints
+		auto	hint = imageutils::imageHint { dstName + srcNumber.upToLastOccurrenceOf ( ".", false, false ),
+											   "." + srcNumber.fromLastOccurrenceOf ( ".", false, false ) };
+		hint.forceNTSC = isNTSC;
 
-		// A cropped border travels as the border-color hint
-		if ( const auto it = borderHints.find ( f ); it != borderHints.end () && it->second >= 0 )
-			dstFileName = imageutils::filenameFromHint ( { dstName + srcNumber.upToLastOccurrenceOf ( ".", false, false ),
-														   "." + srcNumber.fromLastOccurrenceOf ( ".", false, false ),
-														   it->second } );
+		if ( const auto it = borderHints.find ( f ); it != borderHints.end () )
+			hint.borderColor = it->second;
 
-		auto	dstFile = dst.getChildFile ( dstFileName );
+		auto	dstFile = dst.getChildFile ( imageutils::filenameFromHint ( hint ) );
 
  		srcFile.moveFileTo ( dstFile );
 
@@ -486,9 +498,10 @@ void assettools::keepForTune ( const juce::String& picture, const std::string& t
 	const auto	dstName = juce::String ( tuneKey ).fromLastOccurrenceOf ( "/", false, false ).upToLastOccurrenceOf ( ".", false, false ).toLowerCase ();
 	const auto	number = juce::String ( lookup->getLastNumber ( tuneKey ) + 1 ).paddedLeft ( '0', 2 );
 
-	const auto	plainName = dstDir + dstName + "_" + number + ".png";
+	auto	hint = imageutils::imageHint { dstDir + dstName + "_" + number, ".png" };
+	hint.forceNTSC = tuneIsNTSC ( tuneKey );
 
-	writeUserPicture ( plainName, mb );
+	writeUserPicture ( imageutils::filenameFromHint ( hint ), mb );
 }
 //-----------------------------------------------------------------------------
 
