@@ -1524,7 +1524,7 @@ COMMENT: In the original rip voice 2 plays sharp from 1:14 to the end, a stray
 (#9)
    NAME: Charge!
 (#10)
-   NAME: Level start
+   NAME: End game
 
 /GAMES/M-R/River_Raid.sid
 (#1)
