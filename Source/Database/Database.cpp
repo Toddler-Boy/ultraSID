@@ -36,7 +36,7 @@ static char searchFold ( const char c )
 	return searchChar ( char ( sortingLut[ uint8_t ( c ) ] ) );
 }
 
-size_t db::foldSearch ( const std::string_view text, char* const dst )
+size_t db::foldSearch ( const std::string_view text, char* const dst, textSpan* const sources )
 {
 	static constexpr std::pair<std::string_view, char>	numerals[] =
 	{
@@ -48,10 +48,12 @@ size_t db::foldSearch ( const std::string_view text, char* const dst )
 	char	word[ 4 ];
 	auto	wordLen = 0;		// -1 once the word can no longer be a numeral
 
-	const auto	emit = [ & ] ( const char c )
+	const auto	emit = [ & ] ( const char c, const textSpan source )
 	{
 		if ( dst )
 			dst[ n ] = c;
+		if ( sources )
+			sources[ n ] = source;
 		++n;
 	};
 
@@ -61,24 +63,28 @@ size_t db::foldSearch ( const std::string_view text, char* const dst )
 			for ( const auto& [ numeral, digit ] : numerals )
 				if ( numeral == std::string_view ( word, size_t ( wordLen ) ) )
 				{
+					const auto	source = sources ? textSpan { sources[ wordStart ].from, sources[ n - 1 ].to } : textSpan {};
+
 					n = wordStart;
-					emit ( digit );
+					emit ( digit, source );
 					break;
 				}
 
 		wordLen = 0;
 	};
 
-	for ( const auto c : text )
+	for ( size_t i = 0; i < text.size (); ++i )
 	{
-		const auto	f = searchFold ( c );
+		const auto	f = searchFold ( text[ i ] );
 		if ( ! f )
 			continue;
+
+		const auto	source = textSpan { int ( i ), int ( i + 1 ) };
 
 		if ( f == ' ' )
 		{
 			endWord ();
-			emit ( ' ' );
+			emit ( ' ', source );
 			wordStart = n;
 			continue;
 		}
@@ -91,7 +97,7 @@ size_t db::foldSearch ( const std::string_view text, char* const dst )
 				wordLen = -1;
 		}
 
-		emit ( f );
+		emit ( f, source );
 	}
 
 	endWord ();

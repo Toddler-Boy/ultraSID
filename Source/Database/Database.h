@@ -202,10 +202,16 @@ private:
 
 namespace db
 {
-	// The search form of text: the sorting fold with path separators as spaces
-	// and all other punctuation dropped, whole-word roman numerals II to IX as
-	// digits. A null dst only measures; returns the length
-	[[ nodiscard ]] size_t foldSearch ( std::string_view text, char* dst );
+	// A half-open character range [from, to) of a text
+	struct textSpan
+	{
+		int	from;
+		int	to;
+	};
+
+	// Search form: sorting fold, separators as spaces, punctuation dropped, II to
+	// IX as digits. A null dst only measures; sources gets each char's origin
+	[[ nodiscard ]] size_t foldSearch ( std::string_view text, char* dst, textSpan* sources = nullptr );
 
 	// Looks up filename in the HVSC database first, then the user database
 	[[ nodiscard ]] const Database::entry* findDatabaseEntry ( const std::string& filename );

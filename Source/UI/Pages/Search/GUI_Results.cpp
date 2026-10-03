@@ -239,6 +239,10 @@ struct textHit
 	size_t	len;
 };
 
+// Words of four letters or more may be one typo off once the exact pass
+// found nothing
+static constexpr auto	shortestFuzzyWord = 4;
+
 // Where field holds text with at most one edit; one edit leaves one of the
 // three pieces intact, so only their exact hits get the full check
 static std::optional<textHit> fuzzyFind ( const std::string_view field, const std::string_view text )
@@ -303,13 +307,6 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	searchPattern = words.joinIntoString ( " " );
 	searchOpts = options;
 
-	// A word matches any search field unless a prefix limits it to one
-	struct searchTerm
-	{
-		std::string_view Database::entry::*	field;		// null: any field
-		std::string							text;
-	};
-
 	// A hit ranks by field, then by the tune having screenshots, then by how
 	// much of the field the word covers: the whole field, a word start, anywhere
 	struct searchField
@@ -327,12 +324,7 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		{ "path", &Database::entry::searchFile, 0 },
 	};
 
-	// Words of four letters or more may be one typo off once the exact pass
-	// found nothing
-	constexpr auto	shortestFuzzyWord = 4;
-	auto			fuzzy = false;
-
-	const auto	rankIn = [ &fuzzy ] ( const std::string_view field, const std::string& text, const int fieldRank )
+	const auto	rankIn = [ this ] ( const std::string_view field, const std::string& text, const int fieldRank )
 	{
 		auto	hit = std::optional<textHit> ();
 
@@ -379,11 +371,13 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		{ "is:8580", [] ( const Database::entry& e ) { return ( e.chipModels () & 2 ) != 0; } },
 	};
 
-	std::vector<searchTerm>								terms;
+	terms.clear ();
+	fuzzy = false;
+
 	std::vector<bool ( * ) ( const Database::entry& )>	tests;
-	std::optional<intRange>	yearFilter;
-	std::optional<intRange>	sidFilter;
-	auto						mustHaveScreenshots = false;
+	std::optional<intRange>								yearFilter;
+	std::optional<intRange>								sidFilter;
+	auto												mustHaveScreenshots = false;
 
 	for ( const auto& word : words )
 	{
@@ -495,7 +489,7 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	};
 
 	// The ranks of every word's best hit added up, nullopt when a word has none
-	auto scoreTerms = [ &terms, &rankIn ] ( const Database::entry* entry ) -> std::optional<int>
+	auto scoreTerms = [ this, &rankIn ] ( const Database::entry* entry ) -> std::optional<int>
 	{
 		auto	score = 0;
 
@@ -560,6 +554,63 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	getHeader ().reSortTable ();
 
 	return int ( rowData.size () );
+}
+//-----------------------------------------------------------------------------
+
+std::vector<db::textSpan> GUI_Results::getHighlights ( const std::string_view shown, const textField field ) const
+{
+	if ( terms.empty () || shown.empty () )
+		return {};
+
+	const auto	view = field == textField::name ? &Database::entry::searchName
+					 : field == textField::author ? &Database::entry::searchAuthor : &Database::entry::searchPublisher;
+
+	// The shown text folded the way the fields were, each folded character
+	// knowing where it came from
+	std::string					folded ( shown.size (), '\0' );
+	std::vector<db::textSpan>	sources ( shown.size () );
+
+	folded.resize ( db::foldSearch ( shown, folded.data (), sources.data () ) );
+
+	std::vector<db::textSpan>	spans;
+
+	const auto	add = [ & ] ( const textHit hit )
+	{
+		spans.push_back ( { sources[ hit.pos ].from, sources[ hit.pos + hit.len - 1 ].to } );
+	};
+
+	for ( const auto& term : terms )
+	{
+		if ( term.field && term.field != view )
+			continue;
+
+		auto	pos = folded.find ( term.text );
+
+		if ( pos == std::string::npos )
+		{
+			if ( fuzzy && term.text.size () >= shortestFuzzyWord )
+				if ( const auto hit = fuzzyFind ( folded, term.text ) )
+					add ( *hit );
+
+			continue;
+		}
+
+		for ( ; pos != std::string::npos; pos = folded.find ( term.text, pos + 1 ) )
+			add ( { pos, term.text.size () } );
+	}
+
+	// Overlapping spans merge so the boxes never stack
+	std::ranges::sort ( spans, {}, &db::textSpan::from );
+
+	std::vector<db::textSpan>	merged;
+
+	for ( const auto& span : spans )
+		if ( ! merged.empty () && span.from <= merged.back ().to )
+			merged.back ().to = std::max ( merged.back ().to, span.to );
+		else
+			merged.push_back ( span );
+
+	return merged;
 }
 //-----------------------------------------------------------------------------
 

@@ -47,8 +47,22 @@ public:
 	void returnKeyPressed ( int lastRowSelected ) override;
 	void sortOrderChanged ( int newSortColumnId, bool isForwards ) override;
 
+	// GUI_ListBox
+	[[ nodiscard ]] std::vector<db::textSpan> getHighlights ( const std::string_view shown, const textField field ) const override;
+
 private:
 	GUI_Pages&	pages;
+
+	// A word matches any search field unless a prefix limits it to one
+	struct searchTerm
+	{
+		std::string_view Database::entry::*	field;		// null: any field
+		std::string							text;
+	};
+
+	// The terms of the last search, for the highlights
+	std::vector<searchTerm>	terms;
+	bool					fuzzy = false;
 
 	std::vector<const Database::entry*>	database;
 	std::vector<const Database::entry*>	userDatabase;

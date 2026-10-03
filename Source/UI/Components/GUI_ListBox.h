@@ -128,6 +128,11 @@ protected:
 	// What the number column shows for a row
 	[[ nodiscard ]] virtual int getRowNumber ( const int rowNumber ) const	{	return rowNumber + 1;	}
 
+	// Spans of a row's shown text (the original bytes) to box as search hits
+	enum class textField { name, author, publisher };
+
+	[[ nodiscard ]] virtual std::vector<db::textSpan> getHighlights ( const std::string_view /*shown*/, const textField /*field*/ ) const	{	return {};	}
+
 	// juce::ComponentMovementWatcher, watching this list itself: coming on
 	// screen takes the keyboard focus and defaults to the first row selected
 	void componentMovedOrResized ( bool /*wasMoved*/, bool /*wasResized*/ ) override	{}

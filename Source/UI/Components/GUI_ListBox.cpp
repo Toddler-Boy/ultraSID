@@ -37,6 +37,50 @@
 
 	return videoStr[ ( ent.flags >> 2 ) & 3 ];
 }
+//-----------------------------------------------------------------------------
+
+// drawText's left-justified glyph run with a box behind each span and the
+// span's glyphs in the hit colour; a curtailed run keeps the boxes off its ellipsis
+static void drawTextWithHighlights ( juce::Graphics& g, const juce::Font& font, const juce::String& text, const juce::Rectangle<float> area,
+									 const std::vector<db::textSpan>& spans, const juce::Colour textColour, const juce::Colour hitTextColour, const juce::Colour boxColour )
+{
+	if ( spans.empty () )
+	{
+		g.setColour ( textColour );
+		g.drawText ( text, area, juce::Justification::centredLeft );
+		return;
+	}
+
+	juce::GlyphArrangement	run;
+
+	run.addCurtailedLineOfText ( font, text, 0.0f, 0.0f, area.getWidth (), true );
+	run.justifyGlyphs ( 0, run.getNumGlyphs (), area.getX (), area.getY (), area.getWidth (), area.getHeight (), juce::Justification::centredLeft );
+
+	const auto	curtailed = juce::GlyphArrangement::getStringWidth ( font, text ) > area.getWidth ();
+	const auto	shown = curtailed ? run.getNumGlyphs () - 3 : run.getNumGlyphs ();
+
+	const auto	inSpan = [ & ] ( const int glyph )
+	{
+		return glyph < shown && std::ranges::any_of ( spans, [ glyph ] ( const db::textSpan& s ) { return glyph >= s.from && glyph < s.to; } );
+	};
+
+	g.setColour ( boxColour );
+
+	for ( const auto& span : spans )
+	{
+		const auto	to = std::min ( span.to, shown );
+		if ( span.from >= to )
+			continue;
+
+		g.fillRoundedRectangle ( run.getBoundingBox ( span.from, to - span.from, true ).expanded ( 2.0f, 0.0f ), 3.0f );
+	}
+
+	for ( auto i = 0; i < run.getNumGlyphs (); ++i )
+	{
+		g.setColour ( inSpan ( i ) ? hitTextColour : textColour );
+		run.getGlyph ( i ).draw ( g );
+	}
+}
 
 namespace
 {
@@ -248,6 +292,7 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 
 	const auto	col = findColour ( UI::colors::textMuted );
 	const auto	txtCol = findColour ( UI::colors::text );
+	const auto	hitCol = findColour ( UI::colors::accent );
 	g.setColour ( col );
 
 	// A tune the database no longer resolves (deleted user tune, HVSC moved
@@ -328,20 +373,21 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 
 						auto	area = b.removeFromTop ( b.getHeight () / 2.0f );
 
-						g.setColour ( findColour ( rowPlaying == rowNumber ? UI::colors::accentBright : UI::colors::text ) );
-
+						const auto	nameCol = findColour ( rowPlaying == rowNumber ? UI::colors::accentBright : UI::colors::text );
 						const auto	name = stringutils::extendedASCIItoUTF8 ( ent.name );
+						const auto	hits = getHighlights ( ent.name, textField::name );
+
 						if ( subTune != ent.startTune )
 						{
 							const auto	strWidth = juce::GlyphArrangement::getStringWidth ( font, name ) + 4.0f;
-							g.drawText ( name, area.removeFromLeft ( strWidth ), juce::Justification::centredLeft );
+							drawTextWithHighlights ( g, font, name, area.removeFromLeft ( strWidth ), hits, nameCol, txtCol, hitCol );
 
 							g.setFont ( UI::font ( UI::fonts::browser_small ) );
 							g.setColour ( col );
 							g.drawText ( "#" + juce::String ( subTune ), area, juce::Justification::centredLeft );
 						}
 						else
-							g.drawText ( name, area, juce::Justification::centredLeft );
+							drawTextWithHighlights ( g, font, name, area, hits, nameCol, txtCol, hitCol );
 					}
 
 					// Author
@@ -352,8 +398,7 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 						const auto	authWidth = juce::GlyphArrangement::getStringWidth ( smlFont, author );
 
 						g.setFont ( smlFont );
-						g.setColour ( rowIsSelected ? txtCol : col );
-						g.drawText ( author, b.removeFromLeft ( authWidth + 4 ), juce::Justification::centredLeft );
+						drawTextWithHighlights ( g, smlFont, author, b.removeFromLeft ( authWidth + 4 ), getHighlights ( ent.author, textField::author ), rowIsSelected ? txtCol : col, txtCol, hitCol );
 					}
 
 					// Tags
@@ -421,8 +466,12 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 
 				// Party (Company or Author)
 				{
-					g.setFont ( UI::font ( UI::fonts::browser_small ) );
-					g.drawText ( str.fromFirstOccurrenceOf ( " ", false, false ), b, juce::Justification::centredLeft );
+					const auto	space = ent.release.find ( ' ' );
+					const auto	party = space == std::string_view::npos ? std::string_view () : ent.release.substr ( space + 1 );
+					const auto	smlFont = UI::font ( UI::fonts::browser_small );
+
+					g.setFont ( smlFont );
+					drawTextWithHighlights ( g, smlFont, str.fromFirstOccurrenceOf ( " ", false, false ), b, getHighlights ( party, textField::publisher ), rowIsSelected ? txtCol : col, txtCol, hitCol );
 				}
 			}
 			break;
