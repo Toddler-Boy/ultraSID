@@ -148,7 +148,9 @@ int GUI_Search::updateSearch ()
 
 	const juce::SharedResourcePointer<Strings>	strings;
 
-	if ( numResults )
+	if ( numResults && results.isCloseMatch () )
+		info.setText ( strings->get ( numResults == 1 ? "search/close_match" : "search/close_matches" ).replace ( "{}", textutils::getHumanNumber ( numResults ) ) );
+	else if ( numResults )
 		info.setText ( strings->get ( numResults == 1 ? "search/result" : "search/results" ).replace ( "{}", textutils::getHumanNumber ( numResults ) ) );
 	else
 		info.setText ( strings->get ( "search/no_results" ) );

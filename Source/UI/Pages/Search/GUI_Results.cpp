@@ -1,10 +1,13 @@
 #include <JuceHeader.h>
 
+#include <functional>
+
 #include "GUI_Results.h"
 
 #include "ultra-shared/Config/BuildInfo.h"
 #include "ultra-shared/UI/UI_Helpers.h"
 
+#include "App/ScreenshotLookup.h"
 #include "Data/Likes.h"
 #include "Data/Tags.h"
 #include "UI/UI_Menus.h"
@@ -62,7 +65,7 @@ void GUI_Results::sortOrderChanged ( int newSortColumnId, bool isForwards )
 }
 //-----------------------------------------------------------------------------
 
-struct yearRange
+struct intRange
 {
 	int	from;
 	int	to;
@@ -119,7 +122,7 @@ static bool parseSearchYear ( const std::string_view str, int& lo, int& hi )
 //-----------------------------------------------------------------------------
 
 // "YYYY", "YYYY-", "-YYYY" or "YYYY-YYYY"; the ends may come in any order
-static std::optional<yearRange> parseYearRange ( const std::string_view word )
+static std::optional<intRange> parseYearRange ( const std::string_view word )
 {
 	auto	leftLo = firstYear;
 	auto	leftHi = firstYear;
@@ -133,7 +136,7 @@ static std::optional<yearRange> parseYearRange ( const std::string_view word )
 		if ( ! parseSearchYear ( word, leftLo, leftHi ) )
 			return std::nullopt;
 
-		return yearRange { leftLo, leftHi };
+		return intRange { leftLo, leftHi };
 	}
 
 	const auto	left = word.substr ( 0, dash );
@@ -148,12 +151,131 @@ static std::optional<yearRange> parseYearRange ( const std::string_view word )
 	if ( ! right.empty () && ! parseSearchYear ( right, rightLo, rightHi ) )
 		return std::nullopt;
 
-	return yearRange { std::min ( leftLo, rightLo ), std::max ( leftHi, rightHi ) };
+	return intRange { std::min ( leftLo, rightLo ), std::max ( leftHi, rightHi ) };
+}
+//-----------------------------------------------------------------------------
+
+// "N", "N+", "N-", "-N" or "N-M", up to two digits each
+static std::optional<intRange> parseSidRange ( const std::string_view word )
+{
+	constexpr auto	mostSids = 99;
+
+	const auto	number = [] ( const std::string_view s, int& out )
+	{
+		if ( s.empty () || s.size () > 2 )
+			return false;
+
+		out = 0;
+		for ( const auto c : s )
+		{
+			if ( c < '0' || c > '9' )
+				return false;
+
+			out = out * 10 + ( c - '0' );
+		}
+
+		return true;
+	};
+
+	auto	from = 1;
+	auto	to = mostSids;
+
+	if ( word.ends_with ( '+' ) )
+		return number ( word.substr ( 0, word.size () - 1 ), from ) ? std::optional ( intRange { from, mostSids } ) : std::nullopt;
+
+	const auto	dash = word.find ( '-' );
+
+	if ( dash == std::string_view::npos )
+		return number ( word, from ) ? std::optional ( intRange { from, from } ) : std::nullopt;
+
+	const auto	left = word.substr ( 0, dash );
+	const auto	right = word.substr ( dash + 1 );
+
+	if ( left.empty () && right.empty () )
+		return std::nullopt;
+
+	if ( ! left.empty () && ! number ( left, from ) )
+		return std::nullopt;
+
+	if ( ! right.empty () && ! number ( right, to ) )
+		return std::nullopt;
+
+	return intRange { from, to };
+}
+//-----------------------------------------------------------------------------
+
+// a and b differ by at most one wrong, missing, extra or swapped letter
+static bool withinOneEdit ( std::string_view a, std::string_view b )
+{
+	if ( a.size () == b.size () )
+	{
+		size_t	i = 0;
+		while ( i < a.size () && a[ i ] == b[ i ] )
+			++i;
+
+		if ( i == a.size () || a.substr ( i + 1 ) == b.substr ( i + 1 ) )
+			return true;
+
+		return i + 1 < a.size () && a[ i ] == b[ i + 1 ] && a[ i + 1 ] == b[ i ] && a.substr ( i + 2 ) == b.substr ( i + 2 );
+	}
+
+	if ( a.size () + 1 == b.size () )
+		std::swap ( a, b );
+
+	if ( a.size () != b.size () + 1 )
+		return false;
+
+	size_t	i = 0;
+	while ( i < b.size () && a[ i ] == b[ i ] )
+		++i;
+
+	return a.substr ( i + 1 ) == b.substr ( i );
+}
+//-----------------------------------------------------------------------------
+
+struct textHit
+{
+	size_t	pos;
+	size_t	len;
+};
+
+// Where field holds text with at most one edit; one edit leaves one of the
+// three pieces intact, so only their exact hits get the full check
+static std::optional<textHit> fuzzyFind ( const std::string_view field, const std::string_view text )
+{
+	const auto	m = text.size ();
+	const auto	k = m / 2;
+
+	const auto	fromPiece = [ & ] ( const size_t a, const size_t b ) -> std::optional<textHit>
+	{
+		const auto	piece = text.substr ( a, b - a );
+
+		for ( auto p = field.find ( piece ); p != std::string_view::npos; p = field.find ( piece, p + 1 ) )
+			for ( auto s = ptrdiff_t ( p ) - ptrdiff_t ( a ) - 1; s <= ptrdiff_t ( p - a ) + 1; ++s )
+			{
+				if ( s < 0 )
+					continue;
+
+				for ( auto len = m - 1; len <= m + 1; ++len )
+					if ( size_t ( s ) + len <= field.size () && withinOneEdit ( field.substr ( size_t ( s ), len ), text ) )
+						return textHit { size_t ( s ), len };
+			}
+
+		return std::nullopt;
+	};
+
+	if ( const auto hit = fromPiece ( 0, k ) )
+		return hit;
+
+	if ( const auto hit = fromPiece ( k, m ) )
+		return hit;
+
+	return fromPiece ( k + 1, m );
 }
 //-----------------------------------------------------------------------------
 
 // The release year must be known to lie inside the range, "198?" is not in "1987"
-static bool isInYearRange ( const std::string_view release, const yearRange range )
+static bool isInYearRange ( const std::string_view release, const intRange range )
 {
 	auto	lo = 0;
 	auto	hi = 0;
@@ -188,36 +310,106 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		std::string							text;
 	};
 
-	static constexpr std::pair<const char*, std::string_view Database::entry::*>	fields[] =
+	// A hit ranks by field, then by the tune having screenshots, then by how
+	// much of the field the word covers: the whole field, a word start, anywhere
+	struct searchField
 	{
-		{ "name", &Database::entry::searchName },
-		{ "author", &Database::entry::searchAuthor },
-		{ "path", &Database::entry::searchFile },
-		{ "publisher", &Database::entry::searchPublisher },
+		const char*							prefix;
+		std::string_view Database::entry::*	view;
+		int									rank;
 	};
+
+	static constexpr searchField	fields[] =
+	{
+		{ "name", &Database::entry::searchName, 3 },
+		{ "author", &Database::entry::searchAuthor, 2 },
+		{ "publisher", &Database::entry::searchPublisher, 1 },
+		{ "path", &Database::entry::searchFile, 0 },
+	};
+
+	// Words of four letters or more may be one typo off once the exact pass
+	// found nothing
+	constexpr auto	shortestFuzzyWord = 4;
+	auto			fuzzy = false;
+
+	const auto	rankIn = [ &fuzzy ] ( const std::string_view field, const std::string& text, const int fieldRank )
+	{
+		auto	hit = std::optional<textHit> ();
+
+		if ( const auto pos = field.find ( text ); pos != std::string_view::npos )
+			hit = textHit { pos, text.size () };
+		else if ( fuzzy && text.size () >= shortestFuzzyWord )
+			hit = fuzzyFind ( field, text );
+
+		if ( ! hit )
+			return 0;
+
+		const auto	cover = hit->len == field.size () ? 3 : hit->pos == 0 || field[ hit->pos - 1 ] == ' ' ? 2 : 1;
+
+		return fieldRank * 8 + cover;
+	};
+
+	constexpr auto	pictureRank = 4;
 
 	// Folds like the fields, code points beyond the sorting table are dropped
 	const auto	foldWord = [] ( const juce::String& word )
 	{
-		std::string	folded;
+		std::string	latin;
 
 		for ( const auto cp : word )
 			if ( cp < 256 )
-				if ( const auto f = searchChar ( char ( sortingLut[ cp ] ) ) )
-					folded += f;
+				latin += char ( cp );
+
+		std::string	folded ( latin.size (), '\0' );
+		folded.resize ( db::foldSearch ( latin, folded.data () ) );
 
 		return folded;
 	};
 
-	std::vector<searchTerm>		terms;
-	std::optional<yearRange>	yearFilter;
+	// "has:" asks whether any subtune or attachment carries it, "is:" states a
+	// fact about the file; an unknown value is ignored
+	static constexpr std::pair<const char*, bool ( * ) ( const Database::entry& )>	keywords[] =
+	{
+		{ "has:digi", [] ( const Database::entry& e ) { return e.hasAnyDigi (); } },
+		{ "has:filter", [] ( const Database::entry& e ) { return e.hasAnyFilter (); } },
+		{ "has:oneshot", [] ( const Database::entry& e ) { return e.hasAnyOneShot (); } },
+		{ "is:pal", [] ( const Database::entry& e ) { return e.isPAL (); } },
+		{ "is:ntsc", [] ( const Database::entry& e ) { return e.isNTSC (); } },
+		{ "is:6581", [] ( const Database::entry& e ) { return ( e.chipModels () & 1 ) != 0; } },
+		{ "is:8580", [] ( const Database::entry& e ) { return ( e.chipModels () & 2 ) != 0; } },
+	};
+
+	std::vector<searchTerm>								terms;
+	std::vector<bool ( * ) ( const Database::entry& )>	tests;
+	std::optional<intRange>	yearFilter;
+	std::optional<intRange>	sidFilter;
+	auto						mustHaveScreenshots = false;
 
 	for ( const auto& word : words )
 	{
 		const auto	quoted = word.startsWithChar ( '"' );
+
+		if ( ! quoted && word.startsWith ( "sids:" ) )
+		{
+			if ( const auto range = parseSidRange ( word.substring ( 5 ).toStdString () ) )
+				sidFilter = range;
+
+			continue;
+		}
+
+		if ( ! quoted && ( word.startsWith ( "has:" ) || word.startsWith ( "is:" ) ) )
+		{
+			if ( word == "has:screenshot" || word == "has:screenshots" )
+				mustHaveScreenshots = true;
+			else if ( const auto k = std::ranges::find_if ( keywords, [ &word ] ( const auto& kw ) { return word == kw.first; } ); k != std::end ( keywords ) )
+				tests.push_back ( k->second );
+
+			continue;
+		}
+
 		const auto	colon = quoted ? -1 : word.indexOfChar ( ':' );
 		const auto	prefix = colon > 0 ? word.substring ( 0, colon ) : juce::String ();
-		const auto	known = std::ranges::find_if ( fields, [ &prefix ] ( const auto& f ) { return prefix == f.first; } );
+		const auto	known = std::ranges::find_if ( fields, [ &prefix ] ( const auto& f ) { return prefix == f.prefix; } );
 		const auto	isYear = prefix == "year";
 		const auto	typed = ( known != std::end ( fields ) || isYear ? word.substring ( colon + 1 ) : word ).unquoted ();
 		const auto	text = typed.toStdString ();
@@ -239,7 +431,7 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		}
 
 		if ( auto folded = foldWord ( typed ); ! folded.empty () )
-			terms.push_back ( { known != std::end ( fields ) ? known->second : nullptr, std::move ( folded ) } );
+			terms.push_back ( { known != std::end ( fields ) ? known->view : nullptr, std::move ( folded ) } );
 	}
 
 	// Check if all options are false
@@ -254,6 +446,7 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		rowData = database;
 		rowData.insert ( rowData.end (), userDatabase.begin (), userDatabase.end () );
 		unsorted = rowData;
+		closeMatch = false;
 
 		updateContent ();
 		getHeader ().reSortTable ();
@@ -261,19 +454,29 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		return int ( rowData.size () );
 	}
 
+	const juce::SharedResourcePointer<ScreenshotLookup>	screenshots;
+
 	// Same search as previous one
-	if ( searchPattern == oldPattern && ! std::memcmp ( (const void*)&oldOptions, (const void*)&options, sizeof ( searchOptions ) ) && ! rowData.empty () )
+	if ( searchPattern == oldPattern && ! std::memcmp ( (const void*)&oldOptions, (const void*)&options, sizeof ( searchOptions ) )
+		 && searchScreenshots == screenshots->getGeneration () && ! rowData.empty () )
 		return int ( rowData.size () );
 
 	// New search
 	rowData.clear ();
+	searchScreenshots = screenshots->getGeneration ();
 
 	const juce::SharedResourcePointer<Likes>	likes;
 	const juce::SharedResourcePointer<Tags>		tags;
 
-	auto matchesFilter = [ &options, &likes, &tags, yearFilter ] ( const Database::entry* entry ) -> bool
+	auto matchesFilter = [ &options, &likes, &tags, &tests, yearFilter, sidFilter ] ( const Database::entry* entry ) -> bool
 	{
 		if ( yearFilter && ! isInYearRange ( entry->release, *yearFilter ) )
+			return false;
+
+		if ( sidFilter && ( entry->sidCount () < sidFilter->from || entry->sidCount () > sidFilter->to ) )
+			return false;
+
+		if ( ! std::ranges::all_of ( tests, [ entry ] ( const auto test ) { return test ( *entry ); } ) )
 			return false;
 
 		if ( options.mustBeLiked && ! likes->isLiked ( entry->file ) )
@@ -291,34 +494,67 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		return true;
 	};
 
-	auto matchesTerms = [ &terms ] ( const Database::entry* entry ) -> bool
+	// The ranks of every word's best hit added up, nullopt when a word has none
+	auto scoreTerms = [ &terms, &rankIn ] ( const Database::entry* entry ) -> std::optional<int>
 	{
-		const auto	has = [ entry ] ( const searchTerm& term, std::string_view Database::entry::* const field )
-		{
-			return ( entry->*field ).find ( term.text ) != std::string_view::npos;
-		};
+		auto	score = 0;
 
 		for ( const auto& term : terms )
 		{
-			const auto	found = term.field ? has ( term, term.field )
-										  : std::ranges::any_of ( fields, [ & ] ( const auto& f ) { return has ( term, f.second ); } );
+			auto	best = 0;
 
-			if ( ! found )
-				return false;
+			for ( const auto& f : fields )
+				if ( ! term.field || term.field == f.view )
+					best = std::max ( best, rankIn ( entry->*f.view, term.text, f.rank ) );
+
+			if ( ! best )
+				return std::nullopt;
+
+			score += best;
 		}
 
-		return true;
+		return score;
 	};
 
-	// Search in HVSC database
-	for ( auto entry : database )
-		if ( matchesFilter ( entry ) && matchesTerms ( entry ) )
-			rowData.push_back ( entry );
+	// The picture counts once per word so it outranks the summed cover tiers;
+	// the probe comes last so it only runs for rows the text already admitted
+	const auto	pictureScore = pictureRank * std::max ( int ( terms.size () ), 1 );
 
-	// Search in user database
-	for ( auto entry : userDatabase )
-		if ( matchesFilter ( entry ) && matchesTerms ( entry ) )
-			rowData.push_back ( entry );
+	std::vector<std::pair<int, const Database::entry*>>	hits;
+
+	const auto	collect = [ & ] ( const std::vector<const Database::entry*>& entries )
+	{
+		for ( const auto entry : entries )
+			if ( matchesFilter ( entry ) )
+				if ( const auto score = scoreTerms ( entry ) )
+				{
+					const auto	pictured = screenshots->hasScreenshots ( entry->lowerFile );
+
+					if ( pictured || ! mustHaveScreenshots )
+						hits.emplace_back ( *score + ( pictured ? pictureScore : 0 ), entry );
+				}
+	};
+
+	collect ( database );
+	collect ( userDatabase );
+
+	closeMatch = false;
+
+	if ( hits.empty () && std::ranges::any_of ( terms, [] ( const searchTerm& t ) { return t.text.size () >= shortestFuzzyWord; } ) )
+	{
+		fuzzy = true;
+
+		collect ( database );
+		collect ( userDatabase );
+
+		closeMatch = ! hits.empty ();
+	}
+
+	std::ranges::stable_sort ( hits, std::ranges::greater {}, &std::pair<int, const Database::entry*>::first );
+
+	rowData.reserve ( hits.size () );
+	for ( const auto& [ score, entry ] : hits )
+		rowData.push_back ( entry );
 
 	unsorted = rowData;
 	getHeader ().reSortTable ();

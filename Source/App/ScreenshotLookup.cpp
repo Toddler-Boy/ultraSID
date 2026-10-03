@@ -1,7 +1,5 @@
 #include "ScreenshotLookup.h"
 
-#include "std_lime/lime_string_utils.h"
-
 #include "ultra-shared/Config/DataSource.h"
 #include "ultra-shared/Helpers/ImageUtils.h"
 
@@ -98,6 +96,8 @@ void ScreenshotLookup::reload ()
 
 void ScreenshotLookup::rebuildIndex ()
 {
+	++generation;
+
 	tuneFileToArtFiles.clear ();
 	tree.clear ();
 
@@ -148,6 +148,22 @@ std::vector<std::string> ScreenshotLookup::getScreenshots ( const std::string& t
 		return {};
 
 	return scrSht->second;
+}
+//-----------------------------------------------------------------------------
+
+bool ScreenshotLookup::hasScreenshots ( const std::string_view lowerFile ) const
+{
+	static constexpr std::string_view	lowerHvscPrefix = "$hvsc$/";
+
+	if ( ! lowerFile.starts_with ( lowerHvscPrefix ) )
+		return false;
+
+	auto	key = lowerFile.substr ( lowerHvscPrefix.size () );
+	key = key.substr ( 0, key.find_last_of ( '.' ) );
+
+	const juce::CriticalSection::ScopedLockType	csLock ( lutCs );
+
+	return tuneFileToArtFiles.contains ( key );
 }
 //-----------------------------------------------------------------------------
 

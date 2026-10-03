@@ -27,16 +27,7 @@
 	static const juce::String	typeStr[ 4 ] = { "Unknown", "6581", "8580", "Both" };
 	static const juce::String	spokenStr[ 4 ] = { "Unknown", "65 81", "85 80", "Both" };
 
-	auto		sid1Type = ( ent.flags >> 4 ) & 3;
-	const auto	sid2Type = ( ent.flags >> 6 ) & 3;
-	const auto	sid3Type = ( ent.flags >> 8 ) & 3;
-
-	if ( ent.lowerFile.ends_with ( "_2sid.sid" ) || ent.lowerFile.ends_with ( "_3sid.sid" ) )
-		sid1Type |= sid2Type | sid3Type;
-	else if ( sid1Type == 3 )
-		sid1Type = 1;
-
-	return ( spoken ? spokenStr : typeStr )[ sid1Type ];
+	return ( spoken ? spokenStr : typeStr )[ ent.chipModels () ];
 }
 //-----------------------------------------------------------------------------
 

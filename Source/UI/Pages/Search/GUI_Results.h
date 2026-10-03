@@ -27,6 +27,9 @@ public:
 
 	int search ( const juce::String& str, const searchOptions options );
 
+	// The last search found nothing as typed and the rows are one typo off
+	[[ nodiscard ]] bool isCloseMatch () const		{	return closeMatch;	}
+
 	// Which filters still match something in the current results; the search
 	// page disables dead-end filter buttons from this
 	struct filterAvailability
@@ -55,6 +58,8 @@ private:
 
 	juce::String		searchPattern;
 	searchOptions		searchOpts;
+	int					searchScreenshots = -1;		// ScreenshotLookup generation the results are from
+	bool				closeMatch = false;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( GUI_Results )
 };

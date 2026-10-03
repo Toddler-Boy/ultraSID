@@ -159,6 +159,8 @@ search:
   no_results: No results
   result:     "{} result"
   results:    "{} results"
+  close_match:   "{} close match"
+  close_matches: "{} close matches"
 
   tag:
     pioneers:     Pioneers

@@ -39,16 +39,6 @@ constexpr uint8_t sortingLut[ 256 ] =
 	'o', 'n', 'o', 'o', 'o', 'o', 'o', 0xf7, 'o', 'u', 'u', 'u', 'u', 'y', 't', 'y'
 };
 
-// The search form of a folded character: path separators become a space,
-// anything but letters, digits and spaces is dropped (0)
-[[ nodiscard ]] constexpr char searchChar ( const char c )
-{
-	if ( c == '_' || c == '/' )
-		return ' ';
-
-	return ( c >= 'a' && c <= 'z' ) || ( c >= '0' && c <= '9' ) || c == ' ' ? c : 0;
-}
-
 class Database
 {
 public:
@@ -80,8 +70,8 @@ public:
 		std::string_view	lowerFile;		// key fold
 		std::string_view	lowerName;		// sorting fold
 
-		// Sorting fold through searchChar; the path between marker and
-		// extension, the release minus its year
+		// db::foldSearch of the path between marker and extension, the name,
+		// the author and the release minus its year
 		std::string_view	searchFile;
 		std::string_view	searchName;
 		std::string_view	searchAuthor;
@@ -147,6 +137,13 @@ public:
 
 		// A tune that declares both clocks counts as NTSC
 		[[ nodiscard ]] bool isNTSC () const	{	return flags & libsidplayfp::PSID_CLOCK_NTSC;	}
+		[[ nodiscard ]] bool isPAL () const		{	return flags & libsidplayfp::PSID_CLOCK_PAL;	}
+
+		[[ nodiscard ]] int sidCount () const;
+
+		// Bits 1 = 6581, 2 = 8580 over every SID of the tune; a single SID
+		// declaring both counts as 6581
+		[[ nodiscard ]] int chipModels () const;
 
 		[[ nodiscard ]] bool hasAnyFlag ( const int flag ) const;
 		[[ nodiscard ]] bool hasAnyFilter () const			{	return hasAnyFlag ( 1 );		}
@@ -205,6 +202,11 @@ private:
 
 namespace db
 {
+	// The search form of text: the sorting fold with path separators as spaces
+	// and all other punctuation dropped, whole-word roman numerals II to IX as
+	// digits. A null dst only measures; returns the length
+	[[ nodiscard ]] size_t foldSearch ( std::string_view text, char* dst );
+
 	// Looks up filename in the HVSC database first, then the user database
 	[[ nodiscard ]] const Database::entry* findDatabaseEntry ( const std::string& filename );
 

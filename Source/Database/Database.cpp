@@ -21,23 +21,96 @@ static constexpr auto asciiLowerLut = [] {
 } ();
 //-----------------------------------------------------------------------------
 
+// The search form of a folded character: path separators become a space,
+// anything but letters, digits and spaces is dropped (0)
+static constexpr char searchChar ( const char c )
+{
+	if ( c == '_' || c == '/' )
+		return ' ';
+
+	return ( c >= 'a' && c <= 'z' ) || ( c >= '0' && c <= '9' ) || c == ' ' ? c : 0;
+}
+
 static char searchFold ( const char c )
 {
 	return searchChar ( char ( sortingLut[ uint8_t ( c ) ] ) );
 }
 
+size_t db::foldSearch ( const std::string_view text, char* const dst )
+{
+	static constexpr std::pair<std::string_view, char>	numerals[] =
+	{
+		{ "ii", '2' }, { "iii", '3' }, { "iv", '4' }, { "vi", '6' }, { "vii", '7' }, { "viii", '8' }, { "ix", '9' },
+	};
+
+	size_t	n = 0;
+	size_t	wordStart = 0;
+	char	word[ 4 ];
+	auto	wordLen = 0;		// -1 once the word can no longer be a numeral
+
+	const auto	emit = [ & ] ( const char c )
+	{
+		if ( dst )
+			dst[ n ] = c;
+		++n;
+	};
+
+	const auto	endWord = [ & ]
+	{
+		if ( wordLen > 0 )
+			for ( const auto& [ numeral, digit ] : numerals )
+				if ( numeral == std::string_view ( word, size_t ( wordLen ) ) )
+				{
+					n = wordStart;
+					emit ( digit );
+					break;
+				}
+
+		wordLen = 0;
+	};
+
+	for ( const auto c : text )
+	{
+		const auto	f = searchFold ( c );
+		if ( ! f )
+			continue;
+
+		if ( f == ' ' )
+		{
+			endWord ();
+			emit ( ' ' );
+			wordStart = n;
+			continue;
+		}
+
+		if ( wordLen >= 0 )
+		{
+			if ( wordLen < 4 && ( f == 'i' || f == 'v' || f == 'x' ) )
+				word[ wordLen++ ] = f;
+			else
+				wordLen = -1;
+		}
+
+		emit ( f );
+	}
+
+	endWord ();
+
+	return n;
+}
+
 static size_t strippedSize ( const std::string_view s )
 {
-	return size_t ( std::ranges::count_if ( s, [] ( const char c ) { return searchFold ( c ) != 0; } ) );
+	return db::foldSearch ( s, nullptr );
 }
 
 static bool strippedWhole ( const std::string_view s )
 {
-	return std::ranges::all_of ( s, [] ( const char c ) { return searchFold ( c ) == char ( sortingLut[ uint8_t ( c ) ] ); } );
+	return strippedSize ( s ) == s.size () && std::ranges::all_of ( s, [] ( const char c ) { return searchFold ( c ) == char ( sortingLut[ uint8_t ( c ) ] ); } );
 }
 //-----------------------------------------------------------------------------
 
-// A name that searchChar leaves whole is not copied, its search view
+// A name that foldSearch leaves whole is not copied, its search view
 // aliases the sorting fold
 struct foldedViews
 {
@@ -70,9 +143,7 @@ static foldedViews writeFolded ( char*& dst, const std::string_view key, const s
 	{
 		const auto	start = dst;
 
-		for ( const auto c : s )
-			if ( const auto f = searchFold ( c ) )
-				*dst++ = f;
+		dst += db::foldSearch ( s, dst );
 
 		return std::string_view ( start, size_t ( dst - start ) );
 	};
@@ -623,6 +694,45 @@ bool Database::entry::hasAnyFlag ( const int flag ) const
 			return true;
 
 	return false;
+}
+//-----------------------------------------------------------------------------
+
+// A "_Nsid.sid" filename declares N chips
+int Database::entry::sidCount () const
+{
+	const auto	underscore = lowerFile.rfind ( '_' );
+	if ( underscore == std::string_view::npos )
+		return 1;
+
+	auto	digits = lowerFile.substr ( underscore + 1 );
+	if ( ! digits.ends_with ( "sid.sid" ) )
+		return 1;
+
+	digits.remove_suffix ( 7 );
+
+	auto	count = 0;
+	for ( const auto c : digits )
+	{
+		if ( c < '0' || c > '9' )
+			return 1;
+
+		count = count * 10 + ( c - '0' );
+	}
+
+	return std::max ( count, 1 );
+}
+//-----------------------------------------------------------------------------
+
+int Database::entry::chipModels () const
+{
+	const auto	sid1 = ( flags >> 4 ) & 3;
+	const auto	sid2 = ( flags >> 6 ) & 3;
+	const auto	sid3 = ( flags >> 8 ) & 3;
+
+	if ( sidCount () > 1 )
+		return sid1 | sid2 | sid3;
+
+	return sid1 == 3 ? 1 : sid1;
 }
 //-----------------------------------------------------------------------------
 

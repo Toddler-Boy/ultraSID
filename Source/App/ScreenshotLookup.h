@@ -2,9 +2,12 @@
 
 #include <JuceHeader.h>
 
+#include <atomic>
 #include <map>
 #include <set>
 #include <unordered_set>
+
+#include "std_lime/lime_string_utils.h"
 
 //-----------------------------------------------------------------------------
 
@@ -20,6 +23,13 @@ public:
 	void reload ();
 
 	[[ nodiscard ]] std::vector<std::string> getScreenshots ( const std::string& tunename ) const;
+
+	// Takes the key folded like Database::entry::lowerFile, no allocation
+	[[ nodiscard ]] bool hasScreenshots ( std::string_view lowerFile ) const;
+
+	// Changes whenever the set of screenshots does
+	[[ nodiscard ]] int getGeneration () const		{	return generation;	}
+
 	[[ nodiscard ]] std::string getDefaultScreenshot ( const std::string& tunename ) const;
 	[[ nodiscard ]] static int getDefaultScreenshotIndex ( const std::vector<std::string>& screenshots );
 
@@ -64,11 +74,13 @@ private:
 
 	juce::CriticalSection	lutCs;
 
+	std::atomic<int>		generation = 0;
+
 	juce::File				userRoot;
 	std::set<std::string>	names;
 	std::unordered_set<std::string>	userNames;
 
-	std::unordered_map<std::string, std::vector<std::string>>	tuneFileToArtFiles;
+	std::unordered_map<std::string, std::vector<std::string>, lime::str::TransparentHash, std::equal_to<>>	tuneFileToArtFiles;
 	std::map<std::string, listing>								tree;	// lowercase folder path
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR ( ScreenshotLookup )
