@@ -4,6 +4,17 @@
 
 //-----------------------------------------------------------------------------
 
+static bool isDeepSIDPlaylistPage ( const juce::URL& url )
+{
+	if ( ! url.getDomain ().equalsIgnoreCase ( "deepsid.chordian.net" ) )
+		return false;
+
+	const auto	file = url.getParameterNames ().indexOf ( "file" );
+
+	return file >= 0 && url.getParameterValues ()[ file ].startsWith ( "/$" );
+}
+//-----------------------------------------------------------------------------
+
 bool GUI_ultraSID::isInterestedInFileDrag ( const juce::StringArray& files )
 {
 	for ( const auto& f : files )
@@ -38,8 +49,12 @@ bool GUI_ultraSID::isInterestedInTextDrag ( const juce::String& text )
 	const auto	trimmed = text.trim ().toLowerCase ();
 
 	if ( trimmed.startsWith ( "http://" ) || trimmed.startsWith ( "https://" ) )
-		if ( juce::URL ( trimmed ).getDomain ().equalsIgnoreCase ( "csdb.dk" ) )
+	{
+		const auto	url = juce::URL ( text.trim () );
+
+		if ( url.getDomain ().equalsIgnoreCase ( "csdb.dk" ) || isDeepSIDPlaylistPage ( url ) )
 			return true;
+	}
 
 	return textutils::isUrlWithExtension ( text, { ".sid", ".m3u" } );
 }
@@ -48,6 +63,12 @@ bool GUI_ultraSID::isInterestedInTextDrag ( const juce::String& text )
 void GUI_ultraSID::textDropped ( const juce::String& text, int /*x*/, int /*y*/ )
 {
 	const auto	dlURL = juce::URL ( text.trim () );
+
+	if ( isDeepSIDPlaylistPage ( dlURL ) )
+	{
+		downloadDeepSIDPlaylist ( dlURL );
+		return;
+	}
 
 	if ( dlURL.getSubPath ().endsWithIgnoreCase ( ".m3u" ) )
 	{

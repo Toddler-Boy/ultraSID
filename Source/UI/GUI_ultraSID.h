@@ -271,6 +271,9 @@ private:
 	// An M3U becomes a new playlist, a sibling .jpg/.png of the same name its cover
 	void downloadPlaylist ( const juce::URL& dlUrl );
 
+	// A public DeepSID playlist page becomes a new playlist of the entries the database knows
+	void downloadDeepSIDPlaylist ( const juce::URL& pageUrl );
+
 	// Global objects
 	juce::SharedResourcePointer<Icons>			icons;
 	juce::SharedResourcePointer<InstallState>	installState;

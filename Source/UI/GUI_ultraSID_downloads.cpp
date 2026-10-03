@@ -1,3 +1,5 @@
+#include "Config/FilePaths.h"
+#include "Database/Database.h"
 #include "Helpers/Messages.h"
 
 #include "GUI_ultraSID.h"
@@ -123,6 +125,83 @@ void GUI_ultraSID::downloadPlaylist ( const juce::URL& dlUrl )
 		downloadCoverImage ( imported.name, { res.url.withNewSubPath ( base + ".jpg" ).toString ( false ),
 											  res.url.withNewSubPath ( base + ".png" ).toString ( false ) } );
 	} );
+}
+//-----------------------------------------------------------------------------
+
+void GUI_ultraSID::downloadDeepSIDPlaylist ( const juce::URL& pageUrl )
+{
+	const auto	folder = pageUrl.getParameterValues ()[ pageUrl.getParameterNames ().indexOf ( "file" ) ];
+	const auto	apiUrl = juce::URL ( "https://deepsid.chordian.net/php/music.php" ).withParameter ( "folder", folder );
+
+	// The endpoint only answers requests that look like the page's own XHR
+	downloader.startAsyncDownload ( apiUrl, [ this, folder ] ( gin::DownloadManager::DownloadResult res )
+	{
+		if ( ! res.ok )
+		{
+			Z_ERR ( "Download failed HTTP/" << res.httpCode << " for " << res.url.toString ( true ) );
+			return;
+		}
+
+		const auto	json = juce::JSON::parse ( res.data.toString () );
+		const auto*	fileArray = json.getProperty ( "files", {} ).getArray ();
+
+		if ( ! fileArray )
+		{
+			Z_ERR ( "Not a DeepSID playlist: " << res.url.toString ( true ) );
+			return;
+		}
+
+		// DeepSID has no manual order, its page sorts by renamed title, else by path
+		auto	files = *fileArray;
+
+		std::ranges::stable_sort ( files, [] ( const juce::var& a, const juce::var& b )
+		{
+			const auto	title = [] ( const juce::var& f )
+			{
+				const auto	renamed = f[ "substname" ].toString ();
+				return ( renamed.isNotEmpty () ? renamed : f[ "filename" ].toString () ).toLowerCase ();
+			};
+
+			return title ( a ) < title ( b );
+		} );
+
+		const auto	name = folder.trimCharactersAtStart ( "/$" );
+		const auto	hvsc = filepaths::markerFor ( filepaths::root::hvsc );
+
+		juce::String	m3u = "#EXTM3U\n#PLAYLIST:" + name + "\n\n";
+		int				known = 0;
+
+		for ( const auto& file : files )
+		{
+			// "_High Voltage SID Collection/MUSICIANS/..." -> "$HVSC$/MUSICIANS/..."
+			const auto	key = hvsc + file[ "filename" ].toString ().fromFirstOccurrenceOf ( "/", true, false );
+			const auto*	dbEnt = db::findDatabaseEntry ( key.toStdString () );
+
+			if ( ! dbEnt )
+				continue;
+
+			m3u += key;
+
+			if ( const int subtune = file[ "startsubtune" ]; subtune > 0 && subtune != dbEnt->startTune )
+				m3u += "," + juce::String ( subtune );
+
+			m3u += "\n";
+			++known;
+		}
+
+		if ( known < files.size () )
+			Z_LOG ( "DeepSID playlist \"" << name << "\": " << files.size () - known << " of " << files.size () << " entries are not in the database" );
+
+		if ( ! known )
+			return;
+
+		const auto	imported = playlists->importPlaylist ( name, m3u );
+
+		if ( imported.created )
+			msg::PlaylistNew { imported.name }.send ();
+
+		msg::ShowPlaylist { imported.name }.send ();
+	}, nullptr, "X-Requested-With: XMLHttpRequest" );
 }
 //-----------------------------------------------------------------------------
 
