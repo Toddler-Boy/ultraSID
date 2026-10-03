@@ -181,19 +181,32 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	searchPattern = words.joinIntoString ( " " );
 	searchOpts = options;
 
-	// A word matches the whole search line unless a prefix limits it to one field
+	// A word matches any search field unless a prefix limits it to one
 	struct searchTerm
 	{
-		std::string_view Database::entry::*	field;
+		std::string_view Database::entry::*	field;		// null: any field
 		std::string							text;
 	};
 
 	static constexpr std::pair<const char*, std::string_view Database::entry::*>	fields[] =
 	{
-		{ "name", &Database::entry::lowerName },
-		{ "author", &Database::entry::lowerAuthor },
-		{ "path", &Database::entry::lowerFile },
-		{ "publisher", &Database::entry::lowerPublisher },
+		{ "name", &Database::entry::searchName },
+		{ "author", &Database::entry::searchAuthor },
+		{ "path", &Database::entry::searchFile },
+		{ "publisher", &Database::entry::searchPublisher },
+	};
+
+	// Folds like the fields, code points beyond the sorting table are dropped
+	const auto	foldWord = [] ( const juce::String& word )
+	{
+		std::string	folded;
+
+		for ( const auto cp : word )
+			if ( cp < 256 )
+				if ( const auto f = searchChar ( char ( sortingLut[ cp ] ) ) )
+					folded += f;
+
+		return folded;
 	};
 
 	std::vector<searchTerm>		terms;
@@ -206,7 +219,8 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		const auto	prefix = colon > 0 ? word.substring ( 0, colon ) : juce::String ();
 		const auto	known = std::ranges::find_if ( fields, [ &prefix ] ( const auto& f ) { return prefix == f.first; } );
 		const auto	isYear = prefix == "year";
-		const auto	text = ( known != std::end ( fields ) || isYear ? word.substring ( colon + 1 ) : word ).unquoted ().toStdString ();
+		const auto	typed = ( known != std::end ( fields ) || isYear ? word.substring ( colon + 1 ) : word ).unquoted ();
+		const auto	text = typed.toStdString ();
 
 		if ( text.empty () )
 			continue;
@@ -224,7 +238,8 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 				continue;
 		}
 
-		terms.push_back ( { known != std::end ( fields ) ? known->second : &Database::entry::search, text } );
+		if ( auto folded = foldWord ( typed ); ! folded.empty () )
+			terms.push_back ( { known != std::end ( fields ) ? known->second : nullptr, std::move ( folded ) } );
 	}
 
 	// Check if all options are false
@@ -278,9 +293,19 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 
 	auto matchesTerms = [ &terms ] ( const Database::entry* entry ) -> bool
 	{
+		const auto	has = [ entry ] ( const searchTerm& term, std::string_view Database::entry::* const field )
+		{
+			return ( entry->*field ).find ( term.text ) != std::string_view::npos;
+		};
+
 		for ( const auto& term : terms )
-			if ( ( entry->*term.field ).find ( term.text ) == std::string_view::npos )
+		{
+			const auto	found = term.field ? has ( term, term.field )
+										  : std::ranges::any_of ( fields, [ & ] ( const auto& f ) { return has ( term, f.second ); } );
+
+			if ( ! found )
 				return false;
+		}
 
 		return true;
 	};

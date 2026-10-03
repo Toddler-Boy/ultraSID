@@ -21,10 +21,72 @@ static constexpr auto asciiLowerLut = [] {
 } ();
 //-----------------------------------------------------------------------------
 
-static void foldCorpus ( char* const data, const size_t len, const uint8_t* const lut )
+static char searchFold ( const char c )
 {
-	for ( size_t i = 0; i < len; ++i )
-		data[ i ] = char ( lut[ uint8_t ( data[ i ] ) ] );
+	return searchChar ( char ( sortingLut[ uint8_t ( c ) ] ) );
+}
+
+static size_t strippedSize ( const std::string_view s )
+{
+	return size_t ( std::ranges::count_if ( s, [] ( const char c ) { return searchFold ( c ) != 0; } ) );
+}
+
+static bool strippedWhole ( const std::string_view s )
+{
+	return std::ranges::all_of ( s, [] ( const char c ) { return searchFold ( c ) == char ( sortingLut[ uint8_t ( c ) ] ); } );
+}
+//-----------------------------------------------------------------------------
+
+// A name that searchChar leaves whole is not copied, its search view
+// aliases the sorting fold
+struct foldedViews
+{
+	std::string_view	lowerFile;
+	std::string_view	lowerName;
+	std::string_view	searchFile;
+	std::string_view	searchName;
+	std::string_view	searchAuthor;
+	std::string_view	searchPublisher;
+};
+
+static size_t foldedBytes ( const size_t keyLen, const std::string_view path, const std::string_view name, const std::string_view author, const std::string_view publisher )
+{
+	return keyLen + name.size () + strippedSize ( path ) + ( strippedWhole ( name ) ? 0 : strippedSize ( name ) ) + strippedSize ( author ) + strippedSize ( publisher );
+}
+
+static foldedViews writeFolded ( char*& dst, const std::string_view key, const std::string_view path, const std::string_view name, const std::string_view author, const std::string_view publisher )
+{
+	const auto	putFolded = [ &dst ] ( const std::string_view s, const uint8_t* const lut )
+	{
+		const auto	start = dst;
+
+		for ( const auto c : s )
+			*dst++ = char ( lut[ uint8_t ( c ) ] );
+
+		return std::string_view ( start, size_t ( dst - start ) );
+	};
+
+	const auto	putStripped = [ &dst ] ( const std::string_view s )
+	{
+		const auto	start = dst;
+
+		for ( const auto c : s )
+			if ( const auto f = searchFold ( c ) )
+				*dst++ = f;
+
+		return std::string_view ( start, size_t ( dst - start ) );
+	};
+
+	foldedViews	views;
+
+	views.lowerFile = putFolded ( key, asciiLowerLut.data () );
+	views.lowerName = putFolded ( name, sortingLut );
+	views.searchFile = putStripped ( path );
+	views.searchName = strippedWhole ( name ) ? views.lowerName : putStripped ( name );
+	views.searchAuthor = putStripped ( author );
+	views.searchPublisher = putStripped ( publisher );
+
+	return views;
 }
 //-----------------------------------------------------------------------------
 
@@ -104,12 +166,15 @@ int Database::load ( const juce::MemoryBlock& mb )
 		while ( tempNumEntries-- )
 		{
 			const auto	fileLen = size_t ( *tempSrc++ );
+			const auto	path = std::string_view ( (const char*)tempSrc, fileLen );
 			tempSrc += fileLen;
 
-			size_t	textLen = 0;
-			for ( auto i = 0; i < 3; ++i )		// name, author, release
+			std::string_view	texts[ 3 ];		// name, author, release
+			size_t				textLen = 0;
+			for ( auto& text : texts )
 			{
 				const auto	len = size_t ( *tempSrc++ );
+				text = { (const char*)tempSrc, len };
 				tempSrc += len;
 				textLen += len;
 			}
@@ -123,10 +188,9 @@ int Database::load ( const juce::MemoryBlock& mb )
 			if ( numTunes > maxTunesArray )
 				totalSubtunesWithMoreThanMax += ( numTunes - 1 ) * usid::wordsPerSubtune;	// With the pointer in use, the array tail stores the first pair
 
-			// "$HVSC$<path>.sid" + the three text fields; the corpus line
-			// additionally carries its three field separators
+			// "$HVSC$<path>.sid" + the three text fields
 			stringBytes += 6 + fileLen + 4 + textLen;
-			corpusBytes += 6 + fileLen + 4 + textLen + 3;
+			corpusBytes += foldedBytes ( 6 + fileLen + 4, path, texts[ 0 ], texts[ 1 ], releasePublisher ( texts[ 2 ] ) );
 		}
 
 		// One arena for the subtunes of every tune with more than maxTunesArray of them:
@@ -169,23 +233,14 @@ int Database::load ( const juce::MemoryBlock& mb )
 		std::memcpy ( sp, ".sid", 4 );						sp += 4;
 		const auto	keyLen = size_t ( sp - keyStart );
 
-		const auto	nameStart = sp;		put ( sp, name.first, name.second );
-		const auto	authorStart = sp;	put ( sp, author.first, author.second );
-		const auto	releaseStart = sp;	put ( sp, release.first, release.second );
-
-		// The folded line: NUL-separated fields
-		const auto	lineStart = cp;
-		put ( cp, keyStart, keyLen );				*cp++ = 0;
-		const auto	textStart = cp;
-		put ( cp, name.first, name.second );		*cp++ = 0;
-		put ( cp, author.first, author.second );	*cp++ = 0;
-		const auto	publisher = releasePublisher ( { release.first, size_t ( release.second ) } );
-		put ( cp, publisher.data (), publisher.size () );
-
-		foldCorpus ( lineStart, keyLen, asciiLowerLut.data () );
-		foldCorpus ( textStart, size_t ( cp - textStart ), sortingLut );
-
 		const auto	nameLen = size_t ( name.second ), authorLen = size_t ( author.second ), releaseLen = size_t ( release.second );
+
+		const auto	nameStart = sp;		put ( sp, name.first, nameLen );
+		const auto	authorStart = sp;	put ( sp, author.first, authorLen );
+		const auto	releaseStart = sp;	put ( sp, release.first, releaseLen );
+
+		const auto	views = writeFolded ( cp, { keyStart, keyLen }, { path.first, size_t ( path.second ) }, { nameStart, nameLen }, { authorStart, authorLen },
+										  releasePublisher ( { releaseStart, releaseLen } ) );
 
 		auto&	ent = db.emplace ( std::string_view ( keyStart, keyLen ), entry {
 
@@ -194,11 +249,12 @@ int Database::load ( const juce::MemoryBlock& mb )
 			.author = { authorStart, authorLen },
 			.release = { releaseStart, releaseLen },
 
-			.search = { lineStart, size_t ( cp - lineStart ) },
-			.lowerFile = { lineStart, keyLen },
-			.lowerName = { textStart, nameLen },
-			.lowerAuthor = { textStart + nameLen + 1, authorLen },
-			.lowerPublisher = { textStart + nameLen + 1 + authorLen + 1, publisher.size () },
+			.lowerFile = views.lowerFile,
+			.lowerName = views.lowerName,
+			.searchFile = views.searchFile,
+			.searchName = views.searchName,
+			.searchAuthor = views.searchAuthor,
+			.searchPublisher = views.searchPublisher,
 
 			.numTunes = numTunes,
 			.flags = flags,
@@ -456,23 +512,19 @@ void UserDatabase::resolveNames ()
 		const auto	shown = ( tunenames::isPlaceholder ( bck.name ) || counts[ tunenames::folded ( bck.name ) ] > 1 )
 							? tunenames::stemName ( key ) : bck.name;
 
-		// texts: the shown name, then the folded search line in arena layout
-		auto&	t = bck.texts;
-
-		t.clear ();
-		t.reserve ( shown.size () + key.size () + shown.size () + bck.author.size () + bck.release.size () + 3 );
-
 		const auto	publisher = releasePublisher ( bck.release );
 
-		t += shown;
-		const auto	lineOff = t.size ();
-		t += key;			t += '\0';
-		t += shown;			t += '\0';
-		t += bck.author;	t += '\0';
-		t += publisher;
+		auto	path = filepaths::stripLocationMarker ( std::string_view ( key ) );
+		if ( const auto dot = path.rfind ( '.' ); dot != std::string_view::npos )
+			path = path.substr ( 0, dot );
 
-		foldCorpus ( t.data () + lineOff, key.size (), asciiLowerLut.data () );
-		foldCorpus ( t.data () + lineOff + key.size () + 1, t.size () - lineOff - key.size () - 1, sortingLut );
+		auto&	t = bck.texts;
+
+		t = shown;
+		t.resize ( shown.size () + foldedBytes ( key.size (), path, shown, bck.author, publisher ) );
+
+		auto		dst = t.data () + shown.size ();
+		const auto	views = writeFolded ( dst, key, path, shown, bck.author, publisher );
 
 		auto	it = db.find ( std::string_view ( key ) );
 		if ( it == db.end () )
@@ -482,14 +534,14 @@ void UserDatabase::resolveNames ()
 		}
 
 		auto&	ent = it->second;
-		const auto	base = std::string_view ( t );
 
-		ent.name = base.substr ( 0, shown.size () );
-		ent.search = base.substr ( lineOff );
-		ent.lowerFile = base.substr ( lineOff, key.size () );
-		ent.lowerName = base.substr ( lineOff + key.size () + 1, shown.size () );
-		ent.lowerAuthor = base.substr ( lineOff + key.size () + 1 + shown.size () + 1, bck.author.size () );
-		ent.lowerPublisher = base.substr ( t.size () - publisher.size () );
+		ent.name = std::string_view ( t ).substr ( 0, shown.size () );
+		ent.lowerFile = views.lowerFile;
+		ent.lowerName = views.lowerName;
+		ent.searchFile = views.searchFile;
+		ent.searchName = views.searchName;
+		ent.searchAuthor = views.searchAuthor;
+		ent.searchPublisher = views.searchPublisher;
 	}
 }
 //-----------------------------------------------------------------------------

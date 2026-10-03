@@ -39,6 +39,16 @@ constexpr uint8_t sortingLut[ 256 ] =
 	'o', 'n', 'o', 'o', 'o', 'o', 'o', 0xf7, 'o', 'u', 'u', 'u', 'u', 'y', 't', 'y'
 };
 
+// The search form of a folded character: path separators become a space,
+// anything but letters, digits and spaces is dropped (0)
+[[ nodiscard ]] constexpr char searchChar ( const char c )
+{
+	if ( c == '_' || c == '/' )
+		return ' ';
+
+	return ( c >= 'a' && c <= 'z' ) || ( c >= '0' && c <= '9' ) || c == ' ' ? c : 0;
+}
+
 class Database
 {
 public:
@@ -67,14 +77,15 @@ public:
 		std::string_view	author;
 		std::string_view	release;
 
-		// The folded search line "lowerFile NUL lowerName NUL lowerAuthor NUL
-		// lowerPublisher" (the release minus its year), the lower* views are
-		// subviews of it
-		std::string_view	search;
-		std::string_view	lowerFile;
-		std::string_view	lowerName;
-		std::string_view	lowerAuthor;
-		std::string_view	lowerPublisher;
+		std::string_view	lowerFile;		// key fold
+		std::string_view	lowerName;		// sorting fold
+
+		// Sorting fold through searchChar; the path between marker and
+		// extension, the release minus its year
+		std::string_view	searchFile;
+		std::string_view	searchName;
+		std::string_view	searchAuthor;
+		std::string_view	searchPublisher;
 
 		// Interleaved word pairs per subtune, layout in Database/uSIDFormat.h
 		static constexpr int	arraySlots = maxTunesArray * usid::wordsPerSubtune;
@@ -155,8 +166,8 @@ protected:
 
 	std::vector<int16_t>	allSubtuneProperties;
 
-	// The entry views' storage: originals in one arena, folded search lines
-	// in the other. Sized exactly up front, the views never move
+	// The entry views' storage: originals in one arena, folded and search
+	// texts in the other. Sized exactly up front, the views never move
 	std::vector<char>	stringArena;
 	std::vector<char>	searchArena;
 
@@ -180,13 +191,13 @@ private:
 	void resolveNames ();
 
 	// Storage behind one user entry's views: file aliases the map key,
-	// author/release the originals, name/search the texts resolveNames rebuilds
+	// author/release the originals, the rest the texts resolveNames rebuilds
 	struct Backing
 	{
 		std::string	name;		// header original, entries may show a substitute
 		std::string	author;
 		std::string	release;
-		std::string	texts;		// shown name + the folded search line
+		std::string	texts;		// shown name + the folded and search texts
 	};
 	std::unordered_map<std::string, Backing>	backing;
 };
