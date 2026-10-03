@@ -711,9 +711,8 @@ void GUI_CRT::drawRasterBars ( uint8_t* dst, const uint16_t cpuCycles )
 		}
 	};
 
-	// Convert cycles to rasterlines
-	const auto	crtSet = overlay.getSettings ();
-	const auto	cyclesPerLine = crtSet.isNTSC ? 65 : 63;
+	// Convert cycles to rasterlines of the emulated machine, whatever the CRT displays
+	const auto	cyclesPerLine = sidInfoStr.clock == "NTSC" ? 65 : 63;
 	const auto	lineWidth = cyclesPerLine * 8;
 	const auto	fullLines = cpuCycles / cyclesPerLine;
 	const auto	remainder = ( cpuCycles - ( fullLines * cyclesPerLine ) ) * 8;
