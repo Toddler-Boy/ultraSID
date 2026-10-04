@@ -2,6 +2,9 @@
 
 #include <JuceHeader.h>
 
+#include <atomic>
+#include <functional>
+
 #include "std_lime/lime_string_utils.h"
 
 #include "Config/FilePaths.h"
@@ -25,6 +28,21 @@ public:
 	using STIL_tune = std::unordered_map<int, STIL_block>;
 
 	[[ nodiscard ]] std::optional<STIL_block> getSTILEntry ( const std::string& name, const int tune = 0 );
+
+	// A block's NAME, or one of its covers as "Title by Artist (Author)"
+	struct stilLine
+	{
+		int16_t		subtune;		// 0 = the file-level block
+		std::string	shown;			// Latin-1
+		std::string	folded;			// db::foldSearch of shown
+	};
+
+	// Under the lock, for every line of the tune until fn returns false; takes
+	// a pre-folded tune key (Database::entry::lowerFile)
+	void visitSTILLines ( std::string_view lowerFile, const std::function<bool ( const stilLine& )>& fn ) const;
+
+	[[ nodiscard ]] int getSTILGeneration () const	{	return stilGeneration;	}
+
 	[[ nodiscard ]] uint32_t getLengthMs ( std::string_view name, const int tune ) const;
 
 	// Milliseconds of silence before the music starts, 0 = starts right away
@@ -50,9 +68,12 @@ private:
 	void loadLengths ();
 	void loadStarts ();
 	void loadSTIL ();
+	void buildSTILLines ();
 	void loadBugs ();
 
 	mutable juce::CriticalSection	dbLock;
+
+	std::atomic<int>	stilGeneration = 0;
 
 	// Maps tune keys (path past the marker) to per-subtune milliseconds
 	using msMap = std::unordered_map<std::string, std::vector<uint32_t>, lime::str::TransparentHash, std::equal_to<>>;
@@ -61,6 +82,8 @@ private:
 
 	// Maps Folder/Filenames to STIL_tune entries
 	std::unordered_map<std::string, STIL_tune>	stilDB;
+
+	std::unordered_map<std::string, std::vector<stilLine>, lime::str::TransparentHash, std::equal_to<>>	stilLines;
 
 	// Maps filenames to length database
 	msMap	lengthDB;

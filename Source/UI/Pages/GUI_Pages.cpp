@@ -256,12 +256,12 @@ void GUI_Pages::timerUpdate ( const float secondsPassed, uint16_t c64cpuCycles )
 }
 //-----------------------------------------------------------------------------
 
-void GUI_Pages::setPlaying ( const std::string& name, const int playlistPostion )
+void GUI_Pages::setPlaying ( const std::string& name, const int subtune, const int playlistPostion )
 {
 	if ( currentPlaylist )
 		currentPlaylist->setPlayingRow ( playlistPostion );
 
-	search.results.setPlayingName ( playlistPostion < 0 ? name : "" );
+	search.results.setPlayingName ( playlistPostion < 0 ? name : "", subtune );
 }
 //-----------------------------------------------------------------------------
 

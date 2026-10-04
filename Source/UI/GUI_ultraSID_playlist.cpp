@@ -196,7 +196,7 @@ void GUI_ultraSID::updatePlaylistPosition ()
 
 	if ( playQueue->position < 0 )
 	{
-		mainScreen.pages.setPlaying ( "", -1 );
+		mainScreen.pages.setPlaying ( "", 0, -1 );
 		mainScreen.sidebarRight.setTunePlaying ( -1 );
 		return;
 	}
@@ -241,7 +241,7 @@ void GUI_ultraSID::nextPreviousPlaylistItem ( const int delta, const bool manual
 
 	if ( next.stopped )
 	{
-		mainScreen.pages.setPlaying ( "", -1 );
+		mainScreen.pages.setPlaying ( "", 0, -1 );
 		mainScreen.sidebarRight.setTunePlaying ( -1 );
 		return;
 	}
@@ -274,7 +274,7 @@ void GUI_ultraSID::loadTune ( const juce::String& name, const int subtune, const
 		return skipBroken ( "Tune file is gone: " + name );
 
 	// Must fold exactly like the database builds lowerFile (ASCII-only lime toLower)
-	mainScreen.pages.setPlaying ( lime::str::toLower ( name.toStdString () ), _playlistPosition );
+	mainScreen.pages.setPlaying ( lime::str::toLower ( name.toStdString () ), subtune, _playlistPosition );
 	mainScreen.sidebarRight.setTunePlaying ( -1 );
 
 	// A queue advance already computed the logical position, which differs from

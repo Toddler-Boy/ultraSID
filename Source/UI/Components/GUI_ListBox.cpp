@@ -390,15 +390,17 @@ void GUI_ListBox::paintCell ( juce::Graphics& g, int rowNumber, int columnId, in
 							drawTextWithHighlights ( g, font, name, area, hits, nameCol, txtCol, hitCol );
 					}
 
-					// Author
+					// Author, or the subtitle a STIL search row carries instead
 					{
-						const auto	author = stringutils::extendedASCIItoUTF8 ( ent.author );
+						const auto	subtitle = getRowSubtitle ( rowNumber );
+						const auto	line = subtitle.empty () ? ent.author : subtitle;
+						const auto	text = stringutils::extendedASCIItoUTF8 ( line );
 
 						const auto	smlFont = UI::font ( UI::fonts::browser_small );
-						const auto	authWidth = juce::GlyphArrangement::getStringWidth ( smlFont, author );
+						const auto	lineWidth = juce::GlyphArrangement::getStringWidth ( smlFont, text );
 
 						g.setFont ( smlFont );
-						drawTextWithHighlights ( g, smlFont, author, b.removeFromLeft ( authWidth + 4 ), getHighlights ( ent.author, textField::author ), rowIsSelected ? txtCol : col, txtCol, hitCol );
+						drawTextWithHighlights ( g, smlFont, text, b.removeFromLeft ( lineWidth + 4 ), getHighlights ( line, subtitle.empty () ? textField::author : textField::stil ), rowIsSelected ? txtCol : col, txtCol, hitCol );
 					}
 
 					// Tags
@@ -806,8 +808,11 @@ void GUI_ListBox::timerUpdate ( const float secondsPassed )
 			return;
 		}
 
-		// Find row that is currently playing by name
-		if ( rowPlaying < 0 || ! rowData[ rowPlaying ] || rowData[ rowPlaying ]->lowerFile != tunePlaying )
+		// The visible row with the playing subtune, else the first of the file
+		const auto	playsFile = [ this ] ( const int row ) { return rowData[ row ] && rowData[ row ]->lowerFile == tunePlaying; };
+		const auto	playsSubtune = [ this, &playsFile ] ( const int row ) { return playsFile ( row ) && getRealSubtune ( row ) == db::realSubtune ( rowData[ row ], subtunePlaying ); };
+
+		if ( rowPlaying < 0 || ! playsSubtune ( rowPlaying ) )
 		{
 			rowPlaying = -1;
 
@@ -820,14 +825,22 @@ void GUI_ListBox::timerUpdate ( const float secondsPassed )
 			const auto	firstIndex = y / rowH;
 			const auto	lastIndex = std::min ( getNumRows () - 1, firstIndex + numNeeded );
 
+			auto	fileRow = -1;
+
 			for ( auto i = firstIndex; i <= lastIndex; ++i )
 			{
-				if ( rowData[ i ] && rowData[ i ]->lowerFile == tunePlaying )
+				if ( playsSubtune ( i ) )
 				{
 					rowPlaying = i;
 					break;
 				}
+
+				if ( fileRow < 0 && playsFile ( i ) )
+					fileRow = i;
 			}
+
+			if ( rowPlaying < 0 )
+				rowPlaying = fileRow;
 		}
 	}
 
@@ -841,11 +854,12 @@ void GUI_ListBox::timerUpdate ( const float secondsPassed )
 }
 //-------------------------------------------------------------------------------------------------
 
-void GUI_ListBox::setPlayingName ( const std::string& tuneName )
+void GUI_ListBox::setPlayingName ( const std::string& tuneName, const int subtune )
 {
 	const auto	oldRow = rowPlaying;
 
 	tunePlaying = tuneName;
+	subtunePlaying = subtune;
 	rowPlaying = -1;
 	useNameOnly = true;
 

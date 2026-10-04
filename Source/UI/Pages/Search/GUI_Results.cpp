@@ -56,7 +56,10 @@ void GUI_Results::sortOrderChanged ( int newSortColumnId, bool isForwards )
 	if ( sortKeyForColumn ( newSortColumnId ) == db::SortKey::none )
 	{
 		if ( unsorted.size () == rowData.size () )
+		{
 			rowData = unsorted;
+			rowSubtune = unsortedSubtune;
+		}
 
 		return;
 	}
@@ -324,7 +327,8 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		{ "path", &Database::entry::searchFile, 0 },
 	};
 
-	const auto	rankIn = [ this ] ( const std::string_view field, const std::string& text, const int fieldRank )
+	// The cover tier of text in field, 0 when absent
+	const auto	coverOf = [ this ] ( const std::string_view field, const std::string& text )
 	{
 		auto	hit = std::optional<textHit> ();
 
@@ -336,9 +340,14 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		if ( ! hit )
 			return 0;
 
-		const auto	cover = hit->len == field.size () ? 3 : hit->pos == 0 || field[ hit->pos - 1 ] == ' ' ? 2 : 1;
+		return hit->len == field.size () ? 3 : hit->pos == 0 || field[ hit->pos - 1 ] == ' ' ? 2 : 1;
+	};
 
-		return fieldRank * 8 + cover;
+	const auto	rankIn = [ &coverOf ] ( const std::string_view field, const std::string& text, const int fieldRank )
+	{
+		const auto	cover = coverOf ( field, text );
+
+		return cover ? fieldRank * 8 + cover : 0;
 	};
 
 	constexpr auto	pictureRank = 4;
@@ -405,7 +414,8 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		const auto	prefix = colon > 0 ? word.substring ( 0, colon ) : juce::String ();
 		const auto	known = std::ranges::find_if ( fields, [ &prefix ] ( const auto& f ) { return prefix == f.prefix; } );
 		const auto	isYear = prefix == "year";
-		const auto	typed = ( known != std::end ( fields ) || isYear ? word.substring ( colon + 1 ) : word ).unquoted ();
+		const auto	isStil = prefix == "stil";
+		const auto	typed = ( known != std::end ( fields ) || isYear || isStil ? word.substring ( colon + 1 ) : word ).unquoted ();
 		const auto	text = typed.toStdString ();
 
 		if ( text.empty () )
@@ -425,8 +435,10 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		}
 
 		if ( auto folded = foldWord ( typed ); ! folded.empty () )
-			terms.push_back ( { known != std::end ( fields ) ? known->view : nullptr, std::move ( folded ) } );
+			terms.push_back ( { known != std::end ( fields ) ? known->view : nullptr, isStil, std::move ( folded ) } );
 	}
+
+	const auto	stilTerms = std::ranges::count_if ( terms, &searchTerm::stil );
 
 	// Check if all options are false
 	auto isAnyFilterUsed = [] ( const searchOptions& opts ) -> bool
@@ -439,7 +451,10 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	{
 		rowData = database;
 		rowData.insert ( rowData.end (), userDatabase.begin (), userDatabase.end () );
+		rowSubtune.assign ( rowData.size (), 0 );
+		stilRows.clear ();
 		unsorted = rowData;
+		unsortedSubtune = rowSubtune;
 		closeMatch = false;
 
 		updateContent ();
@@ -452,12 +467,15 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 
 	// Same search as previous one
 	if ( searchPattern == oldPattern && ! std::memcmp ( (const void*)&oldOptions, (const void*)&options, sizeof ( searchOptions ) )
-		 && searchScreenshots == screenshots->getGeneration () && ! rowData.empty () )
+		 && searchScreenshots == screenshots->getGeneration () && searchStil == hvscDB->getSTILGeneration () && ! rowData.empty () )
 		return int ( rowData.size () );
 
 	// New search
 	rowData.clear ();
+	rowSubtune.clear ();
+	stilRows.clear ();
 	searchScreenshots = screenshots->getGeneration ();
+	searchStil = hvscDB->getSTILGeneration ();
 
 	const juce::SharedResourcePointer<Likes>	likes;
 	const juce::SharedResourcePointer<Tags>		tags;
@@ -495,6 +513,9 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 
 		for ( const auto& term : terms )
 		{
+			if ( term.stil )
+				continue;
+
 			auto	best = 0;
 
 			for ( const auto& f : fields )
@@ -510,23 +531,85 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		return score;
 	};
 
+	// One row per subtune, from its best line holding every "stil:" word
+	struct stilHit
+	{
+		int16_t		subtune;
+		int			score;
+		std::string	line;
+	};
+
+	auto scoreStil = [ this, &coverOf ] ( const Database::entry* entry )
+	{
+		std::vector<stilHit>	best;
+
+		hvscDB->visitSTILLines ( entry->lowerFile, [ & ] ( const HVSC_database::stilLine& line )
+		{
+			auto	score = 0;
+
+			for ( const auto& term : terms )
+				if ( term.stil )
+				{
+					const auto	cover = coverOf ( line.folded, term.text );
+					if ( ! cover )
+						return true;
+
+					score += cover;
+				}
+
+			const auto	known = std::ranges::find ( best, line.subtune, &stilHit::subtune );
+
+			if ( known == best.end () )
+				best.push_back ( { line.subtune, score, line.shown } );
+			else if ( score > known->score )
+				*known = { line.subtune, score, line.shown };
+
+			return true;
+		} );
+
+		return best;
+	};
+
 	// The picture counts once per word so it outranks the summed cover tiers;
 	// the probe comes last so it only runs for rows the text already admitted
 	const auto	pictureScore = pictureRank * std::max ( int ( terms.size () ), 1 );
 
-	std::vector<std::pair<int, const Database::entry*>>	hits;
+	struct hit
+	{
+		int						score;
+		const Database::entry*	entry;
+		int16_t					subtune;
+		std::string				stil;
+	};
+
+	std::vector<hit>	hits;
 
 	const auto	collect = [ & ] ( const std::vector<const Database::entry*>& entries )
 	{
 		for ( const auto entry : entries )
-			if ( matchesFilter ( entry ) )
-				if ( const auto score = scoreTerms ( entry ) )
-				{
-					const auto	pictured = screenshots->hasScreenshots ( entry->lowerFile );
+		{
+			if ( ! matchesFilter ( entry ) )
+				continue;
 
-					if ( pictured || ! mustHaveScreenshots )
-						hits.emplace_back ( *score + ( pictured ? pictureScore : 0 ), entry );
-				}
+			const auto	score = scoreTerms ( entry );
+			if ( ! score )
+				continue;
+
+			const auto	pictured = screenshots->hasScreenshots ( entry->lowerFile );
+			if ( mustHaveScreenshots && ! pictured )
+				continue;
+
+			const auto	total = *score + ( pictured ? pictureScore : 0 );
+
+			if ( ! stilTerms )
+			{
+				hits.push_back ( { total, entry, 0, {} } );
+				continue;
+			}
+
+			for ( auto& stil : scoreStil ( entry ) )
+				hits.push_back ( { total + stil.score, entry, stil.subtune, std::move ( stil.line ) } );
+		}
 	};
 
 	collect ( database );
@@ -544,16 +627,36 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		closeMatch = ! hits.empty ();
 	}
 
-	std::ranges::stable_sort ( hits, std::ranges::greater {}, &std::pair<int, const Database::entry*>::first );
+	std::ranges::stable_sort ( hits, std::ranges::greater {}, &hit::score );
 
 	rowData.reserve ( hits.size () );
-	for ( const auto& [ score, entry ] : hits )
-		rowData.push_back ( entry );
+	rowSubtune.reserve ( hits.size () );
+
+	for ( auto& h : hits )
+	{
+		rowData.push_back ( h.entry );
+		rowSubtune.push_back ( h.subtune );
+
+		if ( ! h.stil.empty () )
+			stilRows[ { h.entry, h.subtune } ] = std::move ( h.stil );
+	}
 
 	unsorted = rowData;
+	unsortedSubtune = rowSubtune;
 	getHeader ().reSortTable ();
 
 	return int ( rowData.size () );
+}
+//-----------------------------------------------------------------------------
+
+std::string_view GUI_Results::getRowSubtitle ( const int rowNumber ) const
+{
+	if ( stilRows.empty () || ! juce::isPositiveAndBelow ( rowNumber, int ( rowData.size () ) ) )
+		return {};
+
+	const auto	it = stilRows.find ( { rowData[ rowNumber ], rowSubtune.empty () ? 0 : rowSubtune[ rowNumber ] } );
+
+	return it == stilRows.end () ? std::string_view () : std::string_view ( it->second );
 }
 //-----------------------------------------------------------------------------
 
@@ -562,8 +665,10 @@ std::vector<db::textSpan> GUI_Results::getHighlights ( const std::string_view sh
 	if ( terms.empty () || shown.empty () )
 		return {};
 
+	const auto	stil = field == textField::stil;
 	const auto	view = field == textField::name ? &Database::entry::searchName
-					 : field == textField::author ? &Database::entry::searchAuthor : &Database::entry::searchPublisher;
+					 : field == textField::author ? &Database::entry::searchAuthor
+					 : field == textField::publisher ? &Database::entry::searchPublisher : nullptr;
 
 	// The shown text folded the way the fields were, each folded character
 	// knowing where it came from
@@ -581,7 +686,7 @@ std::vector<db::textSpan> GUI_Results::getHighlights ( const std::string_view sh
 
 	for ( const auto& term : terms )
 	{
-		if ( term.field && term.field != view )
+		if ( term.stil != stil || ( term.field && term.field != view ) )
 			continue;
 
 		auto	pos = folded.find ( term.text );
@@ -640,7 +745,7 @@ void GUI_Results::returnKeyPressed ( int lastRowSelected )
 {
 	pages.setCurrentPlaylist ( nullptr );
 	const auto&	file = rowData[ lastRowSelected ]->file;
-	pages.loadTune ( juce::String ( file.data (), file.size () ), 0, "search", -1 );
+	pages.loadTune ( juce::String ( file.data (), file.size () ), rowSubtune.empty () ? 0 : rowSubtune[ lastRowSelected ], "search", -1 );
 }
 //-----------------------------------------------------------------------------
 
@@ -656,10 +761,11 @@ void GUI_Results::cellClicked ( int row, int columnId, const juce::MouseEvent& e
 	const auto	rows = getSelectedRows ();
 	const auto	selectedTunes = getTuneList ( rows, false );
 
-	// A search row is a whole tune, and 0 already means its start song. Tags need the bare key
+	// Tags need the bare key
 	juce::StringArray	tuneKeys;
-	for ( const auto& tune : selectedTunes )
-		tuneKeys.add ( tune + ",0" );
+	for ( auto i = 0; i < rows.size (); ++i )
+		if ( const auto ent = rowData[ rows[ i ] ] )
+			tuneKeys.addIfNotAlreadyThere ( juce::String ( ent->file.data (), ent->file.size () ) + "," + juce::String ( rowSubtune.empty () ? 0 : rowSubtune[ rows[ i ] ] ) );
 
 	// Add to playlist
 	UI::menu_AddToPlaylist ( m, tuneKeys );

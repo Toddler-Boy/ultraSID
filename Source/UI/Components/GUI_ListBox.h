@@ -86,7 +86,7 @@ public:
 	[[ nodiscard ]] static int columnForSortKey ( const db::SortKey key );
 
 	void timerUpdate ( const float secondsPassed );
-	void setPlayingName ( const std::string& tuneName );
+	void setPlayingName ( const std::string& tuneName, const int subtune );
 	void setPlayingRow ( const int rowNumber );
 	[[ nodiscard ]] int getPlayingRow () const	{	return rowPlaying;	}
 	[[ nodiscard ]] const Database::entry* getRow ( const int rowNumber );
@@ -129,9 +129,12 @@ protected:
 	[[ nodiscard ]] virtual int getRowNumber ( const int rowNumber ) const	{	return rowNumber + 1;	}
 
 	// Spans of a row's shown text (the original bytes) to box as search hits
-	enum class textField { name, author, publisher };
+	enum class textField { name, author, publisher, stil };
 
 	[[ nodiscard ]] virtual std::vector<db::textSpan> getHighlights ( const std::string_view /*shown*/, const textField /*field*/ ) const	{	return {};	}
+
+	// Latin-1 text for a row's second line instead of the author, empty for the author
+	[[ nodiscard ]] virtual std::string_view getRowSubtitle ( const int /*rowNumber*/ ) const	{	return {};	}
 
 	// juce::ComponentMovementWatcher, watching this list itself: coming on
 	// screen takes the keyboard focus and defaults to the first row selected
@@ -148,6 +151,7 @@ protected:
 	bool			useNameOnly = false;
 	int				rowPlaying = -1;
 	std::string		tunePlaying;
+	int				subtunePlaying = 0;
 
 	float			animSpeed = 0.0f;
 

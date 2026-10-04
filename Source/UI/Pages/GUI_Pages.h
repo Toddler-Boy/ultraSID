@@ -61,7 +61,7 @@ public:
 		return items ? items->getEntries () : noEntries;
 	}
 
-	void setPlaying ( const std::string& name, const int playlistPostion );
+	void setPlaying ( const std::string& name, const int subtune, const int playlistPostion );
 
 	void loadTune ( const juce::String&, const int subtune, const juce::String& src, const int playlistPostion );
 

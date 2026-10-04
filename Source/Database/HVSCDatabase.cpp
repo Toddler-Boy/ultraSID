@@ -8,6 +8,7 @@
 
 #include "Config/HVSCSource.h"
 #include "Config/TunePatches.h"
+#include "Database/Database.h"
 #include "Database/SonglengthsParser.h"
 
 //-----------------------------------------------------------------------------
@@ -425,6 +426,123 @@ void HVSC_database::loadSTIL ()
 
 	// Load overrides
 	loadEntries ( datasource::loadText ( "Databases/STIL-addendum.txt" ) );
+
+	buildSTILLines ();
+}
+//-----------------------------------------------------------------------------
+
+// The Latin-1 bytes of a STIL value, minus a parenthesised time range
+static std::string latin1 ( const std::string& utf8 )
+{
+	std::string	out;
+
+	for ( const auto cp : juce::String ( utf8 ) )
+		if ( cp < 256 )
+			out += char ( cp );
+
+	const auto	isTimeChar = [] ( const char c ) { return ( c >= '0' && c <= '9' ) || c == ':' || c == '-' || c == '.' || c == '?' || c == ' '; };
+
+	for ( auto open = out.find ( '(' ); open != std::string::npos; )
+	{
+		const auto	close = out.find ( ')', open );
+		if ( close == std::string::npos )
+			break;
+
+		const auto	inner = std::string_view ( out ).substr ( open + 1, close - open - 1 );
+		if ( inner.empty () || ! std::ranges::all_of ( inner, isTimeChar ) )
+		{
+			open = out.find ( '(', open + 1 );
+			continue;
+		}
+
+		const auto	from = open > 0 && out[ open - 1 ] == ' ' ? open - 1 : open;
+		out.erase ( from, close + 1 - from );
+		open = out.find ( '(', from );
+	}
+
+	return out;
+}
+
+void HVSC_database::buildSTILLines ()
+{
+	stilLines.clear ();
+
+	for ( const auto& [ key, tune ] : stilDB )
+	{
+		auto&	lines = stilLines[ key ];
+
+		for ( const auto& [ number, block ] : tune )
+		{
+			// A TITLE opens a cover line, ARTIST and AUTHOR attach to it
+			std::string	cover;
+			std::string	artist;
+			std::string	author;
+
+			const auto	closeCover = [ & ]
+			{
+				if ( cover.empty () && artist.empty () )
+					return;
+
+				auto	shown = cover;
+
+				if ( ! artist.empty () )
+					shown += ( shown.empty () ? "" : " by " ) + artist;
+
+				if ( ! author.empty () && author != artist )
+					shown += " (" + author + ")";
+
+				lines.push_back ( { int16_t ( number ), shown, {} } );
+				cover.clear ();
+				artist.clear ();
+				author.clear ();
+			};
+
+			for ( const auto& [ field, value ] : block )
+			{
+				if ( field == "TITLE" )
+				{
+					closeCover ();
+					cover = latin1 ( value );
+				}
+				else if ( field == "ARTIST" )
+					artist = latin1 ( value );
+				else if ( field == "AUTHOR" )
+					author = latin1 ( value );
+				else if ( field == "NAME" )
+					lines.push_back ( { int16_t ( number ), latin1 ( value ), {} } );
+			}
+
+			closeCover ();
+		}
+
+		if ( lines.empty () )
+		{
+			stilLines.erase ( key );
+			continue;
+		}
+
+		for ( auto& line : lines )
+		{
+			line.folded.resize ( line.shown.size () );
+			line.folded.resize ( db::foldSearch ( line.shown, line.folded.data () ) );
+		}
+	}
+
+	++stilGeneration;
+}
+//-----------------------------------------------------------------------------
+
+void HVSC_database::visitSTILLines ( const std::string_view lowerFile, const std::function<bool ( const stilLine& )>& fn ) const
+{
+	const juce::ScopedLock	sl ( dbLock );
+
+	const auto	it = stilLines.find ( filepaths::stripLocationMarker ( lowerFile ) );
+	if ( it == stilLines.end () )
+		return;
+
+	for ( const auto& line : it->second )
+		if ( ! fn ( line ) )
+			return;
 }
 //-----------------------------------------------------------------------------
 

@@ -719,6 +719,9 @@ void GUI_ultraSID::setHVSCRoot ()
 
 		mainScreen.pages.setError ( hvscError );
 
+		// A "stil:" search typed before the STIL arrived
+		mainScreen.pages.search.updateSearch ();
+
 		checkHVSCStatus ();
 
 		msg::HvscCheck {}.send ();
