@@ -7,7 +7,7 @@
 				{ "id": "search/tag/winners", "xd": 5, "properties": { "focusRadius": "tag-button/corner" } },
 				{ "id": "search/tag/gems", "xd": 5, "properties": { "focusRadius": "tag-button/corner" } },
 				{ "id": "search/tag/liked", "xd": 5, "properties": { "focusRadius": "tag-button/corner" } },
-				{ "id": "info", "x": "getX('searchBar') + getH('searchBar') / 2", "y": "prevB + bentoGap * 2", "r": "getR('searchBar') - getH('searchBar') / 2", "h": 12 },
+				{ "id": "info", "x": "getX('searchBar') + bentoGap", "y": "prevB + bentoGap", "r": "getR('searchBar') - bentoGap", "h": 12 },
 
 				{ "id": "results", "x": "bentoGap", "y": "prevB + bentoGap", "r": "parW - bentoGap", "b": "parH" }
 			]
