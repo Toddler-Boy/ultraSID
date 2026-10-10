@@ -22,6 +22,7 @@ namespace UI
 	void menu_Shuffle ( juce::PopupMenu& m, const juce::String& plName );
 
 	void menu_GoToFolder ( juce::PopupMenu& m, const juce::String& folder );
+	void menu_FindSimilar ( juce::PopupMenu& m, const juce::StringArray& tunes );
 	void menu_ExportTrack ( juce::PopupMenu& m, const juce::StringArray& tunes );
 	void menu_ExportPlaylist ( juce::PopupMenu& m, const juce::String& plName );
 

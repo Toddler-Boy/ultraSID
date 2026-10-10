@@ -253,6 +253,7 @@ void GUI_HistoryItems::cellClicked ( int row, int columnId, const juce::MouseEve
 	// Go to artist
 	m.addSeparator ();
 	UI::menu_GoToFolder ( m, tuneFolder );
+	UI::menu_FindSimilar ( m, selectedTunes );
 
 	// Export track
 	m.addSeparator ();

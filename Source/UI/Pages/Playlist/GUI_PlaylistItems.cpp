@@ -168,6 +168,7 @@ void GUI_PlaylistItems::cellClicked ( int row, int columnId, const juce::MouseEv
 	m.addSeparator ();
 
 	UI::menu_GoToFolder ( m, getTuneFolder ( rows ) );
+	UI::menu_FindSimilar ( m, selectedTunes );
 
 	m.addSeparator ();
 

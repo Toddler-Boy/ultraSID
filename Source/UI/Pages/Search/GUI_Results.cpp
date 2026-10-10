@@ -8,8 +8,10 @@
 #include "ultra-shared/UI/UI_Helpers.h"
 
 #include "App/ScreenshotLookup.h"
+#include "Config/FilePaths.h"
 #include "Data/Likes.h"
 #include "Data/Tags.h"
+#include "Database/Similarity.h"
 #include "UI/UI_Menus.h"
 
 #include "../GUI_Pages.h"
@@ -387,10 +389,17 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	std::optional<intRange>								yearFilter;
 	std::optional<intRange>								sidFilter;
 	auto												mustHaveScreenshots = false;
+	juce::String										similarTo;
 
 	for ( const auto& word : words )
 	{
 		const auto	quoted = word.startsWithChar ( '"' );
+
+		if ( ! quoted && word.startsWith ( "similar:" ) )
+		{
+			similarTo = word.substring ( 8 );
+			continue;
+		}
 
 		if ( ! quoted && word.startsWith ( "sids:" ) )
 		{
@@ -612,12 +621,57 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 		}
 	};
 
-	collect ( database );
-	collect ( userDatabase );
+	// "similar:path[,subtune]" lists the closest tunes first, every other word still filters
+	const auto	collectSimilar = [ & ]
+	{
+		constexpr auto	maxSimilar = 50;
+
+		const juce::SharedResourcePointer<Similarity>	similarity;
+
+		const auto	key = juce::String ( filepaths::hvscMarker.data (), filepaths::hvscMarker.size () ).toLowerCase ()
+						  + similarTo.upToLastOccurrenceOf ( ",", false, false );
+		const auto	subtune = similarTo.containsChar ( ',' ) ? similarTo.fromLastOccurrenceOf ( ",", false, false ).getIntValue () : 0;
+
+		// Songlengths stops at 256 subtunes, 0 = unknown
+		const auto	lengthMs = [ this ] ( const Similarity::match& m )
+		{
+			return m.subtune <= 256 ? hvscDB->getLengthMs ( m.entry->file, m.subtune ) : 0u;
+		};
+
+		// Keeps jingles and sound effects out of a song's matches, unknown lengths pass
+		const auto	similarLength = [ &lengthMs ] ( const Similarity::match& seed, const Similarity::match& candidate )
+		{
+			constexpr auto	lengthFactor = 3u;
+
+			const auto	a = lengthMs ( seed );
+			const auto	b = lengthMs ( candidate );
+
+			return ! a || ! b || a <= b * lengthFactor;
+		};
+
+		const auto	matches = similarity->find ( key.toStdString (), subtune, maxSimilar, [ & ] ( const Similarity::match& seed, const Similarity::match& candidate )
+		{
+			const auto&	entry = *candidate.entry;
+
+			return matchesFilter ( &entry ) && scoreTerms ( &entry ) && ( ! mustHaveScreenshots || screenshots->hasScreenshots ( entry.lowerFile ) )
+				   && similarLength ( seed, candidate );
+		} );
+
+		for ( auto i = 0; i < int ( matches.size () ); ++i )
+			hits.push_back ( { int ( matches.size () ) - i, matches[ i ].entry, int16_t ( matches[ i ].subtune ), {} } );
+	};
+
+	if ( similarTo.isNotEmpty () )
+		collectSimilar ();
+	else
+	{
+		collect ( database );
+		collect ( userDatabase );
+	}
 
 	closeMatch = false;
 
-	if ( hits.empty () && std::ranges::any_of ( terms, [] ( const searchTerm& t ) { return t.text.size () >= shortestFuzzyWord; } ) )
+	if ( hits.empty () && similarTo.isEmpty () && std::ranges::any_of ( terms, [] ( const searchTerm& t ) { return t.text.size () >= shortestFuzzyWord; } ) )
 	{
 		fuzzy = true;
 
@@ -773,6 +827,7 @@ void GUI_Results::cellClicked ( int row, int columnId, const juce::MouseEvent& e
 	// Go to artist
 	m.addSeparator ();
 	UI::menu_GoToFolder ( m, getTuneFolder ( rows ) );
+	UI::menu_FindSimilar ( m, getTuneList ( rows ) );
 
 	// Export track
 	m.addSeparator ();

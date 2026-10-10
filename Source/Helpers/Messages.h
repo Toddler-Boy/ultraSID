@@ -170,6 +170,18 @@ struct GoToFolder
 	void send () const	{	msg::send ( *this );	}
 };
 
+// tune = "tuneKey" or "tuneKey,subtune"
+struct FindSimilar
+{
+	juce::String	tune;
+
+	static constexpr auto	verb = "findSimilar";
+	[[ nodiscard ]] juce::String encode () const							{	return juce::String ( verb ) + " " + quoted ( tune );	}
+	[[ nodiscard ]] static FindSimilar decode ( const juce::StringArray& p )	{	return { p[ 0 ] };	}
+
+	void send () const	{	msg::send ( *this );	}
+};
+
 struct SetCRTPage
 {
 	int	page = 0;

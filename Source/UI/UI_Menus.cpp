@@ -11,6 +11,7 @@
 #include "Config/FilePaths.h"
 #include "Data/Playlists.h"
 #include "Data/Tags.h"
+#include "Database/Similarity.h"
 #include "Helpers/Messages.h"
 
 //-----------------------------------------------------------------------------
@@ -291,6 +292,23 @@ void UI::menu_GoToFolder ( juce::PopupMenu& m, const juce::String& folder )
 		msg::GoToFolder { folder }.send ();
 
 	} ).setEnabled ( folder.isNotEmpty () ) );
+}
+//-----------------------------------------------------------------------------
+
+void UI::menu_FindSimilar ( juce::PopupMenu& m, const juce::StringArray& tunes )
+{
+	const juce::SharedResourcePointer<Strings>		strings;
+	const juce::SharedResourcePointer<Icons>		icons;
+	const juce::SharedResourcePointer<Similarity>	similarity;
+
+	const auto	tune = tunes.size () == 1 ? tunes[ 0 ] : juce::String ();
+	const auto	entry = tune.isEmpty () ? nullptr : db::findDatabaseEntry ( tune.upToLastOccurrenceOf ( ",", false, false ).toStdString () );
+
+	m.addItem ( UI::newMenuItem ( strings->get ( "menu/find_similar" ), icons->get ( "menu/find_similar" ), [ tune ]
+	{
+		msg::FindSimilar { tune }.send ();
+
+	} ).setEnabled ( entry && similarity->contains ( *entry ) ) );
 }
 //-----------------------------------------------------------------------------
 

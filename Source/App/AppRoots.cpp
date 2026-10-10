@@ -106,6 +106,9 @@ void AppRoots::loadDatabase ( SIDPlayer& player )
 	if ( installState->database.versionInstalled <= 0 )
 		Z_ERR ( "The tune database (ultraSID.db) is unreadable, the browser stays empty" );
 
+	if ( similarity->load ( datasource::loadData ( "Databases/similarity.bin" ), *database ) == 0 )
+		Z_ERR ( "The similarity vectors (similarity.bin) are unreadable, Find similar stays disabled" );
+
 	database->applyOverrides ( player.getAllTuneOverrides () );
 }
 //-----------------------------------------------------------------------------

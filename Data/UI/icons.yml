@@ -21,6 +21,7 @@ menu:
   remove_duplicates: tabler/copy-minus
   shuffle:           shuffle
   go_to_folder:      font-awesome/folder-open-solid-full
+  find_similar:      tabler/sparkles-2
   export_tune:       font-awesome/arrow-up-right-from-square-solid-full
   requeue_export:    font-awesome/arrow-down-solid-full
   clear_older:       font-awesome/clock-rotate-left-solid-full

@@ -95,6 +95,7 @@ menu:
   delete_playlist:      Delete playlist
   delete_cover:         Delete cover-image
   go_to_folder:         Go to folder
+  find_similar:         Find similar tunes
   toggle_tag:           Toggle tag
   export_tune:          Export tune
   export_tunes:         Export tunes

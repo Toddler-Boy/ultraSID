@@ -116,6 +116,9 @@ void GUI_STIL_ListView::cellClicked ( int row, int column, const juce::MouseEven
 
 	UI::menu_AddToPlaylist ( m, selectedTunes );
 
+	m.addSeparator ();
+	UI::menu_FindSimilar ( m, selectedTunes );
+
 	// Export track
 	m.addSeparator ();
 	UI::menu_ExportTrack ( m, selectedTunes );

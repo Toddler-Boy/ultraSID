@@ -6,6 +6,7 @@
 #include "App/SharedProfiles.h"
 #include "Database/Database.h"
 #include "Database/HVSCDatabase.h"
+#include "Database/Similarity.h"
 
 class SIDPlayer;
 
@@ -39,7 +40,7 @@ public:
 
 	void loadROMs ( SIDPlayer& player );
 
-	// Load ultraSID.db, apply tune overrides, publish versions to InstallState
+	// Load ultraSID.db and the similarity vectors, apply tune overrides, publish versions to InstallState
 	void loadDatabase ( SIDPlayer& player );
 
 	// Parse sidid.cfg into a fresh shared player config, keeping the already
@@ -59,6 +60,7 @@ private:
 
 	juce::SharedResourcePointer<HVSC_database>		hvscDatabase;
 	juce::SharedResourcePointer<Database>			database;
+	juce::SharedResourcePointer<Similarity>			similarity;
 	juce::SharedResourcePointer<InstallState>		installState;
 	juce::SharedResourcePointer<SharedProfiles>		profiles;
 };

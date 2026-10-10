@@ -97,6 +97,7 @@ void GUI_ultraSID::registerNavigationActions ()
 	} );
 
 	router.on<msg::GoToFolder> ( [ this ] ( const auto& e )		{	mainScreen.pages.setSearch ( e.folder, true );	} );
+	router.on<msg::FindSimilar> ( [ this ] ( const auto& e )	{	mainScreen.pages.setSearch ( "similar:" + filepaths::stripLocationMarker ( e.tune.toStdString () ), true );	} );
 	router.on<msg::SetCRTPage> ( [ this ] ( const auto& e )		{	mainScreen.pages.loadGameArtwork ( e.page );	} );
 
 	router.on<msg::SetLocation> ( [ this ] ( const auto& e )

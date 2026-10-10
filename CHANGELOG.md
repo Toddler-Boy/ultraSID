@@ -2,6 +2,19 @@
 
 Headline changes only: small fixes and internal work are not listed.
 
+## 85.3.1 (2026-10-03)
+
+- Search got a lot smarter: "hero" finds H.E.R.O., "turrican 2" finds Turrican II, a
+  typo still finds the tune, results come in relevance order with the matched text
+  highlighted, and has:digi, has:screenshot, is:ntsc, is:6581 or sids:2 narrow the
+  list by what a tune is.
+- stil: searches the STIL: stil:jarre lists every cover of his music, each row pointing
+  at the subtune that plays it.
+- Around 600 screenshots of demo scene productions, and tunes now show their loading
+  screen by default.
+- Drag a public DeepSID playlist link from the browser onto ultraSID and it becomes a
+  playlist, in the order DeepSID shows it.
+
 ## 85.3.0 (2026-09-22)
 
 - The CRT now has a browser and shows any C64 screenshot (320x200 or 384x272).

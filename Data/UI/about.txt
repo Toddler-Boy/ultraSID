@@ -108,6 +108,16 @@ Third-Party Libraries & Open Source Notices:
     Ninja, Yodelking, Wilfred/HVSC, Prof. Chaos and contributors.
 
 
+15. sidflow-data similarity vectors ("Find similar tunes")
+    https://github.com/chrisgleissner/sidflow-data
+    Copyright © 2026 Chris Gleissner
+    GNU General Public License v3.0
+    Modified for ultraSID: converted from the sidcorr-lite-1 bundle,
+    the playroutine dimensions removed.
+    The conversion script is Tools/update_similarity.py in the ultraSID
+    source.
+
+
 --------------------------------------------------
 
 Tune metadata and lengths come from the High Voltage SID Collection
