@@ -390,10 +390,17 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	std::optional<intRange>								sidFilter;
 	auto												mustHaveScreenshots = false;
 	juce::String										similarTo;
+	std::string											location;		// "$user$" or "$hvsc$", the last one wins
 
 	for ( const auto& word : words )
 	{
 		const auto	quoted = word.startsWithChar ( '"' );
+
+		if ( ! quoted && word.length () > 2 && word.startsWithChar ( '$' ) && word.endsWithChar ( '$' ) )
+		{
+			location = word.toStdString ();
+			continue;
+		}
 
 		if ( ! quoted && word.startsWith ( "similar:" ) )
 		{
@@ -489,8 +496,11 @@ int GUI_Results::search ( const juce::String& str, const searchOptions options )
 	const juce::SharedResourcePointer<Likes>	likes;
 	const juce::SharedResourcePointer<Tags>		tags;
 
-	auto matchesFilter = [ &options, &likes, &tags, &tests, yearFilter, sidFilter ] ( const Database::entry* entry ) -> bool
+	auto matchesFilter = [ &options, &likes, &tags, &tests, &location, yearFilter, sidFilter ] ( const Database::entry* entry ) -> bool
 	{
+		if ( ! location.empty () && ! entry->lowerFile.starts_with ( location ) )
+			return false;
+
 		if ( yearFilter && ! isInYearRange ( entry->release, *yearFilter ) )
 			return false;
 
